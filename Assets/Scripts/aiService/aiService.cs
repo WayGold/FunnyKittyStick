@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Agent;
 using MovementOutputs;
 
 public class aiService : MonoBehaviour

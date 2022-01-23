@@ -2,11 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Agent
+public class agent : MonoBehaviour
 {
-    struct agent
+    public Rigidbody rbBody;
+    // Start is called before the first frame update
+    void Start()
     {
-        Rigidbody rBody;
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }
-

@@ -3,35 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using MovementOutputs;
 
-public class aiService : MonoBehaviour
+namespace AIService
 {
-    public aiService(){}
-    // Start is called before the first frame update
-    void Start(){}
-    // Update is called once per frame
-    void Update(){}
+    public static class aiService
+    {
 
-    KinematicSteeringOutput kinematicSeek(Rigidbody characterRB, Rigidbody targetRB, float maxSpeed){
-        KinematicSteeringOutput retVal;
-        float orientation;
+        public static KinematicSteeringOutput kinematicSeek(Rigidbody characterRB, Rigidbody targetRB,
+                                                                float maxSpeed)
+        {
+            KinematicSteeringOutput retVal;
+            float orientation;
 
-        Vector3 seekVec = targetRB.position - characterRB.position;
-        seekVec = Vector3.Normalize(seekVec);
-        seekVec *= maxSpeed;
-        // Ignore rotation on y axis
-        orientation = Mathf.Atan2(seekVec.x, seekVec.z);
+            Vector3 seekVec = targetRB.position - characterRB.position;
+            seekVec = Vector3.Normalize(seekVec);
+            seekVec *= maxSpeed;
 
-        retVal.linearVelocity = seekVec;
-        retVal.rotVelocity = orientation;
+            // Ignore rotation on y axis
+            orientation = Mathf.Atan2(seekVec.x, seekVec.z);
 
-        return retVal;
+            retVal.linearVelocity = seekVec;
+            retVal.rotVelocity = orientation;
+
+            return retVal;
+        }
     }
-
-    // DynamicSteeringOutput dynamicSeek(){
-    //     DynamicSteeringOutput retVal;
-
-
-
-    //     return retVal;
-    // }
 }
+

@@ -3,12 +3,137 @@ guid: d04a058aebd171f48b34c6d8c6c9b218
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BlueDark
+    second: {fileID: 2100000, guid: 29f38aea5bc911e46bae7d3e9abfd2e6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BlueLight
+    second: {fileID: 2100000, guid: 2c2468d6f90be254a9ec96bd4bd09c34, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BlueMiddle
+    second: {fileID: 2100000, guid: 5bd6cb8706fac784e8dd1bd080ebe91b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BrownDark
+    second: {fileID: 2100000, guid: 832182a3e5a31d340b998edd1a458081, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BrownLight
+    second: {fileID: 2100000, guid: 922590f39091bdf44b0303bb77807bfb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BrownMedium
+    second: {fileID: 2100000, guid: d849cd2cf1a36ea449bf2266a8b87f72, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GreenDark
+    second: {fileID: 2100000, guid: aecf3afa29664ae4aa1ba0349369e711, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GreenLight
+    second: {fileID: 2100000, guid: a54d75e278715984bb1f3cec9f475e97, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GreenMIddle
+    second: {fileID: 2100000, guid: 53ac07874168dc74fabc4c26c6ccc4cf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Grey
+    second: {fileID: 2100000, guid: 03374c9981e031241827c10a6f87c109, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GreypurpleMiddle
+    second: {fileID: 2100000, guid: a3869f1a1dbc12e488db33126ae483e4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MagonyDark
+    second: {fileID: 2100000, guid: 8d13ca3c044e2d247a1aac4852aee691, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MagonyLight
+    second: {fileID: 2100000, guid: 0a149857443928b4b85576592ca16d38, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MagonyMiddle
+    second: {fileID: 2100000, guid: e17c230e0d8c3334e810dd4c2126a0d8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalHandle
+    second: {fileID: 2100000, guid: bad88006d4b17a448a85f9673a95fd27, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OcreDark
+    second: {fileID: 2100000, guid: 21b066e1cd5b5b94cbcc20f726cb5746, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OcreLight
+    second: {fileID: 2100000, guid: 3db8a8303f788ee46b9d6e8fa7631bba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OcreMedium
+    second: {fileID: 2100000, guid: 099edd9e2f3ac974cb53f8b4e1a356cb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OrangeDark
+    second: {fileID: 2100000, guid: d55d7b7a4f57a1949b0d9201e0d1bc58, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OrangeLight
+    second: {fileID: 2100000, guid: 83f2f24f072e2324c9fbff3ff4e29389, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OrangeMedium
+    second: {fileID: 2100000, guid: 4881bf0336e57ac42b453c2910a934ec, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blinn2
+    second: {fileID: 2100000, guid: be1bfa2627399cb42933443425631dfd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert1
+    second: {fileID: 2100000, guid: 6086f7776536bad4aac681aee36e02ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert25
+    second: {fileID: 2100000, guid: 32a616e516d39744f9ffe3c2800a9cfd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: white
+    second: {fileID: 2100000, guid: bcdfc1a50ffc22e438f964465393f096, type: 2}
   materials:
     materialImportMode: 2
-    materialName: 0
+    materialName: 1
     materialSearch: 1
-    materialLocation: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0

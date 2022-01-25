@@ -793,7 +793,7 @@ BoxCollider:
   m_GameObject: {fileID: 7241657715161366820}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -816,8 +816,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5126481629759329719, guid: 4c4df89ded95c594ca8ab7f0dbe58d00, type: 3}
-  - {fileID: 7488959734034726970, guid: 4c4df89ded95c594ca8ab7f0dbe58d00, type: 3}
+  - {fileID: 2100000, guid: 573d32699c8b74a46a2a0fdb38c0dab2, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -915,9 +915,9 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 8255028161511215929, guid: 4c4df89ded95c594ca8ab7f0dbe58d00, type: 3}
-  - {fileID: -2728332429266605417, guid: 4c4df89ded95c594ca8ab7f0dbe58d00, type: 3}
-  - {fileID: -1734466688874716094, guid: 4c4df89ded95c594ca8ab7f0dbe58d00, type: 3}
+  - {fileID: 2100000, guid: ff138e2f7e1a28b458edabb8a447b74a, type: 2}
+  - {fileID: 2100000, guid: f756d7b36d7c4d2479524e00203f2c55, type: 2}
+  - {fileID: 2100000, guid: 573d32699c8b74a46a2a0fdb38c0dab2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

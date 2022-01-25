@@ -467,8 +467,6 @@ MonoBehaviour:
   targetRB: {fileID: 1064040862}
   maxSpeed: 2
   maxRotationSpeed: 1
-  idleRadius: 20
-  maxTargetSpeed: 5
 --- !u!1 &510783600
 GameObject:
   m_ObjectHideFlags: 0

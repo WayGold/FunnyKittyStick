@@ -70,7 +70,7 @@ public class JoyconDemo : MonoBehaviour {
             stick = j.GetStick();
 			if(stick[0]!=0 || stick[1]!=0)
             {
-				transform.Translate(new Vector3(stick[0], stick[1],0 ) * Time.deltaTime * 5, Space.World);
+				transform.Translate(new Vector3(stick[0], 0, stick[1]) * Time.deltaTime * 5, Space.World);
 			}
 
             // Gyro values: x, y, z axis values (in radians per second)

@@ -26,6 +26,17 @@ namespace AIService
 
             return retVal;
         }
+
+        // FIXME
+        public static DynamicSteeringOutput wander()
+        {
+            DynamicSteeringOutput retVal;
+
+            retVal.linearAccel = new Vector3(0, 0, 0);
+            retVal.rotAccel = 0;
+
+            return retVal;
+        }
     }
 }
 

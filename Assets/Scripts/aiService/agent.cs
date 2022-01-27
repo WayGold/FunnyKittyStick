@@ -80,9 +80,10 @@ public class agent : MonoBehaviour
             currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
             // Fix y so the agent don't fly
             currentMovement.linearVelocity.y = 0;
-            // Update Velocity
-            agentRB.velocity = currentMovement.linearVelocity;
         }
+
+        // Update Velocity
+        agentRB.velocity = currentMovement.linearVelocity;
 
         // Check for movement
         if (agentRB.velocity.magnitude != 0)

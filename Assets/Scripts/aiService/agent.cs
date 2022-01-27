@@ -10,42 +10,92 @@ public class agent : MonoBehaviour
     public Rigidbody agentRB;
     public Rigidbody targetRB;
     public float maxSpeed;
-    public float maxRotationSpeed;
+    //public float maxRotationSpeed;
     public float idleRadius;
     public float maxTargetSpeed;
 
+    private Animator _animator;
+    private bool isSit = false;
+    private bool toSeek = false;
+
     // Start is called before the first frame update
-    void Start() { }
+    void Start()
+    {
+        _animator = GetComponent<Animator>();
+        _animator.SetTrigger("StandUp");
+    }
 
     // Update is called once per frame
     void Update()
     {
         KinematicSteeringOutput currentMovement;
+        currentMovement.linearVelocity = new Vector3(0, 0, 0);
+        currentMovement.rotVelocity = 0;
 
+        /* IDLE RANGE - AGENT MOVE NEAR TARGET */
         // Set a radius around the agent determining an idle range
-        // Only head track + orientation matching 
+        // Only head track + orientation matching, no seeking, attack the target
         if (isInRadius(agentRB.position, targetRB.position, idleRadius))
         {
-            currentMovement.linearVelocity = new Vector3(0, 0, 0);
-            currentMovement.rotVelocity = 0;
+            toSeek = false;
+            _animator.SetTrigger("Attack");
         }
+        // OUT OF RANGE - SEEK THE TARGET
         else
-        { currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed); }
+        { toSeek = true; }
 
-        // Fix y so the agent don't fly
-        currentMovement.linearVelocity.y = 0;
-
+        /* NOT FAST TARGET */
         if (!isTooFast(targetRB, maxTargetSpeed))
         {
-            Debug.Log("Not Too Fast With Target Velocity - " + targetRB.velocity);
-            agentRB.velocity = currentMovement.linearVelocity;
+            /* SITTING - Stand up and Seek the target */
+            if (isSit)
+            {
+                isSit = false;
+                _animator.SetTrigger("StandUp");   
+            }
+            toSeek = true;
         }
+        /* FAST TARGET - SIT DOWN UNDER FAR CASE */
+        else
         {
             Debug.Log("Too Fast!");
+            // Sit down - only headtrack + orientation
+            if (!isSit)
+            {
+                _animator.SetTrigger("SitDown");
+                isSit = true;
+                toSeek = false;
+            }
         }
 
-        Quaternion deltaRot = Quaternion.Euler(new Vector3(0, currentMovement.rotVelocity * Mathf.Rad2Deg, 0));
-        agentRB.MoveRotation(deltaRot);
+        // Check for animation state
+        if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Walk_Forward"))
+        {
+            toSeek = false;
+        }
+
+        // SEEK COMMAND VERIFIED
+        if (toSeek)
+        {
+            currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
+            // Fix y so the agent don't fly
+            currentMovement.linearVelocity.y = 0;
+            // Update Velocity
+            agentRB.velocity = currentMovement.linearVelocity;
+        }
+
+        // Check for movement
+        if (agentRB.velocity.magnitude != 0)
+        {
+            _animator.SetBool("IsWalking", true);
+        }
+
+        // Check for orientation changes
+        if (currentMovement.rotVelocity != 0)
+        {
+            Quaternion deltaRot = Quaternion.Euler(new Vector3(0, currentMovement.rotVelocity * Mathf.Rad2Deg, 0));
+            agentRB.MoveRotation(deltaRot);
+        }
     }
 
     bool isInRadius(Vector3 agent, Vector3 target, float radius)

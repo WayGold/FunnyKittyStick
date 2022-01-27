@@ -14,7 +14,15 @@ public class JoyconDemo : MonoBehaviour {
     public Quaternion orientation;
 	public Vector3 rot;
 	public Vector3 velocity;
+	public Vector3 dir;
 
+	public float movingSpeed = 5;
+	public float offsetAngle=-45;
+
+	public Rigidbody fishRigibody;
+	public float pullForce=2500;
+
+	private Transform parentTransform;
     void Start ()
     {
         gyro = new Vector3(0, 0, 0);
@@ -25,6 +33,9 @@ public class JoyconDemo : MonoBehaviour {
 		if (joycons.Count < jc_ind+1){
 			Destroy(gameObject);
 		}
+
+ 		parentTransform = gameObject.GetComponentInParent<Transform>();
+
 	}
 
     // Update is called once per frame
@@ -34,45 +45,43 @@ public class JoyconDemo : MonoBehaviour {
         {
 			Joycon j = joycons [jc_ind];
 			// GetButtonDown checks if a button has been pressed (not held)
-            if (j.GetButtonDown(Joycon.Button.SHOULDER_2))
+            if (j.GetButton(Joycon.Button.SHOULDER_2))
             {
-				Debug.Log ("Shoulder button 2 pressed");
-				// GetStick returns a 2-element vector with x/y joystick components
-				Debug.Log(string.Format("Stick x: {0:N} Stick y: {1:N}",j.GetStick()[0],j.GetStick()[1]));
-            
-				// Joycon has no magnetometer, so it cannot accurately determine its yaw value. Joycon.Recenter allows the user to reset the yaw value.
-				j.Recenter ();
-			}
-			// GetButtonDown checks if a button has been released
-			if (j.GetButtonUp (Joycon.Button.SHOULDER_2))
-			{
-				Debug.Log ("Shoulder button 2 released");
-			}
-			// GetButtonDown checks if a button is currently down (pressed or held)
-			if (j.GetButton (Joycon.Button.SHOULDER_2))
-			{
 				Debug.Log ("Shoulder button 2 held");
+				// GetStick returns a 2-element vector with x/y joystick components
+				transform.Translate(Vector3.down * Time.deltaTime * movingSpeed, Space.World);
+
+			}
+			if(j.GetButton(Joycon.Button.SHOULDER_1))
+            {
+				Debug.Log("Shoulder button 1 held");
+				transform.Translate(Vector3.up * Time.deltaTime * movingSpeed, Space.World);
 			}
 
 			if (j.GetButtonDown (Joycon.Button.DPAD_DOWN)) {
-				Debug.Log ("Rumble");
-
-				// Rumble for 200 milliseconds, with low frequency rumble at 160 Hz and high frequency rumble at 320 Hz. For more information check:
-				// https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/rumble_data_table.md
-
+				Debug.Log ("Recenter");
 				j.SetRumble (160, 320, 0.6f, 200);
-
 				// The last argument (time) in SetRumble is optional. Call it with three arguments to turn it on without telling it when to turn off.
-                // (Useful for dynamically changing rumble values.)
+				// (Useful for dynamically changing rumble values.)
 				// Then call SetRumble(0,0,0) when you want to turn it off.
+
+				Debug.Log(string.Format("Stick x: {0:N} Stick y: {1:N}", j.GetStick()[0], j.GetStick()[1]));
+				// Joycon has no magnetometer, so it cannot accurately determine its yaw value. Joycon.Recenter allows the user to reset the yaw value.
+				j.Recenter();
 			}
 
-            stick = j.GetStick();
+			if (j.GetButtonDown(Joycon.Button.DPAD_RIGHT))
+			{
+				j.SetRumble(160, 320, 0.6f, 200);
+				PullFish();
+			}
+
+			stick = j.GetStick();
 			if(stick[0]!=0 || stick[1]!=0)
             {
-				Vector3 dir = new Vector3(stick[0], 0, stick[1]);
-				dir = transform.TransformDirection(dir);
-				transform.Translate(dir * Time.deltaTime * 5, Space.World);
+				dir = new Vector3(stick[0], 0, stick[1]);
+				dir = Quaternion.AngleAxis(offsetAngle, new Vector3(0,1,0))*dir;
+				transform.Translate(dir * Time.deltaTime * movingSpeed, Space.World);
 			}
 
             // Gyro values: x, y, z axis values (in radians per second)
@@ -84,11 +93,14 @@ public class JoyconDemo : MonoBehaviour {
 
 			rot = orientation.eulerAngles;
 			rot = new Vector3(rot.x, rot.y, rot.z);
-			//gameObject.transform.rotation = orientation;
-			gameObject.transform.localEulerAngles = rot;
 
-			//velocity += accel * Time.deltaTime;
-			//gameObject.transform.position += velocity * Time.deltaTime;
+			gameObject.transform.localEulerAngles = rot;
 		}
     }
+
+	public void PullFish()
+	{
+		fishRigibody.AddForce(0, pullForce * -1, 0);
+		Debug.Log("PullFish");
+	}
 }

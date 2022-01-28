@@ -31,7 +31,7 @@ public class JoyconDemo : MonoBehaviour {
         // get the public Joycon array attached to the JoyconManager in scene
         joycons = JoyconManager.Instance.j;
 		if (joycons.Count < jc_ind+1){
-			Destroy(gameObject);
+			Debug.Log("Joycon not found!");
 		}
 
  		parentTransform = gameObject.GetComponentInParent<Transform>();

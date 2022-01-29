@@ -62,8 +62,12 @@ public class agent : MonoBehaviour
             // Sit down - only headtrack + orientation
             if (!isSit)
             {
+                Debug.Log("Not Sitted!");
                 _animator.SetTrigger("Sit");
                 isSit = true;
+                toSeek = false;
+            }
+            else{
                 toSeek = false;
             }
         }
@@ -88,10 +92,11 @@ public class agent : MonoBehaviour
         agentRB.velocity = currentMovement.linearVelocity;
 
         // Check for movement
-        if (agentRB.velocity.magnitude != 0)
-        {
-            _animator.SetFloat("Speed", agentRB.velocity.magnitude);
-        }
+        // if (agentRB.velocity.magnitude != 0)
+        // {
+        //     _animator.SetFloat("Speed", agentRB.velocity.magnitude);
+        // }
+        _animator.SetFloat("Speed", agentRB.velocity.magnitude);
 
         // Check for orientation changes
         if (currentMovement.rotVelocity != 0)

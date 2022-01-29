@@ -44,7 +44,23 @@ public class CatAnimationController : MonoBehaviour
     {
         _animator.SetFloat("Speed", speed);
     }
-    
+
+    /// <summary>
+    /// Jump up.
+    /// </summary>
+    public void JumpUp()
+    {
+        _animator.SetTrigger("JumpUp");
+    }
+
+    /// <summary>
+    /// Jump forward.
+    /// </summary>
+    public void JumpForward()
+    {
+        _animator.SetTrigger("JumpForward");
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

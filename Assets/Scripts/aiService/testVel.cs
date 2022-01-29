@@ -17,5 +17,9 @@ public class testVel : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.W)){
             myRB.velocity += new Vector3(1, 0, 0);
         }
+
+        if(Input.GetKeyDown(KeyCode.S)){
+            myRB.velocity += new Vector3(-1, 0, 0);
+        }
     }
 }

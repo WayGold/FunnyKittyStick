@@ -74,7 +74,8 @@ public class agent : MonoBehaviour
 
         // Check for animation state
         if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_to") ||
-            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_from"))
+            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_from") ||
+            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_Idle"))
         {
             Debug.Log("Performing Sit Animation");
             toSeek = false;
@@ -90,12 +91,6 @@ public class agent : MonoBehaviour
 
         // Update Velocity
         agentRB.velocity = currentMovement.linearVelocity;
-
-        // Check for movement
-        // if (agentRB.velocity.magnitude != 0)
-        // {
-        //     _animator.SetFloat("Speed", agentRB.velocity.magnitude);
-        // }
         _animator.SetFloat("Speed", agentRB.velocity.magnitude);
 
         // Check for orientation changes

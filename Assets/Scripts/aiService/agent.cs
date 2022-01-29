@@ -22,7 +22,7 @@ public class agent : MonoBehaviour
     void Start()
     {
         _animator = GetComponent<Animator>();
-        _animator.SetTrigger("StandUp");
+        // _animator.SetTrigger("StandUp");
     }
 
     // Update is called once per frame
@@ -51,7 +51,7 @@ public class agent : MonoBehaviour
             if (isSit)
             {
                 isSit = false;
-                _animator.SetTrigger("StandUp");   
+                _animator.SetTrigger("Stand");
             }
             toSeek = true;
         }
@@ -62,15 +62,17 @@ public class agent : MonoBehaviour
             // Sit down - only headtrack + orientation
             if (!isSit)
             {
-                _animator.SetTrigger("SitDown");
+                _animator.SetTrigger("Sit");
                 isSit = true;
                 toSeek = false;
             }
         }
 
         // Check for animation state
-        if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Walk_Forward"))
+        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_to") ||
+            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_from"))
         {
+            Debug.Log("Performing Sit Animation");
             toSeek = false;
         }
 
@@ -88,7 +90,7 @@ public class agent : MonoBehaviour
         // Check for movement
         if (agentRB.velocity.magnitude != 0)
         {
-            _animator.SetBool("IsWalking", true);
+            _animator.SetFloat("Speed", agentRB.velocity.magnitude);
         }
 
         // Check for orientation changes

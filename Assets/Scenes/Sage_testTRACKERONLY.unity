@@ -439,12 +439,8 @@ MonoBehaviour:
   colorTargets:
   - color:
       serializedVersion: 2
-      rgba: 41242
+      rgba: 14289407
     tolerance: 30
-  - color:
-      serializedVersion: 2
-      rgba: 8383487
-    tolerance: 50
   enableColorMap: 0
   enableColorTrack: 1
   colorMapPointSpacing: 1
@@ -480,6 +476,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10ac532f69b2dd744884c2a87defe6b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deviceName: 
+  tex: {fileID: 0}
 --- !u!65 &851119287
 BoxCollider:
   m_ObjectHideFlags: 0

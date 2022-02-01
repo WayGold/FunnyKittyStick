@@ -29,7 +29,7 @@ public class testVel : MonoBehaviour
         }
 
         if(Input.GetKeyDown(KeyCode.Space)){
-            catRB.AddForce(new Vector3(0, 30, 0), ForceMode.VelocityChange);
+            catRB.AddForce(transform.forward * 10f, ForceMode.Impulse);
         }
     }
 }

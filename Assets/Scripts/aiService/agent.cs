@@ -16,13 +16,18 @@ public class agent : MonoBehaviour
     public float jumpRadius;
     public float jumpUpForce;
     public float jumpUpAtAcceleration;
+    public Vector3 targetAcceleration;
+    public float attackTimeThreshold = 4f;
+    public float jumpTimeThreshold = 5f;
+    public float velocityMultiplier = 1f;
 
     private Animator _animator;
     private bool isSit = false;
     private bool toSeek = false;
     private bool lockY = true;
     private Vector3 targetLastVelocity;
-    public Vector3 targetAcceleration;
+    private float timeElapsedSinceLastAttack;
+    private float timeElapsedSinceLastJump;
 
     // Start is called before the first frame update
     void Start()
@@ -35,25 +40,38 @@ public class agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        timeElapsedSinceLastAttack += Time.deltaTime;
+        timeElapsedSinceLastJump += Time.deltaTime;
+
         KinematicSteeringOutput currentMovement;
         currentMovement.linearVelocity = new Vector3(0, 0, 0);
         currentMovement.rotVelocity = 0;
 
         calcTargetAcceleration();
         Debug.Log("Acceleration - " + targetAcceleration);
-        // if(targetAcceleration.y >= jumpUpAtAcceleration){
-        //     Debug.Log("Acceleration - " + targetAcceleration);
-        //     agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
-        // }
+
+        if (targetRB.velocity.y >= jumpUpAtAcceleration)
+        {
+            if(timeElapsedSinceLastJump >= jumpTimeThreshold)
+            {
+                agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
+                timeElapsedSinceLastJump = 0.0f;
+            }
+                
+        }
 
         /* IDLE RANGE - AGENT MOVE NEAR TARGET */
         // Set a radius around the agent determining an idle range
         // Only head track + orientation matching, no seeking, attack the target
         if (isInRadius(agentRB.position, targetRB.position, idleRadius))
         {
-            Debug.Log("In Radius");
+            Debug.Log("In Radius - " + Time.realtimeSinceStartup % 2);
             toSeek = false;
-            _animator.SetTrigger("Attack");
+            if (timeElapsedSinceLastAttack >= attackTimeThreshold)
+            {
+                timeElapsedSinceLastAttack = 0.0f;
+                _animator.SetTrigger("Attack");
+            }
         }
         // OUT OF RANGE - SEEK THE TARGET
         else
@@ -96,13 +114,13 @@ public class agent : MonoBehaviour
             if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !_animator.IsInTransition(0))
             {
                 // Check for charge jump animation when target is close
-                if ((targetRB.position - agentRB.position).magnitude <= jumpRadius &&
+                if (isInRadius(agentRB.position, targetRB.position, jumpRadius) &&
                     !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
                 {
                     Debug.Log("Jump Forward");
                     _animator.SetTrigger("JumpForward");
                     Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
-                    agentRB.AddForce(transform.up * 6f + Vector3.Normalize(agentRB.velocity) * 4f, ForceMode.Impulse);
+                    agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
                 }
             }
         }
@@ -116,9 +134,25 @@ public class agent : MonoBehaviour
             toSeek = false;
         }
 
+        
+
+        //if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
+        //{
+        //    velocityMultiplier = 2f;
+        //}
+        //else
+        //{
+        //    velocityMultiplier = 1f;
+        //}
+
         // SEEK COMMAND VERIFIED
         if (toSeek)
+        {
             currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
+            //currentMovement.linearVelocity.x *= velocityMultiplier;
+            //currentMovement.linearVelocity.z *= velocityMultiplier;
+        }
+            
         // Update Velocity
         agentRB.velocity = new Vector3(currentMovement.linearVelocity.x, agentRB.velocity.y,
                                         currentMovement.linearVelocity.z);
@@ -149,7 +183,8 @@ public class agent : MonoBehaviour
         return false;
     }
 
-    void calcTargetAcceleration(){
+    void calcTargetAcceleration()
+    {
         targetAcceleration = (targetRB.velocity - targetLastVelocity) / Time.fixedDeltaTime;
     }
 }

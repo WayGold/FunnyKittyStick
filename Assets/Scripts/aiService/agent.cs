@@ -14,17 +14,22 @@ public class agent : MonoBehaviour
     public float idleRadius;
     public float maxTargetSpeed;
     public float jumpRadius;
+    public float jumpUpForce;
+    public float jumpUpAtAcceleration;
 
     private Animator _animator;
     private bool isSit = false;
     private bool toSeek = false;
     private bool lockY = true;
+    private Vector3 targetLastVelocity;
+    public Vector3 targetAcceleration;
 
     // Start is called before the first frame update
     void Start()
     {
         _animator = GetComponent<Animator>();
-        // _animator.SetTrigger("StandUp");
+        targetLastVelocity = new Vector3(0, 0, 0);
+        targetAcceleration = new Vector3(0, 0, 0);
     }
 
     // Update is called once per frame
@@ -33,6 +38,13 @@ public class agent : MonoBehaviour
         KinematicSteeringOutput currentMovement;
         currentMovement.linearVelocity = new Vector3(0, 0, 0);
         currentMovement.rotVelocity = 0;
+
+        calcTargetAcceleration();
+        Debug.Log("Acceleration - " + targetAcceleration);
+        // if(targetAcceleration.y >= jumpUpAtAcceleration){
+        //     Debug.Log("Acceleration - " + targetAcceleration);
+        //     agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
+        // }
 
         /* IDLE RANGE - AGENT MOVE NEAR TARGET */
         // Set a radius around the agent determining an idle range
@@ -118,6 +130,8 @@ public class agent : MonoBehaviour
             Quaternion deltaRot = Quaternion.Euler(new Vector3(0, currentMovement.rotVelocity * Mathf.Rad2Deg, 0));
             agentRB.MoveRotation(deltaRot);
         }
+        // Record Target Velocity
+        targetLastVelocity = targetRB.velocity;
     }
 
     bool isInRadius(Vector3 agent, Vector3 target, float radius)
@@ -133,5 +147,9 @@ public class agent : MonoBehaviour
         if (target.velocity.magnitude > maxTargetSpeed)
             return true;
         return false;
+    }
+
+    void calcTargetAcceleration(){
+        targetAcceleration = (targetRB.velocity - targetLastVelocity) / Time.fixedDeltaTime;
     }
 }

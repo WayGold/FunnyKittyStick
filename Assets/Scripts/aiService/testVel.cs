@@ -25,11 +25,11 @@ public class testVel : MonoBehaviour
         }
 
         if(Input.GetKeyDown(KeyCode.UpArrow)){
-            myRB.AddForce(new Vector3(0, 10, 0), ForceMode.Impulse);
+            myRB.AddForce(new Vector3(0, 30, 0), ForceMode.Impulse);
         }
 
         if(Input.GetKeyDown(KeyCode.Space)){
-            catRB.AddForce(new Vector3(0, 10, 0), ForceMode.VelocityChange);
+            catRB.AddForce(new Vector3(0, 30, 0), ForceMode.VelocityChange);
         }
     }
 }

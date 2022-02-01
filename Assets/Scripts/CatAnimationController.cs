@@ -96,7 +96,7 @@ public class CatAnimationController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            _animator.SetTrigger("Jump");
+            _animator.SetTrigger("JumpUp");
         }
 
         if (Input.GetKeyDown(KeyCode.X))
@@ -107,6 +107,11 @@ public class CatAnimationController : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
             _animator.SetFloat("Speed", 0.5f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            _animator.SetTrigger("JumpForward");
         }
 
         /*if (Input.GetKey(KeyCode.A))

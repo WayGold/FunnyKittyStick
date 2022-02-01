@@ -23,9 +23,9 @@ Material:
   m_Name: Cat.L_6
   m_Shader: {fileID: 4800000, guid: c4ae631e7daaae74eb5266cfa7a61b79, type: 3}
   m_ShaderKeywords: _FRESNELHIGHLIGHTS_ON _GLOSSYREFLECTIONS_OFF _MK_ALBEDO_MAP _MK_ARTISTIC_PROJECTION_SCREEN_SPACE
-    _MK_DETAIL_BLEND_MIX _MK_ENVIRONMENT_REFLECTIONS_AMBIENT _MK_FRESNEL_HIGHLIGHTS
-    _MK_LIGHT_CEL _MK_OUTLINE_HULL_CLIP _MK_RECEIVE_SHADOWS _MK_WRAPPED_DIFFUSE _RECEIVESHADOWS_ON
-    _WRAPPEDLIGHTING_ON
+    _MK_DETAIL_BLEND_MIX _MK_EMISSION_MAP _MK_ENVIRONMENT_REFLECTIONS_AMBIENT _MK_FRESNEL_HIGHLIGHTS
+    _MK_LIGHT_CEL _MK_OUTLINE_HULL_CLIP _MK_RECEIVE_SHADOWS _MK_WORKFLOW_ROUGHNESS
+    _MK_WRAPPED_DIFFUSE _RECEIVESHADOWS_ON _WRAPPEDLIGHTING_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -82,7 +82,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: af6ef52655fb9ae468c2f83f92312808, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GoochBrightMap:
@@ -267,7 +267,7 @@ Material:
     - _RimSize: 1
     - _RimSmoothness: 0.5
     - _RimThresholdOffset: 0.25
-    - _Roughness: 0.5
+    - _Roughness: 0.616
     - _Saturation: 1
     - _SketchMapScale: 1
     - _Smoothness: 0
@@ -293,7 +293,7 @@ Material:
     - _VertexAnimation: 0
     - _VertexAnimationIntensity: 0.05
     - _VertexAnimationStutter: 0
-    - _Workflow: 0
+    - _Workflow: 2
     - _WorkflowMode: 1
     - _WrappedLighting: 1
     - _ZTest: 4

@@ -10,9 +10,9 @@ Material:
   m_Name: "\u6750\u8D28.004"
   m_Shader: {fileID: 4800000, guid: 371dee73dabc89140878360402049bfc, type: 3}
   m_ShaderKeywords: _FRESNELHIGHLIGHTS_ON _MK_ARTISTIC_PROJECTION_SCREEN_SPACE _MK_DETAIL_BLEND_MIX
-    _MK_ENVIRONMENT_REFLECTIONS_AMBIENT _MK_FRESNEL_HIGHLIGHTS _MK_LIGHT_CEL _MK_OUTLINE_HULL_ORIGIN
-    _MK_RECEIVE_SHADOWS _MK_SPECULAR_ISOTROPIC _MK_WRAPPED_DIFFUSE _RECEIVESHADOWS_ON
-    _WRAPPEDLIGHTING_ON
+    _MK_ENVIRONMENT_REFLECTIONS_AMBIENT _MK_FRESNEL_HIGHLIGHTS _MK_LIGHT_CEL _MK_OUTLINE_HULL_CLIP
+    _MK_OUTLINE_NOISE _MK_RECEIVE_SHADOWS _MK_SPECULAR_ISOTROPIC _MK_WRAPPED_DIFFUSE
+    _RECEIVESHADOWS_ON _WRAPPEDLIGHTING_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -219,11 +219,11 @@ Material:
     - _OcclusionMapIntensity: 1
     - _OcclusionStrength: 1
     - _OptionsTab: 1
-    - _Outline: 2
+    - _Outline: 3
     - _OutlineData: 0
     - _OutlineFadeMax: 2
     - _OutlineFadeMin: 0.25
-    - _OutlineNoise: 0
+    - _OutlineNoise: 1
     - _OutlineSize: 5
     - _OutlineTab: 1
     - _Parallax: 0.02
@@ -265,7 +265,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     m_Colors:
-    - _AlbedoColor: {r: 0.6132076, g: 0.1947085, b: 0.17065683, a: 1}
+    - _AlbedoColor: {r: 1, g: 0.41869754, b: 0, a: 1}
     - _Color: {r: 0.8000001, g: 0.4588235, b: 0.43921563, a: 1}
     - _DetailColor: {r: 1, g: 1, b: 1, a: 1}
     - _DissolveBorderColor: {r: 1, g: 1, b: 1, a: 1}
@@ -274,7 +274,7 @@ Material:
     - _GoochDarkColor: {r: 0, g: 0, b: 0, a: 1}
     - _IridescenceColor: {r: 1, g: 1, b: 1, a: 0.5}
     - _LightTransmissionColor: {r: 1, g: 0.65, b: 0, a: 1}
-    - _OutlineColor: {r: 0.4056604, g: 0.4056604, b: 0.4056604, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _RimBrightColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimDarkColor: {r: 0, g: 0, b: 0, a: 1}

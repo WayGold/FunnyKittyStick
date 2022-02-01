@@ -13,10 +13,12 @@ public class agent : MonoBehaviour
     //public float maxRotationSpeed;
     public float idleRadius;
     public float maxTargetSpeed;
+    public float jumpRadius;
 
     private Animator _animator;
     private bool isSit = false;
     private bool toSeek = false;
+    private bool lockY = true;
 
     // Start is called before the first frame update
     void Start()
@@ -37,38 +39,59 @@ public class agent : MonoBehaviour
         // Only head track + orientation matching, no seeking, attack the target
         if (isInRadius(agentRB.position, targetRB.position, idleRadius))
         {
+            Debug.Log("In Radius");
             toSeek = false;
             _animator.SetTrigger("Attack");
         }
         // OUT OF RANGE - SEEK THE TARGET
         else
-        { toSeek = true; }
+        { /* NOT FAST TARGET */
+            if (!isTooFast(targetRB, maxTargetSpeed))
+            {
+                /* SITTING - Stand up and Seek the target */
+                if (isSit)
+                {
+                    isSit = false;
+                    _animator.SetTrigger("Stand");
+                }
+                toSeek = true;
+            }
+            /* FAST TARGET - SIT DOWN UNDER FAR CASE */
+            else
+            {
+                Debug.Log("Too Fast!");
+                // Sit down - only headtrack + orientation
+                if (!isSit)
+                {
+                    Debug.Log("Not Sitted!");
+                    _animator.SetTrigger("Sit");
+                    isSit = true;
+                    toSeek = false;
+                }
+                else
+                {
+                    toSeek = false;
+                }
+            }
 
-        /* NOT FAST TARGET */
-        if (!isTooFast(targetRB, maxTargetSpeed))
-        {
-            /* SITTING - Stand up and Seek the target */
-            if (isSit)
+            // if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward")){
+            //     Debug.Log("Jumping Forward...");
+            // }
+            bool isJmp = _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward");
+            Debug.Log("Jumping Forward: " + isJmp);
+
+            // Check for charge jump forward condition
+            if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !_animator.IsInTransition(0))
             {
-                isSit = false;
-                _animator.SetTrigger("Stand");
-            }
-            toSeek = true;
-        }
-        /* FAST TARGET - SIT DOWN UNDER FAR CASE */
-        else
-        {
-            Debug.Log("Too Fast!");
-            // Sit down - only headtrack + orientation
-            if (!isSit)
-            {
-                Debug.Log("Not Sitted!");
-                _animator.SetTrigger("Sit");
-                isSit = true;
-                toSeek = false;
-            }
-            else{
-                toSeek = false;
+                // Check for charge jump animation when target is close
+                if ((targetRB.position - agentRB.position).magnitude <= jumpRadius &&
+                    !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
+                {
+                    Debug.Log("Jump Forward");
+                    _animator.SetTrigger("JumpForward");
+                    Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
+                    agentRB.AddForce(transform.up * 6f + Vector3.Normalize(agentRB.velocity) * 4f, ForceMode.Impulse);
+                }
             }
         }
 
@@ -83,14 +106,10 @@ public class agent : MonoBehaviour
 
         // SEEK COMMAND VERIFIED
         if (toSeek)
-        {
             currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
-            // Fix y so the agent don't fly
-            currentMovement.linearVelocity.y = 0;
-        }
-
         // Update Velocity
-        agentRB.velocity = currentMovement.linearVelocity;
+        agentRB.velocity = new Vector3(currentMovement.linearVelocity.x, agentRB.velocity.y,
+                                        currentMovement.linearVelocity.z);
         _animator.SetFloat("Speed", agentRB.velocity.magnitude);
 
         // Check for orientation changes
@@ -103,7 +122,7 @@ public class agent : MonoBehaviour
 
     bool isInRadius(Vector3 agent, Vector3 target, float radius)
     {
-        if ((target.x - agent.x) * (target.x - agent.x) + (target.z - agent.z) * (target.z - agent.z) <= radius)
+        if ((target.x - agent.x) * (target.x - agent.x) + (target.z - agent.z) * (target.z - agent.z) <= radius * radius)
             return true;
 
         return false;

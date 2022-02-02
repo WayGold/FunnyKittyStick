@@ -53,7 +53,8 @@ public class agent : MonoBehaviour
         {
             Debug.Log("In Radius");
             toSeek = false;
-            _animator.SetTrigger("Attack");
+            CatAnimationController.Instance.Attack();
+            //_animator.SetTrigger("Attack");
         }
         // OUT OF RANGE - SEEK THE TARGET
         else
@@ -64,7 +65,8 @@ public class agent : MonoBehaviour
                 if (isSit)
                 {
                     isSit = false;
-                    _animator.SetTrigger("Stand");
+                    CatAnimationController.Instance.StandUp();
+                    //_animator.SetTrigger("Stand");
                 }
                 toSeek = true;
             }
@@ -76,7 +78,8 @@ public class agent : MonoBehaviour
                 if (!isSit)
                 {
                     Debug.Log("Not Sitted!");
-                    _animator.SetTrigger("Sit");
+                    CatAnimationController.Instance.SitDown();
+                    //_animator.SetTrigger("Sit");
                     isSit = true;
                     toSeek = false;
                 }
@@ -100,7 +103,8 @@ public class agent : MonoBehaviour
                     !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
                 {
                     Debug.Log("Jump Forward");
-                    _animator.SetTrigger("JumpForward");
+                    CatAnimationController.Instance.JumpForward();
+                    //_animator.SetTrigger("JumpForward");
                     Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
                     agentRB.AddForce(transform.up * 6f + Vector3.Normalize(agentRB.velocity) * 4f, ForceMode.Impulse);
                 }
@@ -122,7 +126,8 @@ public class agent : MonoBehaviour
         // Update Velocity
         agentRB.velocity = new Vector3(currentMovement.linearVelocity.x, agentRB.velocity.y,
                                         currentMovement.linearVelocity.z);
-        _animator.SetFloat("Speed", agentRB.velocity.magnitude);
+        //_animator.SetFloat("Speed", agentRB.velocity.magnitude);
+        CatAnimationController.Instance.Move(agentRB.velocity.magnitude);
 
         // Check for orientation changes
         if (currentMovement.rotVelocity != 0)

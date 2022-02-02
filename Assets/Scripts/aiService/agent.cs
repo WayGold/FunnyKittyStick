@@ -61,6 +61,7 @@ public class agent : MonoBehaviour
         {
             if(timeElapsedSinceLastJump >= jumpTimeThreshold)
             {
+                _animator.SetTrigger("JumpUp");
                 agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
             }
@@ -126,7 +127,7 @@ public class agent : MonoBehaviour
                 {
                     Debug.Log("Jump Forward");
                     _animator.SetTrigger("JumpForward");
-                    _spineAnimator.SpineAnimatorAmount = 0;
+                    _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
                     Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
                     maxSpeed = 6f;
                     // StartCoroutine(RecoverNormalSpeed());
@@ -213,6 +214,10 @@ public class agent : MonoBehaviour
     public float stage3 = 12f;
     public float stage4 = 7f;
     public float stage5 = 2.5f;
+
+
+    [Header("Spine Animator Parameters")]
+    public float spineAnimatorAmount = 0.2f;
 
 
     public void CatJumpForward_1()

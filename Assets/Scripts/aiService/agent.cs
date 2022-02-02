@@ -4,6 +4,7 @@ using UnityEngine;
 
 using MovementOutputs;
 using static AIService.aiService;
+using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
 {
@@ -29,12 +30,18 @@ public class agent : MonoBehaviour
     private float timeElapsedSinceLastAttack;
     private float timeElapsedSinceLastJump;
 
+
+    // Test Fix Cat Animation
+    private FSpineAnimator _spineAnimator;
+
     // Start is called before the first frame update
     void Start()
     {
         _animator = GetComponent<Animator>();
         targetLastVelocity = new Vector3(0, 0, 0);
         targetAcceleration = new Vector3(0, 0, 0);
+
+        _spineAnimator = GetComponent<FSpineAnimator>();
     }
 
     // Update is called once per frame
@@ -119,8 +126,11 @@ public class agent : MonoBehaviour
                 {
                     Debug.Log("Jump Forward");
                     _animator.SetTrigger("JumpForward");
+                    _spineAnimator.SpineAnimatorAmount = 0;
                     Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
-                    agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
+                    maxSpeed = 6f;
+                    // StartCoroutine(RecoverNormalSpeed());
+                    // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
                 }
             }
         }
@@ -149,6 +159,7 @@ public class agent : MonoBehaviour
         if (toSeek)
         {
             currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
+
             //currentMovement.linearVelocity.x *= velocityMultiplier;
             //currentMovement.linearVelocity.z *= velocityMultiplier;
         }
@@ -186,5 +197,46 @@ public class agent : MonoBehaviour
     void calcTargetAcceleration()
     {
         targetAcceleration = (targetRB.velocity - targetLastVelocity) / Time.fixedDeltaTime;
+    }
+
+
+    public void AddJumpForwardForce()
+    {
+        agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
+    }
+
+
+
+    [Header("Jump Forward Parameters")]
+    public float stage1 = 5f;
+    public float stage2 = 8f;
+    public float stage3 = 12f;
+    public float stage4 = 7f;
+    public float stage5 = 2.5f;
+
+
+    public void CatJumpForward_1()
+    {
+        maxSpeed = stage1;
+    }
+
+    public void CatJumpForward_2()
+    {
+        maxSpeed = stage2;
+    }
+
+    public void CatJumpForward_3()
+    {
+        maxSpeed = stage3;
+    }
+
+    public void CatJumpForward_4()
+    {
+        maxSpeed = stage4;
+    }
+
+    public void CatJumpForward_5()
+    {
+        maxSpeed = stage5;
     }
 }

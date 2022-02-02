@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using FIMSpace.FSpine;
 using UnityEngine;
 
 public class CatAnimationController : MonoBehaviour
 {
     private Animator _animator;
+    private FSpineAnimator _spineAnimator;
+    private Rigidbody _rigidbody;
 
     private bool _isSitting;
     private bool _isTurningLeft;
@@ -50,6 +53,7 @@ public class CatAnimationController : MonoBehaviour
     /// </summary>
     public void JumpUp()
     {
+        _spineAnimator.SpineAnimatorAmount = 0;
         _animator.SetTrigger("JumpUp");
     }
 
@@ -58,7 +62,21 @@ public class CatAnimationController : MonoBehaviour
     /// </summary>
     public void JumpForward()
     {
+        SetSpineAnimationAmount(0);
         _animator.SetTrigger("JumpForward");
+    }
+
+    /// <summary>
+    /// Attack.
+    /// </summary>
+    public void Attack()
+    {
+        _animator.SetTrigger("Attack");
+    }
+
+    public void SetSpineAnimationAmount(float amount)
+    {
+        _spineAnimator.SpineAnimatorAmount = amount;
     }
 
     private void Awake()
@@ -73,6 +91,8 @@ public class CatAnimationController : MonoBehaviour
         }
         
         _animator = GetComponent<Animator>();
+        _spineAnimator = GetComponent<FSpineAnimator>();
+        _rigidbody = GetComponent<Rigidbody>();
 
         _isSitting = false;
         _isTurningLeft = false;
@@ -96,7 +116,9 @@ public class CatAnimationController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            _animator.SetTrigger("JumpUp");
+            //_animator.SetTrigger("JumpUp");
+            //JumpForward();
+            //_rigidbody.AddForce(transform.up * 6f + Vector3.Normalize(_rigidbody.velocity) * 4f, ForceMode.Impulse);
         }
 
         if (Input.GetKeyDown(KeyCode.X))

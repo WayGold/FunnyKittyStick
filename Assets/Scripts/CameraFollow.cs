@@ -7,6 +7,8 @@ public class CameraFollow : MonoBehaviour
 
     // 需要跟随的目标对象
     public Transform target;
+    public Collider targetEffectiveCollider;
+    
 
     // 需要锁定的坐标（可以实时生效）
     public bool freazeX, freazeY, freazeZ;
@@ -32,8 +34,15 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
-        oldPosition = transform.position;
 
+        // If outside the effective collider, don't follow the target
+        if (!targetEffectiveCollider.bounds.Contains(target.position))
+        {
+            return;
+        }
+
+
+        oldPosition = transform.position;
         if (!freazeX)
         {
             oldPosition.x = Mathf.SmoothDamp(transform.position.x, target.position.x + offset.x, ref xVelocity, smoothTime);

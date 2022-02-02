@@ -64,7 +64,8 @@ public class agent : MonoBehaviour
                 TempGameManager.Instance.OnCatJumpUp();
                 _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
                 _animator.SetTrigger("JumpUp");
-                agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
+
+                // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
 
 
@@ -218,13 +219,15 @@ public class agent : MonoBehaviour
     }
 
 
-
+    /// <summary>
+    /// Control the movement speed to tween the animation effect
+    /// </summary>
     [Header("Jump Forward Parameters")]
-    public float stage1 = 5f;
-    public float stage2 = 8f;
-    public float stage3 = 12f;
-    public float stage4 = 7f;
-    public float stage5 = 2.5f;
+    public float jumpforward_stage1 = 5f;
+    public float jumpforward_stage2 = 8f;
+    public float jumpforward_stage3 = 12f;
+    public float jumpforward_stage4 = 7f;
+    public float jumpforward_stage5 = 2.5f;
 
 
     [Header("Spine Animator Parameters")]
@@ -233,33 +236,79 @@ public class agent : MonoBehaviour
 
     public void CatJumpForward_1()
     {
-        maxSpeed = stage1;
+        maxSpeed = jumpforward_stage1;
     }
 
     public void CatJumpForward_2()
     {
-        maxSpeed = stage2;
+        maxSpeed = jumpforward_stage2;
     }
 
     public void CatJumpForward_3()
     {
-        maxSpeed = stage3;
+        maxSpeed = jumpforward_stage3;
     }
 
     public void CatJumpForward_4()
     {
-        maxSpeed = stage4;
+        maxSpeed = jumpforward_stage4;
     }
 
     public void CatJumpForward_5()
     {
-        maxSpeed = stage5;
+        maxSpeed = jumpforward_stage5;
     }
 
-    
+
     // IEnumerator CatEndJumpUp()
     // {
     //     yield return new WaitForSeconds(1.2f);
     //     agentRB.mass = 1f;
     // }
+
+
+
+    /// <summary>
+    /// Control the movement velocity to get better physics (Up Velocity)
+    /// </summary>
+    [Header("Jump Up Parameters")]
+    public float jumpup_stage1 = 5f;
+    public float jumpup_stage2 = 8f;
+    public float jumpup_stage3 = 12f;
+    public float jumpup_stage4 = 12f;
+    public float jumpup_stage5 = 12f;
+
+
+    public void CatJumpUp_1()
+    {
+        SetCatJumpUp(jumpup_stage1);
+        maxSpeed = 6f;
+    }
+
+    public void CatJumpUp_2()
+    {
+        SetCatJumpUp(jumpup_stage2);
+    }
+
+    public void CatJumpUp_3()
+    {
+        SetCatJumpUp(jumpup_stage3);
+    }
+
+    public void CatJumpUp_4()
+    {
+        SetCatJumpUp(jumpup_stage4);
+    }
+
+    public void CatJumpUp_5()
+    {
+        SetCatJumpUp(jumpup_stage5);
+        maxSpeed = 2.5f;
+    }
+
+    void SetCatJumpUp(float stage)
+    {
+        var oldVelocity = agentRB.velocity;
+        agentRB.velocity = new Vector3(oldVelocity.x, stage, oldVelocity.z);
+    }
 }

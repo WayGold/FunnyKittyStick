@@ -88,8 +88,7 @@ public class TempGameManager : MonoBehaviour
     {
         var catAudioClips = globalAudioData.AudioClip;
         CatAudioSource.clip = catAudioClips[index];
-        if(!CatAudioSource.isPlaying)
-            CatAudioSource.Play();
+        if(!CatAudioSource.isPlaying) CatAudioSource.Play();
         
     }
 
@@ -120,14 +119,14 @@ public class TempGameManager : MonoBehaviour
 
     public void OnCatAttack()
     {
-        PlayCatAudio(2);
+        //PlayCatAudio(4);
         PlayUIAnimation(catUIAnimator, "Trying", 2);
     }
 
     public void OnCatJumpForward()
     {
         PlayCatAudio(1);
-        PlayUIAnimation(fishUIAnimator, "Highlight", 0.5f);
+        PlayUIAnimation(fishUIAnimator, "Highlight", 2f);
     }
 
     public void OnCatSit()

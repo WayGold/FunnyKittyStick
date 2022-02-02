@@ -34,7 +34,7 @@ public class TempGameManager : MonoBehaviour
             }
         }
 
-        DontDestroyOnLoad(gameObject);
+        // DontDestroyOnLoad(gameObject);
     }
 
     #endregion SINGLETON
@@ -44,8 +44,8 @@ public class TempGameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InitializeAudioData();
-        CheckPlayBGM();
+       //  InitializeAudioData();
+       //  CheckPlayBGM();
     }
 
     // Update is called once per frame

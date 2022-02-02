@@ -61,9 +61,16 @@ public class agent : MonoBehaviour
         {
             if(timeElapsedSinceLastJump >= jumpTimeThreshold)
             {
+                TempGameManager.Instance.OnCatJumpUp();
+                _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
                 _animator.SetTrigger("JumpUp");
                 agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
+
+
+                // TEST: set mass
+                //agentRB.mass = 20f;
+                //StartCoroutine(CatEndJumpUp());
             }
                 
         }
@@ -78,6 +85,7 @@ public class agent : MonoBehaviour
             if (timeElapsedSinceLastAttack >= attackTimeThreshold)
             {
                 timeElapsedSinceLastAttack = 0.0f;
+                TempGameManager.Instance.OnCatAttack();
                 _animator.SetTrigger("Attack");
             }
         }
@@ -90,6 +98,7 @@ public class agent : MonoBehaviour
                 if (isSit)
                 {
                     isSit = false;
+                    TempGameManager.Instance.OnCatStand();
                     _animator.SetTrigger("Stand");
                 }
                 toSeek = true;
@@ -102,6 +111,7 @@ public class agent : MonoBehaviour
                 if (!isSit)
                 {
                     Debug.Log("Not Sitted!");
+                    TempGameManager.Instance.OnCatSit();
                     _animator.SetTrigger("Sit");
                     isSit = true;
                     toSeek = false;
@@ -126,6 +136,7 @@ public class agent : MonoBehaviour
                     !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
                 {
                     Debug.Log("Jump Forward");
+                    TempGameManager.Instance.OnCatJumpForward();
                     _animator.SetTrigger("JumpForward");
                     _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
                     Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
@@ -244,4 +255,11 @@ public class agent : MonoBehaviour
     {
         maxSpeed = stage5;
     }
+
+    
+    // IEnumerator CatEndJumpUp()
+    // {
+    //     yield return new WaitForSeconds(1.2f);
+    //     agentRB.mass = 1f;
+    // }
 }

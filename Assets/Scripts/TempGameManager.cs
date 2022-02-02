@@ -51,13 +51,14 @@ public class TempGameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        TestEmoji();
+        
     }
 
 
 
     [Header("Audio")]
     private AudioSource BGMAudioSource;
+    public AudioSource CatAudioSource;
     public AudioData globalAudioData;
     public bool isPlayedBGM;
 
@@ -68,6 +69,10 @@ public class TempGameManager : MonoBehaviour
         BGMAudioSource = GetComponent<AudioSource>();
         BGMAudioSource.clip = globalAudioData.BGM;
         BGMAudioSource.loop = true;
+
+        // Audio
+
+
     }
 
     void CheckPlayBGM()
@@ -79,6 +84,15 @@ public class TempGameManager : MonoBehaviour
         }
     }
 
+    void PlayCatAudio(int index)
+    {
+        var catAudioClips = globalAudioData.AudioClip;
+        CatAudioSource.clip = catAudioClips[index];
+        if(!CatAudioSource.isPlaying)
+            CatAudioSource.Play();
+        
+    }
+
 
     [Header("Cat Emoji UI")]
     public Animator catUIAnimator;
@@ -86,28 +100,57 @@ public class TempGameManager : MonoBehaviour
     public RectTransform catUITransform;
 
 
-    void PlayUIAnimation(string boolName, float duration)
+    void PlayUIAnimation(Animator _animator,string boolName, float duration)
     {
-        catUIAnimator.SetBool(boolName, true);
-        StartCoroutine(HoldUIAnimation(boolName, duration));
+        _animator.SetBool(boolName, true);
+        StartCoroutine(HoldUIAnimation(_animator, boolName, duration));
         
     }
 
-    IEnumerator HoldUIAnimation(string boolName, float duration)
+    IEnumerator HoldUIAnimation(Animator _animator, string boolName, float duration)
     {
         yield return new WaitForSeconds(duration);
-        catUIAnimator.SetBool(boolName, false);
+        _animator.SetBool(boolName, false);
     }
 
-    void TestEmoji()
+
+
+
+    // --- Public Event
+
+    public void OnCatAttack()
     {
-
-        // Only For Testing
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-             PlayUIAnimation("Trying", 3);
-        }
+        PlayCatAudio(2);
+        PlayUIAnimation(catUIAnimator, "Trying", 2);
     }
+
+    public void OnCatJumpForward()
+    {
+        PlayCatAudio(1);
+        PlayUIAnimation(fishUIAnimator, "Highlight", 0.5f);
+    }
+
+    public void OnCatSit()
+    {
+        PlayCatAudio(2);
+        PlayUIAnimation(catUIAnimator, "Event", 1.2f);
+    }
+
+    public void OnCatJumpUp()
+    {
+        //PlayCatAudio(3);
+        // PlayUIAnimation(catUIAnimator, "Event", 1.5f);
+    }
+
+    public void OnCatStand()
+    {
+        PlayCatAudio(1);
+        PlayUIAnimation(catUIAnimator, "Trying", 1.5f);
+    }
+
+
+
+
     
    
 }

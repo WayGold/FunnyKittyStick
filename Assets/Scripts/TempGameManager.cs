@@ -42,23 +42,16 @@ public class TempGameManager : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
-    {
-       //  InitializeAudioData();
-       //  CheckPlayBGM();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+
 
 
 
     [Header("Audio")]
     private AudioSource BGMAudioSource;
     public AudioSource CatAudioSource;
+    public AudioSource SFXAudioSource;
     public AudioData globalAudioData;
     public bool isPlayedBGM;
 
@@ -86,10 +79,40 @@ public class TempGameManager : MonoBehaviour
 
     void PlayCatAudio(int index)
     {
+
+        if (CatAudioSource.isPlaying) return;
+
         var catAudioClips = globalAudioData.AudioClip;
         CatAudioSource.clip = catAudioClips[index];
-        if(!CatAudioSource.isPlaying) CatAudioSource.Play();
+        CatAudioSource.Play();
         
+    }
+
+    void PlayRandomCatAudio()
+    {
+
+
+        if (CatAudioSource.isPlaying) return;
+
+        var catAudioClips = globalAudioData.AudioClip;
+        int index = (int)Random.Range(0, 4);
+        CatAudioSource.clip = catAudioClips[index];
+        CatAudioSource.Play();
+    }
+
+    public void PlaySFXAttack()
+    {
+
+        if (SFXAudioSource.isPlaying) return;
+        SFXAudioSource.clip = globalAudioData.AudioClip[4];
+        SFXAudioSource.Play();
+    }
+
+    public void PlaySFXJump()
+    {
+        if (SFXAudioSource.isPlaying) return;
+        SFXAudioSource.clip = globalAudioData.AudioClip[5];
+        SFXAudioSource.Play();
     }
 
 
@@ -119,13 +142,15 @@ public class TempGameManager : MonoBehaviour
 
     public void OnCatAttack()
     {
-        //PlayCatAudio(4);
+        // PlayCatAudio(2);
+        // PlaySFXAttack();
         PlayUIAnimation(catUIAnimator, "Trying", 2);
     }
 
     public void OnCatJumpForward()
     {
-        PlayCatAudio(1);
+        PlayCatAudio(0);
+        // PlaySFXJump();
         PlayUIAnimation(fishUIAnimator, "Highlight", 2f);
     }
 
@@ -137,19 +162,46 @@ public class TempGameManager : MonoBehaviour
 
     public void OnCatJumpUp()
     {
-        //PlayCatAudio(3);
-        // PlayUIAnimation(catUIAnimator, "Event", 1.5f);
+        // PlayCatAudio(3);
+        // PlaySFXJump();
+        PlayUIAnimation(catUIAnimator, "Event", 1.5f);
     }
 
     public void OnCatStand()
     {
-        PlayCatAudio(1);
+        // PlayCatAudio(1);
         PlayUIAnimation(catUIAnimator, "Trying", 1.5f);
     }
 
 
 
+    [Header("Joycon Input")]
+    private Joycon joycon;
 
-    
-   
+    void CheckJoyConInput()
+    {
+        if (joycon.GetButtonDown(Joycon.Button.DPAD_LEFT))
+        {
+            PlayRandomCatAudio();
+        }
+    }
+
+
+    void Start()
+    {
+        joycon = JoyconManager.Instance.j[0];
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        CheckJoyConInput();
+    }
+
+
+
+
+
+
 }

@@ -311,4 +311,15 @@ public class agent : MonoBehaviour
         var oldVelocity = agentRB.velocity;
         agentRB.velocity = new Vector3(oldVelocity.x, stage, oldVelocity.z);
     }
+
+
+    public void PlaySFXAttack()
+    {
+        TempGameManager.Instance.PlaySFXAttack();
+    }
+
+    public void PlaySFXJump()
+    {
+        TempGameManager.Instance.PlaySFXJump();
+    }
 }

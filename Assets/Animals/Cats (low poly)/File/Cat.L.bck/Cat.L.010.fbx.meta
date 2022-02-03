@@ -343,7 +343,14 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.49597856
+        functionName: PlaySFXAttack
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

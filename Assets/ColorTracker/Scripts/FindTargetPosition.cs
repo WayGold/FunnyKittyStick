@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FindTargetPosition : MonoBehaviour
 {
+    public static Vector3 targetlocation;
 
     // Start is called before the first frame update
     void Start()
@@ -15,6 +16,6 @@ public class FindTargetPosition : MonoBehaviour
     void Update()
     {
         Debug.Log("Wand is located at " + GetComponent<RectTransform>().position);
-
+        targetlocation = GetComponent<RectTransform>().position;
     }
 }

@@ -61,8 +61,7 @@ public class agent : MonoBehaviour
         {
             if(timeElapsedSinceLastJump >= jumpTimeThreshold)
             {
-                TempGameManager.Instance.OnCatJumpUp();
-                _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
+                // TempGameManager.Instance.OnCatJumpUp();
                 _animator.SetTrigger("JumpUp");
 
                 // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
@@ -86,7 +85,7 @@ public class agent : MonoBehaviour
             if (timeElapsedSinceLastAttack >= attackTimeThreshold)
             {
                 timeElapsedSinceLastAttack = 0.0f;
-                TempGameManager.Instance.OnCatAttack();
+                // TempGameManager.Instance.OnCatAttack();
                 _animator.SetTrigger("Attack");
             }
         }
@@ -99,7 +98,7 @@ public class agent : MonoBehaviour
                 if (isSit)
                 {
                     isSit = false;
-                    TempGameManager.Instance.OnCatStand();
+                    // TempGameManager.Instance.OnCatStand();
                     _animator.SetTrigger("Stand");
                 }
                 toSeek = true;
@@ -112,7 +111,7 @@ public class agent : MonoBehaviour
                 if (!isSit)
                 {
                     Debug.Log("Not Sitted!");
-                    TempGameManager.Instance.OnCatSit();
+                    // TempGameManager.Instance.OnCatSit();
                     _animator.SetTrigger("Sit");
                     isSit = true;
                     toSeek = false;
@@ -137,9 +136,8 @@ public class agent : MonoBehaviour
                     !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
                 {
                     Debug.Log("Jump Forward");
-                    TempGameManager.Instance.OnCatJumpForward();
+                    // TempGameManager.Instance.OnCatJumpForward();
                     _animator.SetTrigger("JumpForward");
-                    _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
                     Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
                     maxSpeed = 6f;
                     // StartCoroutine(RecoverNormalSpeed());
@@ -219,6 +217,9 @@ public class agent : MonoBehaviour
     }
 
 
+
+    #region TEMP EVENTS
+
     /// <summary>
     /// Control the movement speed to tween the animation effect
     /// </summary>
@@ -229,10 +230,15 @@ public class agent : MonoBehaviour
     public float jumpforward_stage4 = 7f;
     public float jumpforward_stage5 = 2.5f;
 
-
+    /// <summary>
+    /// The default spineAnmatorAmount value that should be applied to the cat at the end of each animation
+    /// </summary>
     [Header("Spine Animator Parameters")]
     public float spineAnimatorAmount = 0.2f;
 
+    /* ANIMATION EVENTS - JUMPFORWARD */
+    // The Followings are the animation event that will set different attribute of cats at different animation frames. 
+    // It is for temp pitch use and should be refactor later
 
     public void CatJumpForward_1()
     {
@@ -260,14 +266,6 @@ public class agent : MonoBehaviour
     }
 
 
-    // IEnumerator CatEndJumpUp()
-    // {
-    //     yield return new WaitForSeconds(1.2f);
-    //     agentRB.mass = 1f;
-    // }
-
-
-
     /// <summary>
     /// Control the movement velocity to get better physics (Up Velocity)
     /// </summary>
@@ -278,6 +276,10 @@ public class agent : MonoBehaviour
     public float jumpup_stage4 = 12f;
     public float jumpup_stage5 = 12f;
 
+
+    /* ANIMATION EVENTS - JUMPUP */
+    // The Followings are the animation event that will set different attribute of cats at different animation frames. 
+    // It is for temp pitch use and should be refactor later
 
     public void CatJumpUp_1()
     {
@@ -312,19 +314,25 @@ public class agent : MonoBehaviour
         agentRB.velocity = new Vector3(oldVelocity.x, stage, oldVelocity.z);
     }
 
+    /* GAMEMANAGER EVENTS*/
+    // The TempGameManager is a class that is incharge of UI & Audio, and should be refactored by optimized structure
+
 
     public void PlaySFXAttack()
     {
-        TempGameManager.Instance.PlaySFXAttack();
+        // TempGameManager.Instance.PlaySFXAttack();
     }
 
     public void PlaySFXJump()
     {
-        TempGameManager.Instance.PlaySFXJump();
+        // TempGameManager.Instance.PlaySFXJump();
     }
 
     public void PlayRandomCatAudio()
     {
-        TempGameManager.Instance.PlayRandomCatAudio();
+        // TempGameManager.Instance.PlayRandomCatAudio();
     }
+
+    #endregion TEMP EVENTS
+
 }

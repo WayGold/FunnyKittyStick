@@ -88,7 +88,7 @@ public class TempGameManager : MonoBehaviour
         
     }
 
-    void PlayRandomCatAudio()
+    public void PlayRandomCatAudio()
     {
 
 
@@ -149,14 +149,14 @@ public class TempGameManager : MonoBehaviour
 
     public void OnCatJumpForward()
     {
-        PlayCatAudio(0);
+        //PlayCatAudio(0);
         // PlaySFXJump();
         PlayUIAnimation(fishUIAnimator, "Highlight", 2f);
     }
 
     public void OnCatSit()
     {
-        PlayCatAudio(2);
+        //PlayCatAudio(2);
         PlayUIAnimation(catUIAnimator, "Event", 1.2f);
     }
 

@@ -322,4 +322,9 @@ public class agent : MonoBehaviour
     {
         TempGameManager.Instance.PlaySFXJump();
     }
+
+    public void PlayRandomCatAudio()
+    {
+        TempGameManager.Instance.PlayRandomCatAudio();
+    }
 }

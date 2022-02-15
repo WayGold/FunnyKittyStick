@@ -11,7 +11,6 @@ public class agent : MonoBehaviour
     public Rigidbody agentRB;
     public Rigidbody targetRB;
     public float maxSpeed;
-    //public float maxRotationSpeed;
     public float idleRadius;
     public float maxTargetSpeed;
     public float jumpRadius;
@@ -48,8 +47,7 @@ public class agent : MonoBehaviour
     void Update()
     {
         timeElapsedSinceLastAttack += Time.deltaTime;
-        timeElapsedSinceLastJump += Time.deltaTime;
-
+        
         KinematicSteeringOutput currentMovement;
         currentMovement.linearVelocity = new Vector3(0, 0, 0);
         currentMovement.rotVelocity = 0;
@@ -57,24 +55,71 @@ public class agent : MonoBehaviour
         calcTargetAcceleration();
         Debug.Log("Acceleration - " + targetAcceleration);
 
+        // Animation Listeners
+        JumpUpListener();
+        AttackListener();
+        FastTargetListener();
+        ChargeJumpListener();
+
+        // Disable movement while sitting animation is in progress
+        NoSeekWhileSit();
+
+        // SEEK COMMAND VERIFIED
+        if (toSeek)
+            currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
+
+        UpdateRigidBody(currentMovement);
+    }
+
+    void UpdateRigidBody(KinematicSteeringOutput currentMovement)
+    {
+        // Update Velocity
+        agentRB.velocity = new Vector3(currentMovement.linearVelocity.x, agentRB.velocity.y,
+                                        currentMovement.linearVelocity.z);
+        _animator.SetFloat("Speed", agentRB.velocity.magnitude);
+
+        // Check for orientation changes
+        if (currentMovement.rotVelocity != 0)
+        {
+            Quaternion deltaRot = Quaternion.Euler(new Vector3(0, currentMovement.rotVelocity * Mathf.Rad2Deg, 0));
+            agentRB.MoveRotation(deltaRot);
+        }
+        // Record Target Velocity
+        targetLastVelocity = targetRB.velocity;
+    }
+
+    void NoSeekWhileSit()
+    {
+        // Check for animation state
+        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_to") ||
+            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_from") ||
+            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_Idle"))
+        {
+            Debug.Log("Performing Sit Animation");
+            toSeek = false;
+        }
+    }
+
+    void JumpUpListener()
+    {
+        timeElapsedSinceLastJump += Time.deltaTime;
+
         if (targetRB.velocity.y >= jumpUpAtAcceleration)
         {
-            if(timeElapsedSinceLastJump >= jumpTimeThreshold)
+            if (timeElapsedSinceLastJump >= jumpTimeThreshold)
             {
                 // TempGameManager.Instance.OnCatJumpUp();
                 _animator.SetTrigger("JumpUp");
 
                 // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
-
-
-                // TEST: set mass
-                //agentRB.mass = 20f;
-                //StartCoroutine(CatEndJumpUp());
             }
-                
-        }
 
+        }
+    }
+
+    void AttackListener()
+    {
         /* IDLE RANGE - AGENT MOVE NEAR TARGET */
         // Set a radius around the agent determining an idle range
         // Only head track + orientation matching, no seeking, attack the target
@@ -89,105 +134,60 @@ public class agent : MonoBehaviour
                 _animator.SetTrigger("Attack");
             }
         }
-        // OUT OF RANGE - SEEK THE TARGET
-        else
-        { /* NOT FAST TARGET */
-            if (!isTooFast(targetRB, maxTargetSpeed))
+    }
+
+    void FastTargetListener()
+    {
+        /* NOT FAST TARGET */
+        if (!isTooFast(targetRB, maxTargetSpeed))
+        {
+            /* SITTING - Stand up and Seek the target */
+            if (isSit)
             {
-                /* SITTING - Stand up and Seek the target */
-                if (isSit)
-                {
-                    isSit = false;
-                    // TempGameManager.Instance.OnCatStand();
-                    _animator.SetTrigger("Stand");
-                }
-                toSeek = true;
+                isSit = false;
+                // TempGameManager.Instance.OnCatStand();
+                _animator.SetTrigger("Stand");
             }
-            /* FAST TARGET - SIT DOWN UNDER FAR CASE */
+            toSeek = true;
+        }
+        /* FAST TARGET - SIT DOWN UNDER FAR CASE */
+        else
+        {
+            Debug.Log("Too Fast!");
+            // Sit down - only headtrack + orientation
+            if (!isSit)
+            {
+                Debug.Log("Not Sitted!");
+                // TempGameManager.Instance.OnCatSit();
+                _animator.SetTrigger("Sit");
+                isSit = true;
+                toSeek = false;
+            }
             else
             {
-                Debug.Log("Too Fast!");
-                // Sit down - only headtrack + orientation
-                if (!isSit)
-                {
-                    Debug.Log("Not Sitted!");
-                    // TempGameManager.Instance.OnCatSit();
-                    _animator.SetTrigger("Sit");
-                    isSit = true;
-                    toSeek = false;
-                }
-                else
-                {
-                    toSeek = false;
-                }
+                toSeek = false;
             }
+        }
+    }
 
-            // if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward")){
-            //     Debug.Log("Jumping Forward...");
-            // }
-            bool isJmp = _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward");
-            Debug.Log("Jumping Forward: " + isJmp);
-
-            // Check for charge jump forward condition
-            if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !_animator.IsInTransition(0))
+    void ChargeJumpListener()
+    {
+        // Check for charge jump forward condition
+        if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !_animator.IsInTransition(0))
+        {
+            // Check for charge jump animation when target is close
+            if (isInRadius(agentRB.position, targetRB.position, jumpRadius) &&
+                !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
             {
-                // Check for charge jump animation when target is close
-                if (isInRadius(agentRB.position, targetRB.position, jumpRadius) &&
-                    !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
-                {
-                    Debug.Log("Jump Forward");
-                    // TempGameManager.Instance.OnCatJumpForward();
-                    _animator.SetTrigger("JumpForward");
-                    Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
-                    maxSpeed = 6f;
-                    // StartCoroutine(RecoverNormalSpeed());
-                    // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
-                }
+                Debug.Log("Jump Forward");
+                // TempGameManager.Instance.OnCatJumpForward();
+                _animator.SetTrigger("JumpForward");
+                Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
+                maxSpeed = 6f;
+                // StartCoroutine(RecoverNormalSpeed());
+                // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
             }
         }
-
-        // Check for animation state
-        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_to") ||
-            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_from") ||
-            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_Idle"))
-        {
-            Debug.Log("Performing Sit Animation");
-            toSeek = false;
-        }
-
-        
-
-        //if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
-        //{
-        //    velocityMultiplier = 2f;
-        //}
-        //else
-        //{
-        //    velocityMultiplier = 1f;
-        //}
-
-        // SEEK COMMAND VERIFIED
-        if (toSeek)
-        {
-            currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
-
-            //currentMovement.linearVelocity.x *= velocityMultiplier;
-            //currentMovement.linearVelocity.z *= velocityMultiplier;
-        }
-            
-        // Update Velocity
-        agentRB.velocity = new Vector3(currentMovement.linearVelocity.x, agentRB.velocity.y,
-                                        currentMovement.linearVelocity.z);
-        _animator.SetFloat("Speed", agentRB.velocity.magnitude);
-
-        // Check for orientation changes
-        if (currentMovement.rotVelocity != 0)
-        {
-            Quaternion deltaRot = Quaternion.Euler(new Vector3(0, currentMovement.rotVelocity * Mathf.Rad2Deg, 0));
-            agentRB.MoveRotation(deltaRot);
-        }
-        // Record Target Velocity
-        targetLastVelocity = targetRB.velocity;
     }
 
     bool isInRadius(Vector3 agent, Vector3 target, float radius)

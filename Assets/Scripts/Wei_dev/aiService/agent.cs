@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using MovementOutputs;
-using static AIService.aiService;
+using static AIService.KinematicSeek;
 using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
@@ -70,6 +70,11 @@ public class agent : MonoBehaviour
 
         UpdateRigidBody(currentMovement);
     }
+
+    //DynamicSteeringOutput getSteering()
+    //{
+
+    //}
 
     void UpdateRigidBody(KinematicSteeringOutput currentMovement)
     {

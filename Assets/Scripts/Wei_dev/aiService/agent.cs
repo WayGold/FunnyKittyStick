@@ -11,7 +11,6 @@ public class agent : MonoBehaviour
     public Rigidbody agentRB;
     public Rigidbody targetRB;
     public float maxSpeed;
-    //public float maxRotationSpeed;
     public float idleRadius;
     public float maxTargetSpeed;
     public float jumpRadius;
@@ -48,8 +47,7 @@ public class agent : MonoBehaviour
     void Update()
     {
         timeElapsedSinceLastAttack += Time.deltaTime;
-        timeElapsedSinceLastJump += Time.deltaTime;
-
+        
         KinematicSteeringOutput currentMovement;
         currentMovement.linearVelocity = new Vector3(0, 0, 0);
         currentMovement.rotVelocity = 0;
@@ -57,126 +55,24 @@ public class agent : MonoBehaviour
         calcTargetAcceleration();
         Debug.Log("Acceleration - " + targetAcceleration);
 
-        if (targetRB.velocity.y >= jumpUpAtAcceleration)
-        {
-            if(timeElapsedSinceLastJump >= jumpTimeThreshold)
-            {
-                TempGameManager.Instance.OnCatJumpUp();
-                _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
-                _animator.SetTrigger("JumpUp");
+        // Animation Listeners
+        JumpUpListener();
+        AttackListener();
+        FastTargetListener();
+        ChargeJumpListener();
 
-                // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
-                timeElapsedSinceLastJump = 0.0f;
-
-
-                // TEST: set mass
-                //agentRB.mass = 20f;
-                //StartCoroutine(CatEndJumpUp());
-            }
-                
-        }
-
-        /* IDLE RANGE - AGENT MOVE NEAR TARGET */
-        // Set a radius around the agent determining an idle range
-        // Only head track + orientation matching, no seeking, attack the target
-        if (isInRadius(agentRB.position, targetRB.position, idleRadius))
-        {
-            Debug.Log("In Radius - " + Time.realtimeSinceStartup % 2);
-            toSeek = false;
-            if (timeElapsedSinceLastAttack >= attackTimeThreshold)
-            {
-                timeElapsedSinceLastAttack = 0.0f;
-                TempGameManager.Instance.OnCatAttack();
-                _animator.SetTrigger("Attack");
-            }
-        }
-        // OUT OF RANGE - SEEK THE TARGET
-        else
-        { /* NOT FAST TARGET */
-            if (!isTooFast(targetRB, maxTargetSpeed))
-            {
-                /* SITTING - Stand up and Seek the target */
-                if (isSit)
-                {
-                    isSit = false;
-                    TempGameManager.Instance.OnCatStand();
-                    _animator.SetTrigger("Stand");
-                }
-                toSeek = true;
-            }
-            /* FAST TARGET - SIT DOWN UNDER FAR CASE */
-            else
-            {
-                Debug.Log("Too Fast!");
-                // Sit down - only headtrack + orientation
-                if (!isSit)
-                {
-                    Debug.Log("Not Sitted!");
-                    TempGameManager.Instance.OnCatSit();
-                    _animator.SetTrigger("Sit");
-                    isSit = true;
-                    toSeek = false;
-                }
-                else
-                {
-                    toSeek = false;
-                }
-            }
-
-            // if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward")){
-            //     Debug.Log("Jumping Forward...");
-            // }
-            bool isJmp = _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward");
-            Debug.Log("Jumping Forward: " + isJmp);
-
-            // Check for charge jump forward condition
-            if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !_animator.IsInTransition(0))
-            {
-                // Check for charge jump animation when target is close
-                if (isInRadius(agentRB.position, targetRB.position, jumpRadius) &&
-                    !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
-                {
-                    Debug.Log("Jump Forward");
-                    TempGameManager.Instance.OnCatJumpForward();
-                    _animator.SetTrigger("JumpForward");
-                    _spineAnimator.SpineAnimatorAmount = spineAnimatorAmount;
-                    Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
-                    maxSpeed = 6f;
-                    // StartCoroutine(RecoverNormalSpeed());
-                    // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
-                }
-            }
-        }
-
-        // Check for animation state
-        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_to") ||
-            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_from") ||
-            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_Idle"))
-        {
-            Debug.Log("Performing Sit Animation");
-            toSeek = false;
-        }
-
-        
-
-        //if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
-        //{
-        //    velocityMultiplier = 2f;
-        //}
-        //else
-        //{
-        //    velocityMultiplier = 1f;
-        //}
+        // Disable movement while sitting animation is in progress
+        NoSeekWhileSit();
 
         // SEEK COMMAND VERIFIED
         if (toSeek)
-        {
             currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
 
-            //currentMovement.linearVelocity.x *= velocityMultiplier;
-            //currentMovement.linearVelocity.z *= velocityMultiplier;
-        }
-            
+        UpdateRigidBody(currentMovement);
+    }
+
+    void UpdateRigidBody(KinematicSteeringOutput currentMovement)
+    {
         // Update Velocity
         agentRB.velocity = new Vector3(currentMovement.linearVelocity.x, agentRB.velocity.y,
                                         currentMovement.linearVelocity.z);
@@ -190,6 +86,108 @@ public class agent : MonoBehaviour
         }
         // Record Target Velocity
         targetLastVelocity = targetRB.velocity;
+    }
+
+    void NoSeekWhileSit()
+    {
+        // Check for animation state
+        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_to") ||
+            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_from") ||
+            _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Sit_Idle"))
+        {
+            Debug.Log("Performing Sit Animation");
+            toSeek = false;
+        }
+    }
+
+    void JumpUpListener()
+    {
+        timeElapsedSinceLastJump += Time.deltaTime;
+
+        if (targetRB.velocity.y >= jumpUpAtAcceleration)
+        {
+            if (timeElapsedSinceLastJump >= jumpTimeThreshold)
+            {
+                // TempGameManager.Instance.OnCatJumpUp();
+                _animator.SetTrigger("JumpUp");
+
+                // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
+                timeElapsedSinceLastJump = 0.0f;
+            }
+
+        }
+    }
+
+    void AttackListener()
+    {
+        /* IDLE RANGE - AGENT MOVE NEAR TARGET */
+        // Set a radius around the agent determining an idle range
+        // Only head track + orientation matching, no seeking, attack the target
+        if (isInRadius(agentRB.position, targetRB.position, idleRadius))
+        {
+            Debug.Log("In Radius - " + Time.realtimeSinceStartup % 2);
+            toSeek = false;
+            if (timeElapsedSinceLastAttack >= attackTimeThreshold)
+            {
+                timeElapsedSinceLastAttack = 0.0f;
+                // TempGameManager.Instance.OnCatAttack();
+                _animator.SetTrigger("Attack");
+            }
+        }
+    }
+
+    void FastTargetListener()
+    {
+        /* NOT FAST TARGET */
+        if (!isTooFast(targetRB, maxTargetSpeed))
+        {
+            /* SITTING - Stand up and Seek the target */
+            if (isSit)
+            {
+                isSit = false;
+                // TempGameManager.Instance.OnCatStand();
+                _animator.SetTrigger("Stand");
+            }
+            toSeek = true;
+        }
+        /* FAST TARGET - SIT DOWN UNDER FAR CASE */
+        else
+        {
+            Debug.Log("Too Fast!");
+            // Sit down - only headtrack + orientation
+            if (!isSit)
+            {
+                Debug.Log("Not Sitted!");
+                // TempGameManager.Instance.OnCatSit();
+                _animator.SetTrigger("Sit");
+                isSit = true;
+                toSeek = false;
+            }
+            else
+            {
+                toSeek = false;
+            }
+        }
+    }
+
+    void ChargeJumpListener()
+    {
+        // Check for charge jump forward condition
+        if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !_animator.IsInTransition(0))
+        {
+            // Check for charge jump animation when target is close
+            if (isInRadius(agentRB.position, targetRB.position, jumpRadius) &&
+                !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
+            {
+                Debug.Log("Jump Forward");
+                // TempGameManager.Instance.OnCatJumpForward();
+                _animator.SetTrigger("JumpForward");
+                Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
+                maxSpeed = 6f;
+                // StartCoroutine(RecoverNormalSpeed());
+                // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
+            }
+        }
     }
 
     bool isInRadius(Vector3 agent, Vector3 target, float radius)
@@ -219,6 +217,9 @@ public class agent : MonoBehaviour
     }
 
 
+
+    #region TEMP EVENTS
+
     /// <summary>
     /// Control the movement speed to tween the animation effect
     /// </summary>
@@ -229,10 +230,15 @@ public class agent : MonoBehaviour
     public float jumpforward_stage4 = 7f;
     public float jumpforward_stage5 = 2.5f;
 
-
+    /// <summary>
+    /// The default spineAnmatorAmount value that should be applied to the cat at the end of each animation
+    /// </summary>
     [Header("Spine Animator Parameters")]
     public float spineAnimatorAmount = 0.2f;
 
+    /* ANIMATION EVENTS - JUMPFORWARD */
+    // The Followings are the animation event that will set different attribute of cats at different animation frames. 
+    // It is for temp pitch use and should be refactor later
 
     public void CatJumpForward_1()
     {
@@ -260,14 +266,6 @@ public class agent : MonoBehaviour
     }
 
 
-    // IEnumerator CatEndJumpUp()
-    // {
-    //     yield return new WaitForSeconds(1.2f);
-    //     agentRB.mass = 1f;
-    // }
-
-
-
     /// <summary>
     /// Control the movement velocity to get better physics (Up Velocity)
     /// </summary>
@@ -278,6 +276,10 @@ public class agent : MonoBehaviour
     public float jumpup_stage4 = 12f;
     public float jumpup_stage5 = 12f;
 
+
+    /* ANIMATION EVENTS - JUMPUP */
+    // The Followings are the animation event that will set different attribute of cats at different animation frames. 
+    // It is for temp pitch use and should be refactor later
 
     public void CatJumpUp_1()
     {
@@ -312,19 +314,25 @@ public class agent : MonoBehaviour
         agentRB.velocity = new Vector3(oldVelocity.x, stage, oldVelocity.z);
     }
 
+    /* GAMEMANAGER EVENTS*/
+    // The TempGameManager is a class that is incharge of UI & Audio, and should be refactored by optimized structure
+
 
     public void PlaySFXAttack()
     {
-        TempGameManager.Instance.PlaySFXAttack();
+        // TempGameManager.Instance.PlaySFXAttack();
     }
 
     public void PlaySFXJump()
     {
-        TempGameManager.Instance.PlaySFXJump();
+        // TempGameManager.Instance.PlaySFXJump();
     }
 
     public void PlayRandomCatAudio()
     {
-        TempGameManager.Instance.PlayRandomCatAudio();
+        // TempGameManager.Instance.PlayRandomCatAudio();
     }
+
+    #endregion TEMP EVENTS
+
 }

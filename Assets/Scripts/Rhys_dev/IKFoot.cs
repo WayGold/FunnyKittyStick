@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -33,6 +34,11 @@ public class IKFoot : MonoBehaviour
 
     private float _maxHitDistance = 5f;
     private float _addedHeight = 3f;
+
+    private bool[] _allGroundSpherecastHits;
+    private LayerMask _hitLayer;
+    private Vector3[] _allHitNormals;
+    private float _offset = 0.15f;
     
     #endregion
 
@@ -97,7 +103,20 @@ public class IKFoot : MonoBehaviour
     {
         for (int i = 0; i < 4; ++i)
         {
+            CheckGround(out Vector3 hitPoint, out _allGroundSpherecastHits[i], out Vector3 hitNormal, 
+                out _hitLayer, out _, allTransforms[i], walkableLayer, _maxHitDistance, _addedHeight);
+            _allHitNormals[i] = hitNormal;
 
+            if (_allGroundSpherecastHits[i])
+            {
+                allTargetTransforms[i].position = new Vector3(allTransforms[i].position.x, hitPoint.y + _offset,
+                    allTransforms[i].position.z);
+            }
+            else
+            {
+                allTargetTransforms[i].position = allTransforms[i].position;
+                // allTargetTransforms[i].rotation = allTransforms[i].rotation;
+            }
         }
     }
 
@@ -117,6 +136,10 @@ public class IKFoot : MonoBehaviour
         allIKConstraints[3] = rigBR.GetComponent<TwoBoneIKConstraint>();
         
         walkableLayer = LayerMask.NameToLayer("Walkable");
+
+        _allGroundSpherecastHits = new bool[5];
+
+        _allHitNormals = new Vector3[4];
     }
 
     private void FixedUpdate()

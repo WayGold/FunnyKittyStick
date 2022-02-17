@@ -23,11 +23,13 @@ public class testAlign : MonoBehaviour
     public float timeToTarget;
 
     DynamicAlign dynamicAlign;
+    DynamicArrive dynamicArrive;
 
     // Start is called before the first frame update
     void Start()
     {
         dynamicAlign = new DynamicAlign(agentRB, targetRB, maxAngularAcceleration, maxRotation);
+        dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, 0.5f, 2f);
     }
 
     // Update is called once per frame
@@ -38,7 +40,15 @@ public class testAlign : MonoBehaviour
             targetRB.angularVelocity = new Vector3(0, 1, 0);
         }
 
-        UpdateRigidBody(dynamicAlign.getSteering());
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            targetRB.velocity = new Vector3(1, 0, 0);
+        }
+
+        DynamicSteeringOutput steering = dynamicAlign.getSteering();
+        steering.linearAccel = dynamicArrive.getSteering().linearAccel;
+
+        UpdateRigidBody(steering);
     }
 
     void UpdateRigidBody(DynamicSteeringOutput i_steering)

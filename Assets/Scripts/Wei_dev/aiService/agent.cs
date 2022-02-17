@@ -12,6 +12,7 @@ public class agent : MonoBehaviour
 {
     public Rigidbody agentRB;
     public Rigidbody targetRB;
+    public Rigidbody auxRB;
 
     public float maxSpeed;
     public float maxTargetSpeed;
@@ -42,6 +43,8 @@ public class agent : MonoBehaviour
     private Vector3 targetLastVelocity;
     private float timeElapsedSinceLastAttack;
     private float timeElapsedSinceLastJump;
+
+    [SerializeField]private Vector3 lastVelocity;
 
 
     // Test Fix Cat Animation
@@ -87,10 +90,15 @@ public class agent : MonoBehaviour
         {
             //currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
             DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
-            DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
             currentMovement = dynamicArrive.getSteering();
+
+            DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
             currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
-            
+
+            //DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
+            //currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
+
+            currentMovement.linearAccel.y = 0;
         }
         
         UpdateRigidBody(currentMovement);
@@ -117,11 +125,14 @@ public class agent : MonoBehaviour
     {
         // Update position and orientation
         agentRB.position += agentRB.velocity * Time.deltaTime;
-        agentRB.rotation = Quaternion.Euler(new Vector3(0, (agentRB.angularVelocity.y * Time.deltaTime), 0));
-
+        agentRB.rotation = Quaternion.Euler(new Vector3(0, agentRB.rotation.eulerAngles.y + (agentRB.angularVelocity.y * Time.deltaTime) * Mathf.Rad2Deg, 0));
+        Debug.Log(lastVelocity);
         // Update velocity and rotation.
         agentRB.velocity += i_steering.linearAccel * Time.deltaTime;
         agentRB.angularVelocity += new Vector3(0, i_steering.rotAccel * Time.deltaTime, 0);
+        _animator.SetFloat("Speed", agentRB.velocity.magnitude);
+
+        lastVelocity = agentRB.velocity;
 
         // Check for speeding and clip.
         if (Vector3.Magnitude(agentRB.velocity) > maxSpeed)
@@ -256,7 +267,7 @@ public class agent : MonoBehaviour
 
     void calcTargetAcceleration()
     {
-        targetAcceleration = (targetRB.velocity - targetLastVelocity) / Time.fixedDeltaTime;
+        targetAcceleration = (targetRB.velocity - targetLastVelocity) / Time.deltaTime;
     }
 
 

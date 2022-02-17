@@ -114,10 +114,10 @@ namespace AIService
         public float slowRadius;
         public float timeToTarget;
 
-        public DynamicFace(Rigidbody i_character, Rigidbody i_target, float i_maxAngularAcceleration,
+        public DynamicFace(Rigidbody i_character, Rigidbody i_target, Rigidbody i_explicitTarget, float i_maxAngularAcceleration,
         float i_maxRotation, float i_targetRadius, float i_slowRadius, float i_timeToTarget = 0.1f)
         {
-            explicitTarget = new Rigidbody();
+            explicitTarget = i_explicitTarget;
             characterRB = i_character;
             targetRB = i_target;
 
@@ -171,7 +171,7 @@ namespace AIService
         public float timeToTarget;
 
         public DynamicAlign(Rigidbody i_character, Rigidbody i_target, float i_maxAngularAcceleration,
-        float i_maxRotation, float i_targetRadius, float i_slowRadius, float i_timeToTarget = 0.1f)
+        float i_maxRotation, float i_targetRadius = 0.01f, float i_slowRadius = 0.5f, float i_timeToTarget = 0.1f)
         {
             characterRB = i_character;
             targetRB = i_target;
@@ -251,6 +251,59 @@ namespace AIService
             }
 
             return i_rotation;
+        }
+    }
+
+    public class DynamicLWYAG
+    {
+        public DynamicAlign dynamicAlign;
+        public Rigidbody characterRB;
+        public Rigidbody explicitTarget;
+
+        public float maxAngularAcceleration;
+        public float maxRotation;
+
+        public float targetRadius;
+        public float slowRadius;
+        public float timeToTarget;
+
+        public DynamicLWYAG(Rigidbody i_character, Rigidbody i_explicitTarget, float i_maxAngularAcceleration,
+        float i_maxRotation, float i_targetRadius, float i_slowRadius, float i_timeToTarget = 0.1f)
+        {
+            explicitTarget = i_explicitTarget;
+            characterRB = i_character;
+
+            maxAngularAcceleration = i_maxAngularAcceleration;
+            maxRotation = i_maxRotation;
+            targetRadius = i_targetRadius;
+            slowRadius = i_slowRadius;
+            timeToTarget = i_timeToTarget;
+        }
+
+        public DynamicSteeringOutput getSteering()
+        {
+            DynamicSteeringOutput result;
+            Vector3 velocity;
+
+            // 1. Calculate the target to delegate to align
+            // Check for a zero direction, and make no change if so.
+            velocity = characterRB.velocity;
+            if (Vector3.Magnitude(velocity) < 0.001)
+            {
+                result.linearAccel = new Vector3(0.0f, 0.0f, 0.0f);
+                result.rotAccel = 0.0f;
+                return result;
+            }
+
+            // Otherwise set the target based on the velocity.
+            Quaternion deltaRot = Quaternion.Euler(new Vector3(0, Mathf.Atan2(velocity.x, velocity.z) * Mathf.Rad2Deg, 0));
+            explicitTarget.MoveRotation(deltaRot);
+
+            // 2. Delegate to align.
+            dynamicAlign = new DynamicAlign(characterRB, explicitTarget, maxAngularAcceleration, maxRotation);
+            result = dynamicAlign.getSteering();
+
+            return result;
         }
     }
 }

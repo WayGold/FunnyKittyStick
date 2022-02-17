@@ -86,6 +86,7 @@ public class JoyconDemo : MonoBehaviour {
 
             // Accel values:  x, y, z axis values (in Gs)
             accel = j.GetAccel();
+
             orientation = j.GetVector();
 
 			rot = orientation.eulerAngles;

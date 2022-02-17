@@ -4,22 +4,36 @@ using UnityEngine;
 
 using MovementOutputs;
 using static AIService.KinematicSeek;
+using AIService;
+
 using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
 {
     public Rigidbody agentRB;
     public Rigidbody targetRB;
+
     public float maxSpeed;
-    public float idleRadius;
     public float maxTargetSpeed;
+    public float maxAcceleration;
+
+    public float idleRadius;
     public float jumpRadius;
     public float jumpUpForce;
     public float jumpUpAtAcceleration;
-    public Vector3 targetAcceleration;
+    
     public float attackTimeThreshold = 4f;
     public float jumpTimeThreshold = 5f;
     public float velocityMultiplier = 1f;
+
+    public float maxAngularAcceleration;
+    public float maxRotation;
+
+    public float targetRadius;
+    public float slowRadius;
+    public float timeToTarget;
+
+    public Vector3 targetAcceleration;
 
     private Animator _animator;
     private bool isSit = false;
@@ -47,10 +61,14 @@ public class agent : MonoBehaviour
     void Update()
     {
         timeElapsedSinceLastAttack += Time.deltaTime;
-        
-        KinematicSteeringOutput currentMovement;
-        currentMovement.linearVelocity = new Vector3(0, 0, 0);
-        currentMovement.rotVelocity = 0;
+
+        //KinematicSteeringOutput currentMovement;
+        //currentMovement.linearVelocity = new Vector3(0, 0, 0);
+        //currentMovement.rotVelocity = 0;
+
+        DynamicSteeringOutput currentMovement;
+        currentMovement.linearAccel = new Vector3(0, 0, 0);
+        currentMovement.rotAccel = 0;
 
         calcTargetAcceleration();
         Debug.Log("Acceleration - " + targetAcceleration);
@@ -66,15 +84,17 @@ public class agent : MonoBehaviour
 
         // SEEK COMMAND VERIFIED
         if (toSeek)
-            currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
-
+        {
+            //currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
+            DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
+            DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
+            currentMovement = dynamicArrive.getSteering();
+            currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
+            
+        }
+        
         UpdateRigidBody(currentMovement);
     }
-
-    //DynamicSteeringOutput getSteering()
-    //{
-
-    //}
 
     void UpdateRigidBody(KinematicSteeringOutput currentMovement)
     {
@@ -91,6 +111,30 @@ public class agent : MonoBehaviour
         }
         // Record Target Velocity
         targetLastVelocity = targetRB.velocity;
+    }
+
+    void UpdateRigidBody(DynamicSteeringOutput i_steering)
+    {
+        // Update position and orientation
+        agentRB.position += agentRB.velocity * Time.deltaTime;
+        agentRB.rotation = Quaternion.Euler(new Vector3(0, (agentRB.angularVelocity.y * Time.deltaTime), 0));
+
+        // Update velocity and rotation.
+        agentRB.velocity += i_steering.linearAccel * Time.deltaTime;
+        agentRB.angularVelocity += new Vector3(0, i_steering.rotAccel * Time.deltaTime, 0);
+
+        // Check for speeding and clip.
+        if (Vector3.Magnitude(agentRB.velocity) > maxSpeed)
+        {
+            agentRB.velocity = Vector3.Normalize(agentRB.velocity);
+            agentRB.velocity *= maxSpeed;
+        }
+
+        // Check for rot speeding and clip.
+        if (agentRB.angularVelocity.y > maxRotation)
+        {
+            agentRB.angularVelocity = new Vector3(agentRB.angularVelocity.x, maxRotation, agentRB.angularVelocity.z);
+        }
     }
 
     void NoSeekWhileSit()

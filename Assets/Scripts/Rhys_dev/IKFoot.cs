@@ -39,6 +39,9 @@ public class IKFoot : MonoBehaviour
     private LayerMask _hitLayer;
     private Vector3[] _allHitNormals;
     private float _offset = 0.15f;
+
+    private Animator _animator;
+    private float[] _ikWeights;
     
     #endregion
 
@@ -101,8 +104,15 @@ public class IKFoot : MonoBehaviour
 
     private void RotateFeet()
     {
+        _ikWeights[0] = _animator.GetFloat("FL Weight");
+        _ikWeights[1] = _animator.GetFloat("FR Weight");
+        _ikWeights[2] = _animator.GetFloat("BL Weight");
+        _ikWeights[3] = _animator.GetFloat("BR Weight");
+            
         for (int i = 0; i < 4; ++i)
         {
+            allIKConstraints[i].weight = _ikWeights[i];
+            
             CheckGround(out Vector3 hitPoint, out _allGroundSpherecastHits[i], out Vector3 hitNormal, 
                 out _hitLayer, out _, allTransforms[i], walkableLayer, _maxHitDistance, _addedHeight);
             _allHitNormals[i] = hitNormal;
@@ -126,6 +136,8 @@ public class IKFoot : MonoBehaviour
 
     private void Start()
     {
+        _animator = GetComponent<Animator>();
+        
         allTransforms = new[] {transformFL, transformFR, transformBL, transformBR};
         allTargetTransforms = new[] {targetTransformFL, targetTransformFR, targetTransformBL, targetTransformBR};
         
@@ -140,6 +152,8 @@ public class IKFoot : MonoBehaviour
         _allGroundSpherecastHits = new bool[5];
 
         _allHitNormals = new Vector3[4];
+
+        _ikWeights = new float[4];
     }
 
     private void FixedUpdate()

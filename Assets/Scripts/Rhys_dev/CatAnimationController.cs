@@ -12,6 +12,7 @@ public class CatAnimationController : MonoBehaviour
 
     private bool _isSitting;
     private bool _isTurningLeft;
+    private float[] _ikWeights;
 
     public static CatAnimationController Instance;
 
@@ -96,6 +97,8 @@ public class CatAnimationController : MonoBehaviour
 
         _isSitting = false;
         _isTurningLeft = false;
+
+        _ikWeights = new float[4];
     }
 
     private void Update()

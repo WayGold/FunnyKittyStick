@@ -10,6 +10,8 @@ using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
 {
+    [SerializeField] public List<GameObject> JumpToList;
+
     public Rigidbody agentRB;
     public Rigidbody targetRB;
     public Rigidbody auxRB;

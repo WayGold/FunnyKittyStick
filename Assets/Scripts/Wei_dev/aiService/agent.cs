@@ -243,6 +243,7 @@ public class agent : MonoBehaviour
             {
                 Debug.Log("Jump Forward");
                 // TempGameManager.Instance.OnCatJumpForward();
+                SetSpineAnimationAmount(0);
                 _animator.SetTrigger("JumpForward");
                 Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
                 maxSpeed = 6f;
@@ -250,6 +251,11 @@ public class agent : MonoBehaviour
                 // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
             }
         }
+    }
+
+    public void SetSpineAnimationAmount(float amount)
+    {
+        _spineAnimator.SpineAnimatorAmount = amount;
     }
 
     bool isInRadius(Vector3 agent, Vector3 target, float radius)

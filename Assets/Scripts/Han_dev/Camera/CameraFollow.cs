@@ -35,12 +35,11 @@ public class CameraFollow : MonoBehaviour
     void LateUpdate()
     {
 
-        // If outside the effective collider, don't follow the target
-        if (!targetEffectiveCollider.bounds.Contains(target.position))
-        {
-            return;
-        }
-
+        //// If outside the effective collider, don't follow the target
+        //if (!targetEffectiveCollider.bounds.Contains(target.position))
+        //{
+        //    return;
+        //}
 
         oldPosition = transform.position;
         if (!freazeX)

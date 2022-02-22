@@ -119,13 +119,21 @@ public class IKFoot : MonoBehaviour
 
             if (_allGroundSpherecastHits[i])
             {
-                allTargetTransforms[i].position = new Vector3(allTransforms[i].position.x, hitPoint.y + _offset,
-                    allTransforms[i].position.z);
+                if (i == 2 || i == 3)
+                {
+                    allTargetTransforms[i].position = new Vector3(allTransforms[i].position.x, hitPoint.y + _offset - 0.1f,
+                        allTransforms[i].position.z);
+                }
+                else
+                {
+                    allTargetTransforms[i].position = new Vector3(allTransforms[i].position.x, hitPoint.y + _offset,
+                        allTransforms[i].position.z);
+                }
+
             }
             else
             {
                 allTargetTransforms[i].position = allTransforms[i].position;
-                // allTargetTransforms[i].rotation = allTransforms[i].rotation;
             }
         }
     }
@@ -140,7 +148,7 @@ public class IKFoot : MonoBehaviour
         
         allTransforms = new[] {transformFL, transformFR, transformBL, transformBR};
         allTargetTransforms = new[] {targetTransformFL, targetTransformFR, targetTransformBL, targetTransformBR};
-        
+
         allIKConstraints = new TwoBoneIKConstraint[4];
         allIKConstraints[0] = rigFL.GetComponent<TwoBoneIKConstraint>();
         allIKConstraints[1] = rigFR.GetComponent<TwoBoneIKConstraint>();

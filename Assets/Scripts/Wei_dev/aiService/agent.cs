@@ -92,11 +92,11 @@ public class agent : MonoBehaviour
             DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
             currentMovement = dynamicArrive.getSteering();
 
-            DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
-            currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
+            //DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
+            //currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
 
-            //DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
-            //currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
+            DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, auxRB, maxAngularAcceleration, maxRotation, 0.05f, 0.15f);
+            currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
 
             currentMovement.linearAccel.y = 0;
         }
@@ -129,7 +129,7 @@ public class agent : MonoBehaviour
         Debug.Log(lastVelocity);
         // Update velocity and rotation.
         agentRB.velocity += i_steering.linearAccel * Time.deltaTime;
-        agentRB.angularVelocity += new Vector3(0, i_steering.rotAccel * Time.deltaTime, 0);
+        agentRB.angularVelocity += new Vector3(0, -i_steering.rotAccel * Time.deltaTime, 0);
         _animator.SetFloat("Speed", agentRB.velocity.magnitude);
 
         lastVelocity = agentRB.velocity;

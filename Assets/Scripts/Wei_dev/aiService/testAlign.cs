@@ -9,7 +9,7 @@ public class testAlign : MonoBehaviour
 
     public Rigidbody agentRB;
     public Rigidbody targetRB;
-    public Rigidbody auxRB;
+    [SerializeField] public Rigidbody auxRB;
 
     public float maxSpeed;
     public float maxTargetSpeed;
@@ -24,12 +24,16 @@ public class testAlign : MonoBehaviour
 
     DynamicAlign dynamicAlign;
     DynamicArrive dynamicArrive;
+    DynamicFace dynamicFace;
+    DynamicLWYAG dynamicLWYAG;
 
     // Start is called before the first frame update
     void Start()
     {
         dynamicAlign = new DynamicAlign(agentRB, targetRB, maxAngularAcceleration, maxRotation);
         dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, 0.5f, 2f);
+        dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
+        dynamicLWYAG = new DynamicLWYAG(agentRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
     }
 
     // Update is called once per frame
@@ -37,15 +41,15 @@ public class testAlign : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.S))
         {
-            targetRB.angularVelocity = new Vector3(0, 1, 0);
+            targetRB.angularVelocity += new Vector3(0, 1, 0);
         }
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            targetRB.velocity = new Vector3(1, 0, 0);
+            targetRB.velocity += new Vector3(1, 0, 0);
         }
 
-        DynamicSteeringOutput steering = dynamicAlign.getSteering();
+        DynamicSteeringOutput steering = dynamicLWYAG.getSteering();
         steering.linearAccel = dynamicArrive.getSteering().linearAccel;
 
         UpdateRigidBody(steering);

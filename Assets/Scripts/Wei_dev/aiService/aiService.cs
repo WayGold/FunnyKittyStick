@@ -147,7 +147,7 @@ namespace AIService
 
             // Put the target together.
             Quaternion deltaRot = Quaternion.Euler(new Vector3(0, Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg, 0));
-            explicitTarget.MoveRotation(deltaRot);
+            explicitTarget.rotation = deltaRot;
 
             // 2. Delegate to align.
             dynamicAlign = new DynamicAlign(characterRB, explicitTarget, maxAngularAcceleration,
@@ -191,7 +191,7 @@ namespace AIService
             Vector3 characterForward = characterRB.gameObject.transform.forward;
 
             // Get the naive direction to the target.
-            rotation = Vector3.Angle(new Vector3(targetForward.x, 0, targetForward.z), new Vector3(characterForward.x, 0, characterForward.z));
+            rotation = Vector3.SignedAngle(new Vector3(targetForward.x, 0, targetForward.z), new Vector3(characterForward.x, 0, characterForward.z), new Vector3(0, 1, 0));
             rotation = Mathf.Deg2Rad * rotation;
 
             // Map the result to the (-pi, pi) interval.

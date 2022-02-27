@@ -8,7 +8,6 @@ public class Stick : MonoBehaviour
 
     void Update()
     {
-        //Vector3 cameraAngles = new Vector3(Camera.main.transform.eulerAngles.x, 0, Camera.main.transform.eulerAngles.z);
         gameObject.transform.eulerAngles = (Camera.main.transform.eulerAngles) + offset;
     }
 }

@@ -11,13 +11,13 @@ public class JoyconDemo : MonoBehaviour {
     public Vector3 gyro;
     public Vector3 accel;
     public int jc_ind = 0;
-    public Quaternion orientation;
 	public Vector3 rot;
-	public Vector3 velocity;
 	public Vector3 dir;
+	public Vector3 rotateOffset;
+	private Vector3 centerVector;
 
 	public float movingSpeed = 5;
-	public float offsetAngle=-45;
+	private float movingOffset=-45;
 
 	public Rigidbody fishRigibody;
 	public float pullForce=2500;
@@ -27,12 +27,14 @@ public class JoyconDemo : MonoBehaviour {
     {
         gyro = new Vector3(0, 0, 0);
         accel = new Vector3(0, 0, 0);
-		velocity = new Vector3(0, 0, 0);
         // get the public Joycon array attached to the JoyconManager in scene
         joycons = JoyconManager.Instance.j;
 
  		parentTransform = gameObject.GetComponentInParent<Transform>();
 
+
+		joycons[jc_ind].Recenter();
+		centerVector = joycons[jc_ind].GetVector().eulerAngles;
 	}
 
     // Update is called once per frame
@@ -47,7 +49,6 @@ public class JoyconDemo : MonoBehaviour {
 				Debug.Log ("Shoulder button 2 held");
 				// GetStick returns a 2-element vector with x/y joystick components
 				transform.Translate(Vector3.down * Time.deltaTime * movingSpeed, Space.World);
-
 			}
 			if(j.GetButton(Joycon.Button.SHOULDER_1))
             {
@@ -65,6 +66,7 @@ public class JoyconDemo : MonoBehaviour {
 				Debug.Log(string.Format("Stick x: {0:N} Stick y: {1:N}", j.GetStick()[0], j.GetStick()[1]));
 				// Joycon has no magnetometer, so it cannot accurately determine its yaw value. Joycon.Recenter allows the user to reset the yaw value.
 				j.Recenter();
+				centerVector = j.GetVector().eulerAngles;
 			}
 
 			if (j.GetButtonDown(Joycon.Button.DPAD_RIGHT))
@@ -73,29 +75,31 @@ public class JoyconDemo : MonoBehaviour {
 				PullFish();
 			}
 
-			stick = j.GetStick();
-			if(stick[0]!=0 || stick[1]!=0)
-            {
-				dir = new Vector3(stick[0], 0, stick[1]);
-				dir = Quaternion.AngleAxis(offsetAngle, new Vector3(0,1,0))*dir;
-				transform.Translate(dir * Time.deltaTime * movingSpeed, Space.World);
-			}
+			Move(j);
 
             // Gyro values: x, y, z axis values (in radians per second)
             gyro = j.GetGyro();
 
             // Accel values:  x, y, z axis values (in Gs)
             accel = j.GetAccel();
-            orientation = j.GetVector();
 
-			rot = orientation.eulerAngles;
-			rot = new Vector3(rot.x, rot.y, rot.z);
-
+			rot = j.GetVector().eulerAngles;
 			gameObject.transform.localEulerAngles = rot;
+
+			rotateOffset = new Vector3( (int)(rot.x - centerVector.x), (int)(rot.y - centerVector.y), (int)(rot.z - centerVector.z));
 		}
     }
-
-	public void PullFish()
+    private void Move(Joycon j)
+    {
+		stick = j.GetStick();
+		if (stick[0] != 0 || stick[1] != 0)
+		{
+			dir = new Vector3(stick[0], 0, stick[1]);
+			dir = Quaternion.AngleAxis(movingOffset, new Vector3(0, 1, 0)) * dir;
+			parentTransform.Translate(dir * Time.deltaTime * movingSpeed, Space.World);
+		}
+	}
+    public void PullFish()
 	{
 		fishRigibody.AddForce(0, pullForce * -1, 0);
 		Debug.Log("PullFish");

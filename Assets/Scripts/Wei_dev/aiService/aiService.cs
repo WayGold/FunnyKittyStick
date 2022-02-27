@@ -191,7 +191,8 @@ namespace AIService
             Vector3 characterForward = characterRB.gameObject.transform.forward;
 
             // Get the naive direction to the target.
-            rotation = Vector3.SignedAngle(new Vector3(targetForward.x, 0, targetForward.z), new Vector3(characterForward.x, 0, characterForward.z), new Vector3(0, 1, 0));
+            rotation = Vector3.SignedAngle(new Vector3(targetForward.x, 0, targetForward.z),
+                                            new Vector3(characterForward.x, 0, characterForward.z), new Vector3(0, 1, 0));
             rotation = Mathf.Deg2Rad * rotation;
 
             // Map the result to the (-pi, pi) interval.
@@ -304,6 +305,58 @@ namespace AIService
             result = dynamicAlign.getSteering();
 
             return result;
+        }
+    }
+
+    public static class ProjectionThrow
+    {
+        public static float G = 9.81f;
+
+        static Vector3 CaculateTrowVelocity(GameObject i_cat, Vector3 i_targetPos, float i_addHeight)
+        {
+            //if you need catSize offset, use this!
+            Vector3 catSize = i_cat.GetComponent<Collider>().bounds.size;
+            float h = i_targetPos.y - (i_cat.transform.position.y - catSize.y / 2) + i_addHeight;
+
+            //if you don't need catSize offset, use this!
+            //float h = i_targetPos.y - i_cat.transform.position.y + i_addHeight;
+
+            float s = Vector2.Distance(new Vector2(i_targetPos.x, i_targetPos.z),
+                                        new Vector2(i_cat.transform.position.x, i_cat.transform.position.z));
+
+            return (h >= 0) ? UpThrow(i_cat, i_targetPos, h, s) : DownThrow(i_cat, i_targetPos, h, s);
+        }
+
+        static Vector3 UpThrow(GameObject i_cat, Vector3 i_targetPos, float h, float s)
+        {
+            float v0 = Mathf.Sqrt(2 * G * h);
+            float v1 = s / (Mathf.Sqrt((2 / G) * v0 - 2 * h / G));
+
+            //horizontal velocity
+            Vector3 vs = new Vector3(i_targetPos.x - i_cat.transform.position.x,
+                                        0,
+                                        i_targetPos.z - i_cat.transform.position.z).normalized * v1;
+            //vertical velocity
+            Vector3 vh = new Vector3(0, i_targetPos.y - i_cat.transform.position.y, 0).normalized * v0;
+
+            Debug.Log("UpThrow:" + "vh= " + vh + " vs=" + vs);
+            return vh + vs;
+        }
+
+        static Vector3 DownThrow(GameObject i_cat, Vector3 i_targetPos, float h, float s)
+        {
+            float v0 = 0;
+            float v1 = s / (Mathf.Sqrt((-2 * h) / G));
+
+            //horizontal velocity
+            Vector3 vs = new Vector3(i_targetPos.x - i_cat.transform.position.x,
+                                      0,
+                                      i_targetPos.z - i_cat.transform.position.z).normalized * v1;
+            //vertical velocity
+            Vector3 vh = new Vector3(0, i_targetPos.y - i_cat.transform.position.y, 0).normalized * v0;
+
+            Debug.Log("DownThrow:" + "vh = " + vh + " vs=" + vs);
+            return vs;
         }
     }
 }

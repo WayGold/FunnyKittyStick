@@ -210,9 +210,10 @@ public class agent : MonoBehaviour
                     if (agentRB.position.y < jumpTarget.transform.position.y)
                     {
                         Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject, jumpTarget.transform.position, 10);
-                        float timeToJumpToTarget = 1.0f;
 
-                        result = result / timeToJumpToTarget;
+                        //float timeToJumpToTarget = 1.0f;
+                        // This was originally used for calc acceleration
+                        //result = result / timeToJumpToTarget;
 
                         // Disable Seeking while Throwing, turn on isThrowing flag
                         toSeek = false;

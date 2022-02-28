@@ -41,6 +41,8 @@ public class agent : MonoBehaviour
     private Animator _animator;
     private bool isSit = false;
     private bool toSeek = false;
+    private bool isThrowing = false;
+    private GameObject throwToTarget = null;
     private bool lockY = true;
     private Vector3 targetLastVelocity;
     private float timeElapsedSinceLastAttack;
@@ -75,14 +77,17 @@ public class agent : MonoBehaviour
         currentMovement.linearAccel = new Vector3(0, 0, 0);
         currentMovement.rotAccel = 0;
 
-        calcTargetAcceleration();
-        Debug.Log("Acceleration - " + targetAcceleration);
+        //calcTargetAcceleration();
+        //Debug.Log("Acceleration - " + targetAcceleration);
 
         // Animation Listeners
         JumpUpListener();
         AttackListener();
         FastTargetListener();
-        ChargeJumpListener();
+        //ChargeJumpListener();
+
+        // Check for throwing to preset jumpTo locations
+        ThrowListener();
 
         // Disable movement while sitting animation is in progress
         NoSeekWhileSit();
@@ -102,8 +107,9 @@ public class agent : MonoBehaviour
 
             currentMovement.linearAccel.y = 0;
         }
-        
-        UpdateRigidBody(currentMovement);
+
+        if(!isThrowing)
+            UpdateRigidBody(currentMovement);
     }
 
     void UpdateRigidBody(KinematicSteeringOutput currentMovement)
@@ -162,6 +168,64 @@ public class agent : MonoBehaviour
         }
     }
 
+    #region ANIMATION LISTENERS
+
+    void ThrowListener()
+    {
+        // Already triggerred to jump, Check for Arrival here
+        if (isThrowing)
+        {
+            // If the agent arrive at the target
+            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) && 
+                (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
+            {
+                agentRB.velocity = Vector3.zero;
+                // Reset isThrowing flag and target aux
+                isThrowing = false;
+                throwToTarget = null;
+                // Enable Seek
+                toSeek = true;
+                Debug.Log("Throw Arrived...");
+            }
+            else
+            {
+                toSeek = false;
+                isThrowing = true;
+                Debug.Log("Throw in Progress...");
+            }
+        }
+        // Else Check for all target to jump to
+        else
+        {
+            foreach (GameObject jumpTarget in JumpToList)
+            {
+                float range = 8.0f;
+                // If the agent enter a range and there is a meaningful height difference
+                if (Vector3.Distance(new Vector3(jumpTarget.transform.position.x, 0, jumpTarget.transform.position.z),
+                    new Vector3(agentRB.position.x, 0, agentRB.position.z)) <= range && 
+                    Mathf.Abs(jumpTarget.transform.position.y - agentRB.position.y) > 3)
+                {
+                    Debug.Log("In Range of: " + jumpTarget.name);
+                    // And if the agent is at a lower level
+                    if (agentRB.position.y < jumpTarget.transform.position.y)
+                    {
+                        Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject, jumpTarget.transform.position, 10);
+                        float timeToJumpToTarget = 1.0f;
+
+                        result = result / timeToJumpToTarget;
+
+                        // Disable Seeking while Throwing, turn on isThrowing flag
+                        toSeek = false;
+                        isThrowing = true;
+                        throwToTarget = jumpTarget;
+                        Debug.Log("Throwing with init velocity: " + result);
+                        agentRB.velocity = result;
+                    }
+                }
+            }
+        }
+    }
+
     void JumpUpListener()
     {
         timeElapsedSinceLastJump += Time.deltaTime;
@@ -176,7 +240,6 @@ public class agent : MonoBehaviour
                 // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
             }
-
         }
     }
 
@@ -252,6 +315,8 @@ public class agent : MonoBehaviour
             }
         }
     }
+
+    #endregion
 
     public void SetSpineAnimationAmount(float amount)
     {

@@ -10,7 +10,9 @@ using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
 {
-    [SerializeField] public List<GameObject> JumpToList;
+    [SerializeField] public List<JumpToData> JumpToList;
+    
+    public GameObject StickFish;
 
     public Rigidbody agentRB;
     public Rigidbody targetRB;
@@ -179,13 +181,19 @@ public class agent : MonoBehaviour
             if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) && 
                 (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
             {
-                agentRB.velocity = Vector3.zero;
+                foreach (var collider in gameObject.GetComponents<BoxCollider>())
+                    collider.enabled = true;
+                gameObject.GetComponent<MeshCollider>().enabled = true;
+
+                //agentRB.velocity = Vector3.zero;
+                agentRB.velocity = agentRB.velocity/2;
                 // Reset isThrowing flag and target aux
                 isThrowing = false;
                 throwToTarget = null;
                 // Enable Seek
                 toSeek = true;
                 Debug.Log("Throw Arrived...");
+
             }
             else
             {
@@ -197,28 +205,32 @@ public class agent : MonoBehaviour
         // Else Check for all target to jump to
         else
         {
-            foreach (GameObject jumpTarget in JumpToList)
+            foreach (var jumpTarget in JumpToList)
             {
-                float range = 8.0f;
                 // If the agent enter a range and there is a meaningful height difference
-                if (Vector3.Distance(new Vector3(jumpTarget.transform.position.x, 0, jumpTarget.transform.position.z),
-                    new Vector3(agentRB.position.x, 0, agentRB.position.z)) <= range && 
-                    Mathf.Abs(jumpTarget.transform.position.y - agentRB.position.y) > 3)
+                if (Vector3.Distance(new Vector3(jumpTarget.JumpPointObj.transform.position.x, 0, jumpTarget.JumpPointObj.transform.position.z),
+                    new Vector3(agentRB.position.x, 0, agentRB.position.z)) <= jumpTarget.DetectRange &&
+                    Mathf.Abs(jumpTarget.JumpPointObj.transform.position.y - agentRB.position.y) > 3 && 
+                    Vector3.Distance(jumpTarget.JumpPointObj.transform.position, StickFish.transform.position)<= 2)
                 {
-                    Debug.Log("In Range of: " + jumpTarget.name);
+                    Debug.Log("In Range of: " + jumpTarget.JumpPointObj.name);
                     // And if the agent is at a lower level
-                    if (agentRB.position.y < jumpTarget.transform.position.y)
+                    if (agentRB.position.y < jumpTarget.JumpPointObj.transform.position.y)
                     {
-                        Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject, jumpTarget.transform.position, 10);
+                        Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject, jumpTarget.JumpPointObj.transform.position, jumpTarget.AddHeight);
 
                         //float timeToJumpToTarget = 1.0f;
                         // This was originally used for calc acceleration
                         //result = result / timeToJumpToTarget;
 
+                        foreach(var collider in gameObject.GetComponents<BoxCollider>())
+                            collider.enabled = false;
+                        gameObject.GetComponent<MeshCollider>().enabled = false;
+
                         // Disable Seeking while Throwing, turn on isThrowing flag
                         toSeek = false;
                         isThrowing = true;
-                        throwToTarget = jumpTarget;
+                        throwToTarget = jumpTarget.JumpPointObj;
                         Debug.Log("Throwing with init velocity: " + result);
                         agentRB.velocity = result;
                     }

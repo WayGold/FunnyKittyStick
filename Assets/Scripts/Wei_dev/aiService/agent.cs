@@ -3,31 +3,52 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using MovementOutputs;
-using static AIService.aiService;
+using static AIService.KinematicSeek;
+using AIService;
+
 using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
 {
+    [SerializeField] public List<GameObject> JumpToList;
+
     public Rigidbody agentRB;
     public Rigidbody targetRB;
+    public Rigidbody auxRB;
+
     public float maxSpeed;
-    public float idleRadius;
     public float maxTargetSpeed;
+    public float maxAcceleration;
+
+    public float idleRadius;
     public float jumpRadius;
     public float jumpUpForce;
     public float jumpUpAtAcceleration;
-    public Vector3 targetAcceleration;
+    
     public float attackTimeThreshold = 4f;
     public float jumpTimeThreshold = 5f;
     public float velocityMultiplier = 1f;
 
+    public float maxAngularAcceleration;
+    public float maxRotation;
+
+    public float targetRadius;
+    public float slowRadius;
+    public float timeToTarget;
+
+    public Vector3 targetAcceleration;
+
     private Animator _animator;
     private bool isSit = false;
     private bool toSeek = false;
+    private bool isThrowing = false;
+    private GameObject throwToTarget = null;
     private bool lockY = true;
     private Vector3 targetLastVelocity;
     private float timeElapsedSinceLastAttack;
     private float timeElapsedSinceLastJump;
+
+    [SerializeField]private Vector3 lastVelocity;
 
 
     // Test Fix Cat Animation
@@ -47,28 +68,48 @@ public class agent : MonoBehaviour
     void Update()
     {
         timeElapsedSinceLastAttack += Time.deltaTime;
-        
-        KinematicSteeringOutput currentMovement;
-        currentMovement.linearVelocity = new Vector3(0, 0, 0);
-        currentMovement.rotVelocity = 0;
 
-        calcTargetAcceleration();
-        Debug.Log("Acceleration - " + targetAcceleration);
+        //KinematicSteeringOutput currentMovement;
+        //currentMovement.linearVelocity = new Vector3(0, 0, 0);
+        //currentMovement.rotVelocity = 0;
+
+        DynamicSteeringOutput currentMovement;
+        currentMovement.linearAccel = new Vector3(0, 0, 0);
+        currentMovement.rotAccel = 0;
+
+        //calcTargetAcceleration();
+        //Debug.Log("Acceleration - " + targetAcceleration);
 
         // Animation Listeners
         JumpUpListener();
         AttackListener();
         FastTargetListener();
-        ChargeJumpListener();
+        //ChargeJumpListener();
+
+        // Check for throwing to preset jumpTo locations
+        ThrowListener();
 
         // Disable movement while sitting animation is in progress
         NoSeekWhileSit();
 
         // SEEK COMMAND VERIFIED
         if (toSeek)
-            currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
+        {
+            //currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
+            DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
+            currentMovement = dynamicArrive.getSteering();
 
-        UpdateRigidBody(currentMovement);
+            //DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
+            //currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
+
+            DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, auxRB, maxAngularAcceleration, maxRotation, 0.05f, 0.15f);
+            currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
+
+            currentMovement.linearAccel.y = 0;
+        }
+
+        if(!isThrowing)
+            UpdateRigidBody(currentMovement);
     }
 
     void UpdateRigidBody(KinematicSteeringOutput currentMovement)
@@ -88,6 +129,33 @@ public class agent : MonoBehaviour
         targetLastVelocity = targetRB.velocity;
     }
 
+    void UpdateRigidBody(DynamicSteeringOutput i_steering)
+    {
+        // Update position and orientation
+        agentRB.position += agentRB.velocity * Time.deltaTime;
+        agentRB.rotation = Quaternion.Euler(new Vector3(0, agentRB.rotation.eulerAngles.y + (agentRB.angularVelocity.y * Time.deltaTime) * Mathf.Rad2Deg, 0));
+        Debug.Log(lastVelocity);
+        // Update velocity and rotation.
+        agentRB.velocity += i_steering.linearAccel * Time.deltaTime;
+        agentRB.angularVelocity += new Vector3(0, -i_steering.rotAccel * Time.deltaTime, 0);
+        _animator.SetFloat("Speed", agentRB.velocity.magnitude);
+
+        lastVelocity = agentRB.velocity;
+
+        // Check for speeding and clip.
+        if (Vector3.Magnitude(agentRB.velocity) > maxSpeed)
+        {
+            agentRB.velocity = Vector3.Normalize(agentRB.velocity);
+            agentRB.velocity *= maxSpeed;
+        }
+
+        // Check for rot speeding and clip.
+        if (agentRB.angularVelocity.y > maxRotation)
+        {
+            agentRB.angularVelocity = new Vector3(agentRB.angularVelocity.x, maxRotation, agentRB.angularVelocity.z);
+        }
+    }
+
     void NoSeekWhileSit()
     {
         // Check for animation state
@@ -97,6 +165,65 @@ public class agent : MonoBehaviour
         {
             Debug.Log("Performing Sit Animation");
             toSeek = false;
+        }
+    }
+
+    #region ANIMATION LISTENERS
+
+    void ThrowListener()
+    {
+        // Already triggerred to jump, Check for Arrival here
+        if (isThrowing)
+        {
+            // If the agent arrive at the target
+            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) && 
+                (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
+            {
+                agentRB.velocity = Vector3.zero;
+                // Reset isThrowing flag and target aux
+                isThrowing = false;
+                throwToTarget = null;
+                // Enable Seek
+                toSeek = true;
+                Debug.Log("Throw Arrived...");
+            }
+            else
+            {
+                toSeek = false;
+                isThrowing = true;
+                Debug.Log("Throw in Progress...");
+            }
+        }
+        // Else Check for all target to jump to
+        else
+        {
+            foreach (GameObject jumpTarget in JumpToList)
+            {
+                float range = 8.0f;
+                // If the agent enter a range and there is a meaningful height difference
+                if (Vector3.Distance(new Vector3(jumpTarget.transform.position.x, 0, jumpTarget.transform.position.z),
+                    new Vector3(agentRB.position.x, 0, agentRB.position.z)) <= range && 
+                    Mathf.Abs(jumpTarget.transform.position.y - agentRB.position.y) > 3)
+                {
+                    Debug.Log("In Range of: " + jumpTarget.name);
+                    // And if the agent is at a lower level
+                    if (agentRB.position.y < jumpTarget.transform.position.y)
+                    {
+                        Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject, jumpTarget.transform.position, 10);
+
+                        //float timeToJumpToTarget = 1.0f;
+                        // This was originally used for calc acceleration
+                        //result = result / timeToJumpToTarget;
+
+                        // Disable Seeking while Throwing, turn on isThrowing flag
+                        toSeek = false;
+                        isThrowing = true;
+                        throwToTarget = jumpTarget;
+                        Debug.Log("Throwing with init velocity: " + result);
+                        agentRB.velocity = result;
+                    }
+                }
+            }
         }
     }
 
@@ -114,7 +241,6 @@ public class agent : MonoBehaviour
                 // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
             }
-
         }
     }
 
@@ -181,6 +307,7 @@ public class agent : MonoBehaviour
             {
                 Debug.Log("Jump Forward");
                 // TempGameManager.Instance.OnCatJumpForward();
+                SetSpineAnimationAmount(0);
                 _animator.SetTrigger("JumpForward");
                 Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
                 maxSpeed = 6f;
@@ -188,6 +315,13 @@ public class agent : MonoBehaviour
                 // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
             }
         }
+    }
+
+    #endregion
+
+    public void SetSpineAnimationAmount(float amount)
+    {
+        _spineAnimator.SpineAnimatorAmount = amount;
     }
 
     bool isInRadius(Vector3 agent, Vector3 target, float radius)
@@ -207,7 +341,7 @@ public class agent : MonoBehaviour
 
     void calcTargetAcceleration()
     {
-        targetAcceleration = (targetRB.velocity - targetLastVelocity) / Time.fixedDeltaTime;
+        targetAcceleration = (targetRB.velocity - targetLastVelocity) / Time.deltaTime;
     }
 
 

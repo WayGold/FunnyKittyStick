@@ -103,6 +103,9 @@ public class agent : MonoBehaviour
             DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
             currentMovement = dynamicArrive.getSteering();
 
+            targetRadius = 0.05f;
+            slowRadius = 0.15f;
+
             //DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
             //currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
 
@@ -111,6 +114,10 @@ public class agent : MonoBehaviour
 
             currentMovement.linearAccel.y = 0;
         }
+
+        // No Rotation While Falling
+        if (agentRB.velocity.y < -0.2 || agentRB.velocity.y > 0.2)
+            currentMovement.rotAccel = 0;
 
         if (!isThrowing)
             UpdateRigidBody(currentMovement);

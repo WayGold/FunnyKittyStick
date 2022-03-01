@@ -17,6 +17,7 @@ public class agent : MonoBehaviour
 
     public Rigidbody agentRB;
     public Rigidbody targetRB;
+    public Rigidbody agentCoordAux;
     public Rigidbody auxRB;
 
     public float maxSpeed;
@@ -103,6 +104,9 @@ public class agent : MonoBehaviour
             DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
             currentMovement = dynamicArrive.getSteering();
 
+            targetRadius = 0.05f;
+            slowRadius = 0.15f;
+
             //DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
             //currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
 
@@ -110,6 +114,20 @@ public class agent : MonoBehaviour
             currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
 
             currentMovement.linearAccel.y = 0;
+        }
+
+        // No Rotation While Falling
+        if (agentRB.velocity.y < -0.2 || agentRB.velocity.y > 0.2)
+        {
+            SetSpineAnimationAmount(0);
+            agentRB.freezeRotation = true;
+            currentMovement.linearAccel = new Vector3(0, 0, 0);
+            currentMovement.rotAccel = 0;
+        }
+        else
+        {
+            SetSpineAnimationAmount(100);
+            agentRB.freezeRotation = false;
         }
 
         if (!isThrowing)
@@ -194,13 +212,13 @@ public class agent : MonoBehaviour
 
         foreach (var collider in gameObject.GetComponents<BoxCollider>())
             collider.enabled = false;
-        gameObject.GetComponent<MeshCollider>().enabled = false;
 
         // Disable Seeking while Throwing, turn on isThrowing flag
         toSeek = false;
         isThrowing = true;
         throwToTarget = target;
         Debug.Log("Throwing with init velocity: " + result);
+        _animator.SetTrigger("JumpForward");
         agentRB.velocity = result;
     }
 
@@ -215,7 +233,6 @@ public class agent : MonoBehaviour
             {
                 foreach (var collider in gameObject.GetComponents<BoxCollider>())
                     collider.enabled = true;
-                gameObject.GetComponent<MeshCollider>().enabled = true;
 
                 //agentRB.velocity = Vector3.zero;
                 agentRB.velocity = agentRB.velocity / 2;
@@ -306,7 +323,6 @@ public class agent : MonoBehaviour
             {
                 foreach (var collider in gameObject.GetComponents<BoxCollider>())
                     collider.enabled = true;
-                gameObject.GetComponent<MeshCollider>().enabled = true;
 
                 //agentRB.velocity = Vector3.zero;
                 agentRB.velocity = agentRB.velocity / 2;
@@ -348,7 +364,6 @@ public class agent : MonoBehaviour
 
                         foreach (var collider in gameObject.GetComponents<BoxCollider>())
                             collider.enabled = false;
-                        gameObject.GetComponent<MeshCollider>().enabled = false;
 
                         // Disable Seeking while Throwing, turn on isThrowing flag
                         toSeek = false;
@@ -371,7 +386,7 @@ public class agent : MonoBehaviour
             if (timeElapsedSinceLastJump >= jumpTimeThreshold)
             {
                 // TempGameManager.Instance.OnCatJumpUp();
-                _animator.SetTrigger("JumpUp");
+                //_animator.SetTrigger("JumpUp");
 
                 // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
@@ -487,121 +502,121 @@ public class agent : MonoBehaviour
 
 
 
-    #region TEMP EVENTS
+    //#region TEMP EVENTS
 
-    /// <summary>
-    /// Control the movement speed to tween the animation effect
-    /// </summary>
-    [Header("Jump Forward Parameters")]
-    public float jumpforward_stage1 = 5f;
-    public float jumpforward_stage2 = 8f;
-    public float jumpforward_stage3 = 12f;
-    public float jumpforward_stage4 = 7f;
-    public float jumpforward_stage5 = 2.5f;
+    ///// <summary>
+    ///// Control the movement speed to tween the animation effect
+    ///// </summary>
+    //[Header("Jump Forward Parameters")]
+    //public float jumpforward_stage1 = 5f;
+    //public float jumpforward_stage2 = 8f;
+    //public float jumpforward_stage3 = 12f;
+    //public float jumpforward_stage4 = 7f;
+    //public float jumpforward_stage5 = 2.5f;
 
-    /// <summary>
-    /// The default spineAnmatorAmount value that should be applied to the cat at the end of each animation
-    /// </summary>
-    [Header("Spine Animator Parameters")]
-    public float spineAnimatorAmount = 0.2f;
+    ///// <summary>
+    ///// The default spineAnmatorAmount value that should be applied to the cat at the end of each animation
+    ///// </summary>
+    //[Header("Spine Animator Parameters")]
+    //public float spineAnimatorAmount = 0.2f;
 
-    /* ANIMATION EVENTS - JUMPFORWARD */
-    // The Followings are the animation event that will set different attribute of cats at different animation frames. 
-    // It is for temp pitch use and should be refactor later
+    ///* ANIMATION EVENTS - JUMPFORWARD */
+    //// The Followings are the animation event that will set different attribute of cats at different animation frames. 
+    //// It is for temp pitch use and should be refactor later
 
-    public void CatJumpForward_1()
-    {
-        maxSpeed = jumpforward_stage1;
-    }
+    //public void CatJumpForward_1()
+    //{
+    //    maxSpeed = jumpforward_stage1;
+    //}
 
-    public void CatJumpForward_2()
-    {
-        maxSpeed = jumpforward_stage2;
-    }
+    //public void CatJumpForward_2()
+    //{
+    //    maxSpeed = jumpforward_stage2;
+    //}
 
-    public void CatJumpForward_3()
-    {
-        maxSpeed = jumpforward_stage3;
-    }
+    //public void CatJumpForward_3()
+    //{
+    //    maxSpeed = jumpforward_stage3;
+    //}
 
-    public void CatJumpForward_4()
-    {
-        maxSpeed = jumpforward_stage4;
-    }
+    //public void CatJumpForward_4()
+    //{
+    //    maxSpeed = jumpforward_stage4;
+    //}
 
-    public void CatJumpForward_5()
-    {
-        maxSpeed = jumpforward_stage5;
-    }
-
-
-    /// <summary>
-    /// Control the movement velocity to get better physics (Up Velocity)
-    /// </summary>
-    [Header("Jump Up Parameters")]
-    public float jumpup_stage1 = 5f;
-    public float jumpup_stage2 = 8f;
-    public float jumpup_stage3 = 12f;
-    public float jumpup_stage4 = 12f;
-    public float jumpup_stage5 = 12f;
+    //public void CatJumpForward_5()
+    //{
+    //    maxSpeed = jumpforward_stage5;
+    //}
 
 
-    /* ANIMATION EVENTS - JUMPUP */
-    // The Followings are the animation event that will set different attribute of cats at different animation frames. 
-    // It is for temp pitch use and should be refactor later
-
-    public void CatJumpUp_1()
-    {
-        SetCatJumpUp(jumpup_stage1);
-        maxSpeed = 6f;
-    }
-
-    public void CatJumpUp_2()
-    {
-        SetCatJumpUp(jumpup_stage2);
-    }
-
-    public void CatJumpUp_3()
-    {
-        SetCatJumpUp(jumpup_stage3);
-    }
-
-    public void CatJumpUp_4()
-    {
-        SetCatJumpUp(jumpup_stage4);
-    }
-
-    public void CatJumpUp_5()
-    {
-        SetCatJumpUp(jumpup_stage5);
-        maxSpeed = 2.5f;
-    }
-
-    void SetCatJumpUp(float stage)
-    {
-        var oldVelocity = agentRB.velocity;
-        agentRB.velocity = new Vector3(oldVelocity.x, stage, oldVelocity.z);
-    }
-
-    /* GAMEMANAGER EVENTS*/
-    // The TempGameManager is a class that is incharge of UI & Audio, and should be refactored by optimized structure
+    ///// <summary>
+    ///// Control the movement velocity to get better physics (Up Velocity)
+    ///// </summary>
+    //[Header("Jump Up Parameters")]
+    //public float jumpup_stage1 = 5f;
+    //public float jumpup_stage2 = 8f;
+    //public float jumpup_stage3 = 12f;
+    //public float jumpup_stage4 = 12f;
+    //public float jumpup_stage5 = 12f;
 
 
-    public void PlaySFXAttack()
-    {
-        // TempGameManager.Instance.PlaySFXAttack();
-    }
+    ///* ANIMATION EVENTS - JUMPUP */
+    //// The Followings are the animation event that will set different attribute of cats at different animation frames. 
+    //// It is for temp pitch use and should be refactor later
 
-    public void PlaySFXJump()
-    {
-        // TempGameManager.Instance.PlaySFXJump();
-    }
+    //public void CatJumpUp_1()
+    //{
+    //    SetCatJumpUp(jumpup_stage1);
+    //    maxSpeed = 6f;
+    //}
 
-    public void PlayRandomCatAudio()
-    {
-        // TempGameManager.Instance.PlayRandomCatAudio();
-    }
+    //public void CatJumpUp_2()
+    //{
+    //    SetCatJumpUp(jumpup_stage2);
+    //}
 
-    #endregion TEMP EVENTS
+    //public void CatJumpUp_3()
+    //{
+    //    SetCatJumpUp(jumpup_stage3);
+    //}
+
+    //public void CatJumpUp_4()
+    //{
+    //    SetCatJumpUp(jumpup_stage4);
+    //}
+
+    //public void CatJumpUp_5()
+    //{
+    //    SetCatJumpUp(jumpup_stage5);
+    //    maxSpeed = 2.5f;
+    //}
+
+    //void SetCatJumpUp(float stage)
+    //{
+    //    var oldVelocity = agentRB.velocity;
+    //    agentRB.velocity = new Vector3(oldVelocity.x, stage, oldVelocity.z);
+    //}
+
+    ///* GAMEMANAGER EVENTS*/
+    //// The TempGameManager is a class that is incharge of UI & Audio, and should be refactored by optimized structure
+
+
+    //public void PlaySFXAttack()
+    //{
+    //    // TempGameManager.Instance.PlaySFXAttack();
+    //}
+
+    //public void PlaySFXJump()
+    //{
+    //    // TempGameManager.Instance.PlaySFXJump();
+    //}
+
+    //public void PlayRandomCatAudio()
+    //{
+    //    // TempGameManager.Instance.PlayRandomCatAudio();
+    //}
+
+    //#endregion TEMP EVENTS
 
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Plane
   - Cat
+  - ground
   layers:
   - Default
   - TransparentFX

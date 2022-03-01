@@ -7,8 +7,9 @@ public class destruction : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag=="Cat")
+        if (other.gameObject.tag == "ground")
         {
+            Destroy(gameObject.GetComponent<Rigidbody>());
             Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
             foreach (var value in transforms)
             {

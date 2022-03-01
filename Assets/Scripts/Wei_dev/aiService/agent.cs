@@ -11,7 +11,8 @@ using FIMSpace.FSpine;
 public class agent : MonoBehaviour
 {
     [SerializeField] public List<JumpToData> JumpToList;
-    
+    [SerializeField] public List<GameObject> allTriggers;
+
     public GameObject StickFish;
 
     public Rigidbody agentRB;
@@ -26,7 +27,7 @@ public class agent : MonoBehaviour
     public float jumpRadius;
     public float jumpUpForce;
     public float jumpUpAtAcceleration;
-    
+
     public float attackTimeThreshold = 4f;
     public float jumpTimeThreshold = 5f;
     public float velocityMultiplier = 1f;
@@ -50,7 +51,7 @@ public class agent : MonoBehaviour
     private float timeElapsedSinceLastAttack;
     private float timeElapsedSinceLastJump;
 
-    [SerializeField]private Vector3 lastVelocity;
+    [SerializeField] private Vector3 lastVelocity;
 
 
     // Test Fix Cat Animation
@@ -89,7 +90,8 @@ public class agent : MonoBehaviour
         //ChargeJumpListener();
 
         // Check for throwing to preset jumpTo locations
-        ThrowListener();
+        //ThrowListener();
+        ThrowArrivalUpdate();
 
         // Disable movement while sitting animation is in progress
         NoSeekWhileSit();
@@ -110,9 +112,130 @@ public class agent : MonoBehaviour
             currentMovement.linearAccel.y = 0;
         }
 
-        if(!isThrowing)
+        if (!isThrowing)
             UpdateRigidBody(currentMovement);
     }
+
+    #region JUMP THROW WITH COLLISON TRIGGER AREAS
+    private void OnTriggerStay(Collider other)
+    {
+        if (!isThrowing)
+        {
+            foreach (var triggerBox in allTriggers)
+            {
+                if (triggerBox.GetComponent<Collider>() == other)
+                {
+                    if (other.tag == "bed")
+                    {
+                        Debug.Log("In Bed Trigger Box!");
+                        // Check for our fish position against jumpTo target,
+                        // within a range and higher than the jumpTo target
+                        if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+                                            new Vector3(JumpToList[0].JumpPointObj.transform.position.x, 0,
+                                            JumpToList[0].JumpPointObj.transform.position.z)) <= 4 &&
+                                            targetRB.position.y > JumpToList[0].JumpPointObj.transform.position.y)
+                        {
+                            Debug.Log("Throw to Bed!");
+                            // Throw to Target
+                            ThrowToTarget(JumpToList[0].JumpPointObj, JumpToList[0].AddHeight);
+                        }
+                    }
+
+                    if (other.tag == "chair")
+                    {
+                        Debug.Log("In Chair Trigger Box!");
+                        if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+                                            new Vector3(JumpToList[1].JumpPointObj.transform.position.x, 0,
+                                            JumpToList[1].JumpPointObj.transform.position.z)) <= 4 &&
+                                            targetRB.position.y > JumpToList[1].JumpPointObj.transform.position.y)
+                        {
+                            Debug.Log("Throw to Chair!");
+                            // Throw to Target
+                            ThrowToTarget(JumpToList[1].JumpPointObj, JumpToList[1].AddHeight);
+                        }
+                    }
+
+                    if (other.tag == "desk")
+                    {
+                        Debug.Log("In Desk Trigger Box!");
+                        if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+                                            new Vector3(JumpToList[3].JumpPointObj.transform.position.x, 0,
+                                            JumpToList[3].JumpPointObj.transform.position.z)) <= 4 &&
+                                            targetRB.position.y > JumpToList[3].JumpPointObj.transform.position.y)
+                        {
+                            Debug.Log("Throw to Desk!");
+                            // Throw to Target
+                            ThrowToTarget(JumpToList[3].JumpPointObj, JumpToList[3].AddHeight);
+                        }
+                    }
+
+                    if (other.tag == "closet")
+                    {
+                        Debug.Log("In Closet Trigger Box!");
+                        if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+                                            new Vector3(JumpToList[2].JumpPointObj.transform.position.x, 0,
+                                            JumpToList[2].JumpPointObj.transform.position.z)) <= 4 &&
+                                            targetRB.position.y > JumpToList[2].JumpPointObj.transform.position.y)
+                        {
+                            Debug.Log("Throw to Closet!");
+                            // Throw to Target
+                            ThrowToTarget(JumpToList[2].JumpPointObj, JumpToList[2].AddHeight);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void ThrowToTarget(GameObject target, float addHeight)
+    {
+        Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject,
+                            target.transform.position, addHeight);
+
+        foreach (var collider in gameObject.GetComponents<BoxCollider>())
+            collider.enabled = false;
+        gameObject.GetComponent<MeshCollider>().enabled = false;
+
+        // Disable Seeking while Throwing, turn on isThrowing flag
+        toSeek = false;
+        isThrowing = true;
+        throwToTarget = target;
+        Debug.Log("Throwing with init velocity: " + result);
+        agentRB.velocity = result;
+    }
+
+    void ThrowArrivalUpdate()
+    {
+        if (isThrowing)
+        {
+            Debug.Log("Currently Throwing, Check for arrival...");
+            // If the agent arrive at the target
+            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) &&
+                (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
+            {
+                foreach (var collider in gameObject.GetComponents<BoxCollider>())
+                    collider.enabled = true;
+                gameObject.GetComponent<MeshCollider>().enabled = true;
+
+                //agentRB.velocity = Vector3.zero;
+                agentRB.velocity = agentRB.velocity / 2;
+                // Reset isThrowing flag and target aux
+                isThrowing = false;
+                throwToTarget = null;
+                // Enable Seek
+                toSeek = true;
+                Debug.Log("Throw Arrived...");
+
+            }
+            else
+            {
+                toSeek = false;
+                isThrowing = true;
+                Debug.Log("Hasn't Arrived, Throw in Progress...");
+            }
+        }
+    }
+    #endregion
 
     void UpdateRigidBody(KinematicSteeringOutput currentMovement)
     {
@@ -136,7 +259,7 @@ public class agent : MonoBehaviour
         // Update position and orientation
         agentRB.position += agentRB.velocity * Time.deltaTime;
         agentRB.rotation = Quaternion.Euler(new Vector3(0, agentRB.rotation.eulerAngles.y + (agentRB.angularVelocity.y * Time.deltaTime) * Mathf.Rad2Deg, 0));
-        Debug.Log(lastVelocity);
+        //Debug.Log(lastVelocity);
         // Update velocity and rotation.
         agentRB.velocity += i_steering.linearAccel * Time.deltaTime;
         agentRB.angularVelocity += new Vector3(0, -i_steering.rotAccel * Time.deltaTime, 0);
@@ -178,7 +301,7 @@ public class agent : MonoBehaviour
         if (isThrowing)
         {
             // If the agent arrive at the target
-            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) && 
+            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) &&
                 (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
             {
                 foreach (var collider in gameObject.GetComponents<BoxCollider>())
@@ -186,7 +309,7 @@ public class agent : MonoBehaviour
                 gameObject.GetComponent<MeshCollider>().enabled = true;
 
                 //agentRB.velocity = Vector3.zero;
-                agentRB.velocity = agentRB.velocity/2;
+                agentRB.velocity = agentRB.velocity / 2;
                 // Reset isThrowing flag and target aux
                 isThrowing = false;
                 throwToTarget = null;
@@ -210,8 +333,8 @@ public class agent : MonoBehaviour
                 // If the agent enter a range and there is a meaningful height difference
                 if (Vector3.Distance(new Vector3(jumpTarget.JumpPointObj.transform.position.x, 0, jumpTarget.JumpPointObj.transform.position.z),
                     new Vector3(agentRB.position.x, 0, agentRB.position.z)) <= jumpTarget.DetectRange &&
-                    Mathf.Abs(jumpTarget.JumpPointObj.transform.position.y - agentRB.position.y) > 3 && 
-                    Vector3.Distance(jumpTarget.JumpPointObj.transform.position, StickFish.transform.position)<= 2)
+                    Mathf.Abs(jumpTarget.JumpPointObj.transform.position.y - agentRB.position.y) > 3 &&
+                    Vector3.Distance(jumpTarget.JumpPointObj.transform.position, StickFish.transform.position) <= 2)
                 {
                     Debug.Log("In Range of: " + jumpTarget.JumpPointObj.name);
                     // And if the agent is at a lower level
@@ -223,7 +346,7 @@ public class agent : MonoBehaviour
                         // This was originally used for calc acceleration
                         //result = result / timeToJumpToTarget;
 
-                        foreach(var collider in gameObject.GetComponents<BoxCollider>())
+                        foreach (var collider in gameObject.GetComponents<BoxCollider>())
                             collider.enabled = false;
                         gameObject.GetComponent<MeshCollider>().enabled = false;
 
@@ -263,7 +386,7 @@ public class agent : MonoBehaviour
         // Only head track + orientation matching, no seeking, attack the target
         if (isInRadius(agentRB.position, targetRB.position, idleRadius))
         {
-            Debug.Log("In Radius - " + Time.realtimeSinceStartup % 2);
+            //Debug.Log("In Radius - " + Time.realtimeSinceStartup % 2);
             toSeek = false;
             if (timeElapsedSinceLastAttack >= attackTimeThreshold)
             {

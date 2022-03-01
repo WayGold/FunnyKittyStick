@@ -312,7 +312,7 @@ namespace AIService
     {
         public static float G = 9.81f;
 
-        static Vector3 CaculateTrowVelocity(GameObject i_cat, Vector3 i_targetPos, float i_addHeight)
+        public static Vector3 CaculateThrowVelocity(GameObject i_cat, Vector3 i_targetPos, float i_addHeight)
         {
             //if you need catSize offset, use this!
             Vector3 catSize = i_cat.GetComponent<Collider>().bounds.size;
@@ -324,26 +324,26 @@ namespace AIService
             float s = Vector2.Distance(new Vector2(i_targetPos.x, i_targetPos.z),
                                         new Vector2(i_cat.transform.position.x, i_cat.transform.position.z));
 
-            return (h >= 0) ? UpThrow(i_cat, i_targetPos, h, s) : DownThrow(i_cat, i_targetPos, h, s);
+            return (h >= 0) ? UpThrow(i_cat.transform.position, i_targetPos, h, s) : DownThrow(i_cat, i_targetPos, h, s);
         }
 
-        static Vector3 UpThrow(GameObject i_cat, Vector3 i_targetPos, float h, float s)
+        public static Vector3 UpThrow(Vector3 i_catPos, Vector3 i_targetPos, float h, float s)
         {
             float v0 = Mathf.Sqrt(2 * G * h);
             float v1 = s / (Mathf.Sqrt((2 / G) * v0 - 2 * h / G));
 
             //horizontal velocity
-            Vector3 vs = new Vector3(i_targetPos.x - i_cat.transform.position.x,
+            Vector3 vs = new Vector3(i_targetPos.x - i_catPos.x,
                                         0,
-                                        i_targetPos.z - i_cat.transform.position.z).normalized * v1;
+                                        i_targetPos.z - i_catPos.z).normalized * v1;
             //vertical velocity
-            Vector3 vh = new Vector3(0, i_targetPos.y - i_cat.transform.position.y, 0).normalized * v0;
+            Vector3 vh = new Vector3(0, i_targetPos.y - i_catPos.y, 0).normalized * v0;
 
             Debug.Log("UpThrow:" + "vh= " + vh + " vs=" + vs);
             return vh + vs;
         }
 
-        static Vector3 DownThrow(GameObject i_cat, Vector3 i_targetPos, float h, float s)
+        public static Vector3 DownThrow(GameObject i_cat, Vector3 i_targetPos, float h, float s)
         {
             float v0 = 0;
             float v1 = s / (Mathf.Sqrt((-2 * h) / G));

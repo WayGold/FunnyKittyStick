@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   JumpPointObj: {fileID: 2066630058283485309, guid: 4478dd9cee842ab4880a03aa98b65939, type: 3}
   DetectRange: 10
-  AddHeight: 6
+  AddHeight: 2

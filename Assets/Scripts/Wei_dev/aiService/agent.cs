@@ -200,6 +200,20 @@ public class agent : MonoBehaviour
                             ThrowToTarget(JumpToList[2].JumpPointObj, JumpToList[2].AddHeight);
                         }
                     }
+
+                    if (other.tag == "bear")
+                    {
+                        Debug.Log("In Bear Trigger Box!");
+                        if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+                                            new Vector3(JumpToList[4].JumpPointObj.transform.position.x, 0,
+                                            JumpToList[4].JumpPointObj.transform.position.z)) <= 4 &&
+                                            targetRB.position.y > JumpToList[4].JumpPointObj.transform.position.y)
+                        {
+                            Debug.Log("Throw to Bear!");
+                            // Throw to Target
+                            ThrowToTarget(JumpToList[4].JumpPointObj, JumpToList[4].AddHeight);
+                        }
+                    }
                 }
             }
         }

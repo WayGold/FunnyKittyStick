@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2b59d34244a7944b478b626d206ba0, type: 3}
   m_Name: BearAux
   m_EditorClassIdentifier: 
-  JumpPointObj: {fileID: 7147280522654465416, guid: 4a753256e0b3d724c90e11fcc7a3f49d, type: 3}
+  JumpPointObj: {fileID: 6186713583177898011, guid: 4a753256e0b3d724c90e11fcc7a3f49d, type: 3}
   DetectRange: 10
   AddHeight: 2

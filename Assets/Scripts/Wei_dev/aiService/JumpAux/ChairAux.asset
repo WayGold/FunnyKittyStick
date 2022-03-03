@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2b59d34244a7944b478b626d206ba0, type: 3}
   m_Name: ChairAux
   m_EditorClassIdentifier: 
-  JumpPointObj: {fileID: 5244493367722296997, guid: 847ef7eca2bc3b440a2d40e1ba55338c, type: 3}
+  JumpPointObj: {fileID: 1104196211523406255, guid: 847ef7eca2bc3b440a2d40e1ba55338c, type: 3}
   DetectRange: 8
   AddHeight: 2

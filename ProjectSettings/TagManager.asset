@@ -9,6 +9,8 @@ TagManager:
   - desk
   - chair
   - bear
+  - Cat
+  - ground
   layers:
   - Default
   - TransparentFX

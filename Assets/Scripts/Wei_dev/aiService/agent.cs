@@ -206,6 +206,10 @@ public class agent : MonoBehaviour
                         {
                             Debug.Log("Throw to Closet!");
                             StartCoroutine(WaitToTrow(JumpToList[2].JumpPointObj, JumpToList[2].AddHeight));
+                            
+                            gameObject.GetComponent<Collider>().enabled = false;
+                            StartCoroutine(EnableCollider());
+
                             // Throw to Target
                             //ThrowToTarget(JumpToList[2].JumpPointObj, JumpToList[2].AddHeight);
                         }
@@ -230,6 +234,12 @@ public class agent : MonoBehaviour
         }
     }
 
+    IEnumerator EnableCollider()
+    {
+        yield return new WaitForSeconds(1.5f);
+        gameObject.GetComponent<Collider>().enabled = true;
+    }
+
     [SerializeField] private float waitToThrowTime;
     IEnumerator WaitToTrow(GameObject target, float addHeight)
     {
@@ -251,8 +261,8 @@ public class agent : MonoBehaviour
         Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject,
                             target.transform.position, addHeight);
 
-        foreach (var collider in gameObject.GetComponents<BoxCollider>())
-            collider.enabled = false;
+        //foreach (var collider in gameObject.GetComponents<BoxCollider>())
+            //collider.enabled = false;
 
         // Disable Seeking while Throwing, turn on isThrowing flag
         toSeek = false;
@@ -261,6 +271,14 @@ public class agent : MonoBehaviour
         Debug.Log("Throwing with init velocity: " + result);
         // _animator.SetTrigger("JumpUp");
         agentRB.velocity = result;
+        StartCoroutine(SetSeekTrue());
+
+    }
+    IEnumerator SetSeekTrue()
+    {
+        yield return new WaitForSeconds(3f);
+        toSeek = true;
+        isThrowing = false;
     }
 
     void ThrowArrivalUpdate()
@@ -403,8 +421,8 @@ public class agent : MonoBehaviour
                         // This was originally used for calc acceleration
                         //result = result / timeToJumpToTarget;
 
-                        foreach (var collider in gameObject.GetComponents<BoxCollider>())
-                            collider.enabled = false;
+                        //foreach (var collider in gameObject.GetComponents<BoxCollider>())
+                            //collider.enabled = false;
 
                         // Disable Seeking while Throwing, turn on isThrowing flag
                         toSeek = false;

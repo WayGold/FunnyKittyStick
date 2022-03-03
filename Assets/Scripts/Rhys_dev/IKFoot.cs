@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -33,6 +34,14 @@ public class IKFoot : MonoBehaviour
 
     private float _maxHitDistance = 5f;
     private float _addedHeight = 3f;
+
+    private bool[] _allGroundSpherecastHits;
+    private LayerMask _hitLayer;
+    private Vector3[] _allHitNormals;
+    private float _offset = 0.15f;
+
+    private Animator _animator;
+    private float[] _ikWeights;
     
     #endregion
 
@@ -95,9 +104,37 @@ public class IKFoot : MonoBehaviour
 
     private void RotateFeet()
     {
+        _ikWeights[0] = _animator.GetFloat("FL Weight");
+        _ikWeights[1] = _animator.GetFloat("FR Weight");
+        _ikWeights[2] = _animator.GetFloat("BL Weight");
+        _ikWeights[3] = _animator.GetFloat("BR Weight");
+            
         for (int i = 0; i < 4; ++i)
         {
+            allIKConstraints[i].weight = /*_ikWeights[i]*/0f;
+            
+            CheckGround(out Vector3 hitPoint, out _allGroundSpherecastHits[i], out Vector3 hitNormal, 
+                out _hitLayer, out _, allTransforms[i], walkableLayer, _maxHitDistance, _addedHeight);
+            _allHitNormals[i] = hitNormal;
 
+            if (_allGroundSpherecastHits[i])
+            {
+                if (i == 2 || i == 3)
+                {
+                    allTargetTransforms[i].position = new Vector3(allTransforms[i].position.x, hitPoint.y + _offset - 0.1f,
+                        allTransforms[i].position.z);
+                }
+                else
+                {
+                    allTargetTransforms[i].position = new Vector3(allTransforms[i].position.x, hitPoint.y + _offset,
+                        allTransforms[i].position.z);
+                }
+
+            }
+            else
+            {
+                allTargetTransforms[i].position = allTransforms[i].position;
+            }
         }
     }
 
@@ -107,9 +144,11 @@ public class IKFoot : MonoBehaviour
 
     private void Start()
     {
+        _animator = GetComponent<Animator>();
+        
         allTransforms = new[] {transformFL, transformFR, transformBL, transformBR};
         allTargetTransforms = new[] {targetTransformFL, targetTransformFR, targetTransformBL, targetTransformBR};
-        
+
         allIKConstraints = new TwoBoneIKConstraint[4];
         allIKConstraints[0] = rigFL.GetComponent<TwoBoneIKConstraint>();
         allIKConstraints[1] = rigFR.GetComponent<TwoBoneIKConstraint>();
@@ -117,6 +156,12 @@ public class IKFoot : MonoBehaviour
         allIKConstraints[3] = rigBR.GetComponent<TwoBoneIKConstraint>();
         
         walkableLayer = LayerMask.NameToLayer("Walkable");
+
+        _allGroundSpherecastHits = new bool[5];
+
+        _allHitNormals = new Vector3[4];
+
+        _ikWeights = new float[4];
     }
 
     private void FixedUpdate()

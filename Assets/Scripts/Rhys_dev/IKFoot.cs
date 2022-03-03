@@ -155,7 +155,7 @@ public class IKFoot : MonoBehaviour
         allIKConstraints[2] = rigBL.GetComponent<TwoBoneIKConstraint>();
         allIKConstraints[3] = rigBR.GetComponent<TwoBoneIKConstraint>();
         
-        walkableLayer = LayerMask.NameToLayer("Walkable");
+        walkableLayer = LayerMask.NameToLayer("Default");
 
         _allGroundSpherecastHits = new bool[5];
 

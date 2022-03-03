@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: BearSculptures
-  m_Shader: {fileID: 4800000, guid: 62ec4df7b9bdb594ebec618fa399cb6f, type: 3}
+  m_Shader: {fileID: 4800000, guid: 418a1adfe2e75f34da8aaf192ff8e296, type: 3}
   m_ShaderKeywords: _FRESNELHIGHLIGHTS_ON _MK_ALBEDO_MAP _MK_ARTISTIC_PROJECTION_SCREEN_SPACE
     _MK_DETAIL_BLEND_MIX _MK_ENVIRONMENT_REFLECTIONS_AMBIENT _MK_FRESNEL_HIGHLIGHTS
     _MK_LIGHT_CEL _MK_RECEIVE_SHADOWS _MK_SPECULAR_ISOTROPIC _MK_WRAPPED_DIFFUSE
@@ -25,7 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlbedoMap:
-        m_Texture: {fileID: 2800000, guid: 0200a184bde1fb041ab66bdd3dc49f76, type: 3}
+        m_Texture: {fileID: 2800000, guid: 52af9db0747cb594c97f2a3259a0695a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -101,7 +101,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 0200a184bde1fb041ab66bdd3dc49f76, type: 3}
+        m_Texture: {fileID: 2800000, guid: 52af9db0747cb594c97f2a3259a0695a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -213,7 +213,7 @@ Material:
     - _HatchingMapScale: 1
     - _IndexOfRefraction: 0
     - _Initialized: 1
-    - _InputTab: 0
+    - _InputTab: 1
     - _Iridescence: 0
     - _IridescenceSize: 1
     - _IridescenceSmoothness: 0.5

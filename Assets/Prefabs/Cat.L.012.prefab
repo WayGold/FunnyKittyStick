@@ -3361,15 +3361,15 @@ GameObject:
   - component: {fileID: 6482750421764600718}
   - component: {fileID: 6482750421764599925}
   - component: {fileID: 6482750421764599927}
-  - component: {fileID: 6482750421764599926}
-  - component: {fileID: 6482750421764599929}
   - component: {fileID: 6482750421764599928}
   - component: {fileID: 6482750421764599931}
+  - component: {fileID: 6482750421764599926}
+  - component: {fileID: 6482750421764599929}
   - component: {fileID: 6482750421764599920}
   - component: {fileID: 6482750421764599930}
   m_Layer: 0
   m_Name: Cat.L.012
-  m_TagString: Untagged
+  m_TagString: Cat
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3382,7 +3382,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6482750421764599933}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.28, z: -10.38}
+  m_LocalPosition: {x: 9.68, y: 0.28, z: -12}
   m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_Children:
   - {fileID: 6482750421456148974}
@@ -3537,35 +3537,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &6482750421764599926
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6482750421764599933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f2f621895535124e996fdddb1edfe28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &6482750421764599929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6482750421764599933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad94acd6a9bf4d24bb2aaebcf82f2efb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  joyCon: 1
-  aim: {fileID: 6482750420576862142}
-  rigBuilder: {fileID: 6482750421764599931}
-  sphere: {fileID: 0}
-  cube: {fileID: 0}
 --- !u!114 &6482750421764599928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3794,6 +3765,35 @@ MonoBehaviour:
   - m_Rig: {fileID: 6482750422118976547}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &6482750421764599926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6482750421764599933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f2f621895535124e996fdddb1edfe28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6482750421764599929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6482750421764599933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad94acd6a9bf4d24bb2aaebcf82f2efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joyCon: 1
+  aim: {fileID: 6482750420576862142}
+  rigBuilder: {fileID: 6482750421764599931}
+  sphere: {fileID: 0}
+  cube: {fileID: 0}
 --- !u!114 &6482750421764599920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3843,7 +3843,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  StickFish: {fileID: 0}
   agentRB: {fileID: 6482750421764599925}
   targetRB: {fileID: 0}
   agentCoordAux: {fileID: 6482750420703339621}
@@ -3864,18 +3863,10 @@ MonoBehaviour:
   slowRadius: 3
   timeToTarget: 0.001
   targetAcceleration: {x: 0, y: 0, z: 0}
+  isSit: 0
+  toSeek: 0
+  isThrowing: 0
   lastVelocity: {x: 0, y: 0, z: 0}
-  jumpforward_stage1: 5
-  jumpforward_stage2: 8
-  jumpforward_stage3: 12
-  jumpforward_stage4: 7
-  jumpforward_stage5: 2.5
-  spineAnimatorAmount: 0.2
-  jumpup_stage1: 5
-  jumpup_stage2: 8
-  jumpup_stage3: 12
-  jumpup_stage4: 12
-  jumpup_stage5: 12
 --- !u!1 &6482750421784796970
 GameObject:
   m_ObjectHideFlags: 0

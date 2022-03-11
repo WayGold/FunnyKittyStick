@@ -11,6 +11,8 @@ TagManager:
   - bear
   - Cat
   - ground
+  - CatUI
+  - FishUI
   layers:
   - Default
   - TransparentFX

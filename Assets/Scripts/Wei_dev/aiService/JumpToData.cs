@@ -6,6 +6,6 @@ using UnityEngine;
 public class JumpToData : ScriptableObject
 {
     public GameObject JumpPointObj;
-    public float DetectRange=8;
+    public float DetectRange=2;
     public float AddHeight=2;
 }

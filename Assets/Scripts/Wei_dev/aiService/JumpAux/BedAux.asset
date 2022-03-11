@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: BedAux
   m_EditorClassIdentifier: 
   JumpPointObj: {fileID: 1455403982341900132, guid: 72c912f287481054c8b52b02ec0941e8, type: 3}
-  DetectRange: 10
+  DetectRange: 2
   AddHeight: 0

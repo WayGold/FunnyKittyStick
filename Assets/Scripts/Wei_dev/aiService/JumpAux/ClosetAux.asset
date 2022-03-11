@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: ClosetAux
   m_EditorClassIdentifier: 
   JumpPointObj: {fileID: 2480188794616185528, guid: 4478dd9cee842ab4880a03aa98b65939, type: 3}
-  DetectRange: 10
+  DetectRange: 2
   AddHeight: 2

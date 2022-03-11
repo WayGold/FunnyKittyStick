@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: BearAux
   m_EditorClassIdentifier: 
   JumpPointObj: {fileID: 6186713583177898011, guid: 4a753256e0b3d724c90e11fcc7a3f49d, type: 3}
-  DetectRange: 10
+  DetectRange: 2
   AddHeight: 2

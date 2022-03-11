@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: ChairAux
   m_EditorClassIdentifier: 
   JumpPointObj: {fileID: 1104196211523406255, guid: 847ef7eca2bc3b440a2d40e1ba55338c, type: 3}
-  DetectRange: 8
+  DetectRange: 2
   AddHeight: 2

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2b59d34244a7944b478b626d206ba0, type: 3}
   m_Name: TableAux
   m_EditorClassIdentifier: 
-  JumpPointObj: {fileID: 5076803934913763208, guid: 903624ea1aa12b94abb304bb523e214d, type: 3}
-  DetectRange: 15
-  AddHeight: 2
+  JumpPointObj: {fileID: 6213896575582030603, guid: 903624ea1aa12b94abb304bb523e214d, type: 3}
+  DetectRange: 2
+  AddHeight: 3

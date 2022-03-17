@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine;
+using WiimoteApi;
 
 
 public class TempGameManager : MonoBehaviour
@@ -175,31 +176,63 @@ public class TempGameManager : MonoBehaviour
 
 
 
-    [Header("Joycon Input")]
-    private Joycon joycon;
+    [Header("Wiimote Input")]
+    private Wiimote wiimote;
 
-    void CheckJoyConInput()
+    /*void CheckJoyConInput()
     {
         if (joycon.GetButtonDown(Joycon.Button.DPAD_LEFT))
         {
             PlayRandomCatAudio();
         }
     }
-
+    */
 
     void Start()
     {
-        joycon = JoyconManager.Instance.j[0];
+        StartCoroutine(InitializeWiimote());
     }
 
+    private IEnumerator InitializeWiimote()
+    {
+        WiimoteManager.FindWiimotes();
+
+        //Make sure that a wiimote exists before continuing
+        while (WiimoteManager.HasWiimote() == false)
+        {
+            Debug.LogError("Searching...");
+            yield return null;
+        }
+
+        this.wiimote = WiimoteManager.Wiimotes[0];
+        Debug.LogError("Wiimote found!");
+        this.wiimote.SendPlayerLED(true, false, true, false);
+
+        //Set up gyroscope
+        wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_IR10_EXT9);
+
+        this.wiimote.RequestIdentifyWiiMotionPlus();
+        while (this.wiimote.wmp_attached == false)
+        {
+            Debug.LogError("Initializing WMP...");
+            yield return null;
+        }
+        this.wiimote.ActivateWiiMotionPlus();
+        MotionPlusData wmpData = this.wiimote.MotionPlus;
+        wmpData.SetZeroValues();
+    }
 
     // Update is called once per frame
     void Update()
     {
-        CheckJoyConInput();
+        //CheckJoyConInput();
     }
 
-
+    private void OnApplicationQuit()
+    {
+        this.wiimote.SendPlayerLED(false, false, false, false);
+        WiimoteManager.Cleanup(this.wiimote);
+    }
 
 
 

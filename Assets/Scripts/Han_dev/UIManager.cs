@@ -11,7 +11,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeAnimator();
+        //InitializeAnimator();
     }
     void InitializeAnimator()
     {

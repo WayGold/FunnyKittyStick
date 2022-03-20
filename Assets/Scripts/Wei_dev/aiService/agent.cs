@@ -13,6 +13,8 @@ public class agent : MonoBehaviour
     [SerializeField] public List<JumpToData> JumpToList;
     [SerializeField] public List<GameObject> allTriggers;
 
+    public Rigidbody JumpStartPoint;
+
     public Rigidbody agentRB;
     public Rigidbody targetRB;
     public Rigidbody agentCoordAux;
@@ -42,8 +44,8 @@ public class agent : MonoBehaviour
 
     private Animator _animator;
     private bool isSit = false;
-    private bool toSeek = false;
-    private bool isThrowing = false;
+    public bool toSeek = false;
+    public bool isThrowing = false;
     private bool lockY = true;
 
     private GameObject throwToTarget = null;
@@ -69,10 +71,6 @@ public class agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //KinematicSteeringOutput currentMovement;
-        //currentMovement.linearVelocity = new Vector3(0, 0, 0);
-        //currentMovement.rotVelocity = 0;
-
         DynamicSteeringOutput currentMovement;
         currentMovement.linearAccel = new Vector3(0, 0, 0);
         currentMovement.rotAccel = 0;
@@ -88,10 +86,28 @@ public class agent : MonoBehaviour
 
         // Check for throwing to preset jumpTo locations
         //ThrowListener();
-        ThrowArrivalUpdate();
+        //ThrowArrivalUpdate();
 
         // Disable movement while sitting animation is in progress
         NoSeekWhileSit();
+
+        if (isThrowing)
+        {
+            DynamicArrive dynamicArrive = new DynamicArrive(agentRB, JumpStartPoint, maxAcceleration, maxSpeed, targetRadius, slowRadius);
+            currentMovement = dynamicArrive.getSteering();
+
+            targetRadius = 0.05f;
+            slowRadius = 0.15f;
+
+            //DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
+            //currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
+
+            DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, JumpStartPoint, maxAngularAcceleration, maxRotation, 0.05f, 0.15f);
+            currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
+
+            currentMovement.linearAccel.y = 0;
+        }
+        ThrowArrivalUpdate();
 
         // SEEK COMMAND VERIFIED
         if (toSeek)
@@ -115,85 +131,91 @@ public class agent : MonoBehaviour
         // No Rotation While Falling
         NoRotationWhileFalling(currentMovement);
 
-        if (!isThrowing) UpdateRigidBody(currentMovement);
+        UpdateRigidBody(currentMovement);
     }
 
     #region JUMP THROW WITH COLLISON TRIGGER AREAS
     private void OnTriggerStay(Collider other)
     {
-        if (!isThrowing)
+        if(other.tag=="chair")
         {
-            foreach (var triggerBox in allTriggers)
-            {
-                if (triggerBox.GetComponent<Collider>() == other)
-                {
-                    //0:bed 1:chair 2:closet 3:desk 4:bear
-                    switch (other.tag)
-                    {
-                        case "bed":
-                            Debug.Log("In Bed Trigger Box!");
-                            // Check for our fish position against jumpTo target,
-                            // within a range and higher than the jumpTo target
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[0].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[0].JumpPointObj.transform.position.z)) <= JumpToList[0].DetectRange &&
-                                                targetRB.position.y > JumpToList[0].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Bed!");
-                                StartCoroutine(WaitToTrow(JumpToList[0].JumpPointObj, JumpToList[0].AddHeight));
-                            }
-                            break;
-                        case "chair":
-                            Debug.Log("In Chair Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[1].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[1].JumpPointObj.transform.position.z)) <= JumpToList[1].DetectRange &&
-                                                targetRB.position.y > JumpToList[1].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Chair!");
-                                StartCoroutine(WaitToTrow(JumpToList[1].JumpPointObj, JumpToList[1].AddHeight));
-                            }
-                            break;
-                        case "desk":
-                            Debug.Log("In Desk Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[3].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[3].JumpPointObj.transform.position.z)) <= JumpToList[3].DetectRange &&
-                                                targetRB.position.y > JumpToList[3].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Desk!");
-                                // Throw to Target
-                                StartCoroutine(WaitToTrow(JumpToList[3].JumpPointObj, JumpToList[3].AddHeight));
-                            }
-                            break;
-                        case "closet":
-                            Debug.Log("In Closet Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[2].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[2].JumpPointObj.transform.position.z)) <= JumpToList[2].DetectRange &&
-                                                targetRB.position.y > JumpToList[2].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Closet!");
-                                // Throw to Target
-                                StartCoroutine(WaitToTrow(JumpToList[2].JumpPointObj, JumpToList[2].AddHeight));
-                            }
-                            break;
-                        case "bear":
-                            Debug.Log("In Bear Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[4].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[4].JumpPointObj.transform.position.z)) <= JumpToList[4].DetectRange &&
-                                                targetRB.position.y > JumpToList[4].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Bear!");
-                                // Throw to Target
-                                StartCoroutine(WaitToTrow(JumpToList[4].JumpPointObj, JumpToList[4].AddHeight));
-                            }
-                            break;
-                    }
-                }
-            }
+            toSeek = false;
+            isThrowing = true;
+            
         }
+        //if (!isThrowing)
+        //{
+        //    foreach (var triggerBox in allTriggers)
+        //    {
+        //        if (triggerBox.GetComponent<Collider>() == other)
+        //        {
+        //            //0:bed 1:chair 2:closet 3:desk 4:bear
+        //            switch (other.tag)
+        //            {
+        //                case "bed":
+        //                    Debug.Log("In Bed Trigger Box!");
+        //                    // Check for our fish position against jumpTo target,
+        //                    // within a range and higher than the jumpTo target
+        //                    if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+        //                                        new Vector3(JumpToList[0].JumpPointObj.transform.position.x, 0,
+        //                                        JumpToList[0].JumpPointObj.transform.position.z)) <= JumpToList[0].DetectRange &&
+        //                                        targetRB.position.y > JumpToList[0].JumpPointObj.transform.position.y)
+        //                    {
+        //                        Debug.Log("Throw to Bed!");
+        //                        StartCoroutine(WaitToTrow(JumpToList[0].JumpPointObj, JumpToList[0].AddHeight));
+        //                    }
+        //                    break;
+        //                case "chair":
+        //                    Debug.Log("In Chair Trigger Box!");
+        //                    if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+        //                                        new Vector3(JumpToList[1].JumpPointObj.transform.position.x, 0,
+        //                                        JumpToList[1].JumpPointObj.transform.position.z)) <= JumpToList[1].DetectRange &&
+        //                                        targetRB.position.y > JumpToList[1].JumpPointObj.transform.position.y)
+        //                    {
+        //                        Debug.Log("Throw to Chair!");
+        //                        StartCoroutine(WaitToTrow(JumpToList[1].JumpPointObj, JumpToList[1].AddHeight));
+        //                    }
+        //                    break;
+        //                case "desk":
+        //                    Debug.Log("In Desk Trigger Box!");
+        //                    if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+        //                                        new Vector3(JumpToList[3].JumpPointObj.transform.position.x, 0,
+        //                                        JumpToList[3].JumpPointObj.transform.position.z)) <= JumpToList[3].DetectRange &&
+        //                                        targetRB.position.y > JumpToList[3].JumpPointObj.transform.position.y)
+        //                    {
+        //                        Debug.Log("Throw to Desk!");
+        //                        // Throw to Target
+        //                        StartCoroutine(WaitToTrow(JumpToList[3].JumpPointObj, JumpToList[3].AddHeight));
+        //                    }
+        //                    break;
+        //                case "closet":
+        //                    Debug.Log("In Closet Trigger Box!");
+        //                    if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+        //                                        new Vector3(JumpToList[2].JumpPointObj.transform.position.x, 0,
+        //                                        JumpToList[2].JumpPointObj.transform.position.z)) <= JumpToList[2].DetectRange &&
+        //                                        targetRB.position.y > JumpToList[2].JumpPointObj.transform.position.y)
+        //                    {
+        //                        Debug.Log("Throw to Closet!");
+        //                        // Throw to Target
+        //                        StartCoroutine(WaitToTrow(JumpToList[2].JumpPointObj, JumpToList[2].AddHeight));
+        //                    }
+        //                    break;
+        //                case "bear":
+        //                    Debug.Log("In Bear Trigger Box!");
+        //                    if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
+        //                                        new Vector3(JumpToList[4].JumpPointObj.transform.position.x, 0,
+        //                                        JumpToList[4].JumpPointObj.transform.position.z)) <= JumpToList[4].DetectRange &&
+        //                                        targetRB.position.y > JumpToList[4].JumpPointObj.transform.position.y)
+        //                    {
+        //                        Debug.Log("Throw to Bear!");
+        //                        // Throw to Target
+        //                        StartCoroutine(WaitToTrow(JumpToList[4].JumpPointObj, JumpToList[4].AddHeight));
+        //                    }
+        //                    break;
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     IEnumerator WaitToTrow(GameObject target, float addHeight)
@@ -223,41 +245,55 @@ public class agent : MonoBehaviour
     /// </summary>
     public void CatJumpForwardEvent1()
     {
-        gameObject.GetComponent<Collider>().enabled = false;
-        agentRB.velocity = throwVelocity;
+        //gameObject.GetComponent<Collider>().enabled = false;
+        //agentRB.velocity = throwVelocity;
     }
     public void CatJumpForwardEvent2()
     {
-        gameObject.GetComponent<Collider>().enabled = true;
+        //gameObject.GetComponent<Collider>().enabled = true;
     }
 
     void ThrowArrivalUpdate()
     {
-        if (isThrowing)
+        if(isThrowing)
         {
-            Debug.Log("Currently Throwing, Check for arrival...");
-            // If the agent arrive at the target
-            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) &&
-                (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
+            if ((agentRB.position.x >= JumpStartPoint.transform.position.x - 1f && agentRB.position.x <= JumpStartPoint.transform.position.x + 1f) &&
+              (agentRB.position.z >= JumpStartPoint.transform.position.z - 1f && agentRB.position.z <= JumpStartPoint.transform.position.z + 1f))
             {
-                gameObject.GetComponent<BoxCollider>().enabled = true;
-
-                //agentRB.velocity = Vector3.zero;
-                agentRB.velocity = agentRB.velocity / 2;
-                // Reset isThrowing flag and target aux
                 isThrowing = false;
-                throwToTarget = null;
-                // Enable Seek
                 toSeek = true;
-                Debug.Log("Throw Arrived...");
-            }
-            else
-            {
-                toSeek = false;
-                isThrowing = true;
-                Debug.Log("Hasn't Arrived, Throw in Progress...");
+                _animator.Play("testjump 0");
             }
         }
+        else
+        {
+            if (!toSeek) toSeek = true;
+        }
+        //if (isThrowing)
+        //{
+        //    Debug.Log("Currently Throwing, Check for arrival...");
+        //    // If the agent arrive at the target
+        //    if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) &&
+        //        (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
+        //    {
+        //        gameObject.GetComponent<BoxCollider>().enabled = true;
+
+        //        //agentRB.velocity = Vector3.zero;
+        //        agentRB.velocity = agentRB.velocity / 2;
+        //        // Reset isThrowing flag and target aux
+        //        isThrowing = false;
+        //        throwToTarget = null;
+        //        // Enable Seek
+        //        toSeek = true;
+        //        Debug.Log("Throw Arrived...");
+        //    }
+        //    else
+        //    {
+        //        toSeek = false;
+        //        isThrowing = true;
+        //        Debug.Log("Hasn't Arrived, Throw in Progress...");
+        //    }
+        //}
     }
     #endregion
 

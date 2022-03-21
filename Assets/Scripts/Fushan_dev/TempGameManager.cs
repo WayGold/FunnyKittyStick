@@ -207,22 +207,6 @@ public class TempGameManager : MonoBehaviour
         this.wiimote = WiimoteManager.Wiimotes[0];
         Debug.LogError("Wiimote found!");
         this.wiimote.SendPlayerLED(true, false, true, false);
-
-        //Set up gyroscope
-        wiimote.SendDataReportMode(InputDataType.REPORT_EXT21);
-
-        this.wiimote.RequestIdentifyWiiMotionPlus();
-        wiimote.ReadWiimoteData();
-        while (this.wiimote.wmp_attached == false)
-        {
-            Debug.LogError("Initializing WMP...");
-            yield return null;
-            this.wiimote.RequestIdentifyWiiMotionPlus();
-            wiimote.ReadWiimoteData();
-        }
-        this.wiimote.ActivateWiiMotionPlus();
-        MotionPlusData wmpData = this.wiimote.MotionPlus;
-        wmpData.SetZeroValues();
     }
 
     // Update is called once per frame

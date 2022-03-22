@@ -866,60 +866,18 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.012955256
-        functionName: CatJumpForward_1
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 1
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.04755942
-        functionName: PlayRandomCatAudio
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 1
-        intParameter: 0
-        messageOptions: 0
       - time: 0.19892749
-        functionName: CatJumpForward_2
+        functionName: CatJumpForwardEvent1
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
         floatParameter: 1
         intParameter: 0
         messageOptions: 0
-      - time: 0.27077746
-        functionName: PlaySFXJump
+      - time: 0.70993924
+        functionName: CatJumpForwardEvent2
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
         floatParameter: 1
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.52892566
-        functionName: CatJumpForward_3
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 1
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.7933884
-        functionName: CatJumpForward_4
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 1
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.9624664
-        functionName: CatJumpForward_5
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 1
-        intParameter: 0
-        messageOptions: 0
-      - time: 1
-        functionName: SetSpineAnimationAmount
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 100
         intParameter: 0
         messageOptions: 0
       transformMask: []
@@ -979,56 +937,7 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events:
-      - time: 0.30819198
-        functionName: CatJumpUp_1
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.392562
-        functionName: PlaySFXJump
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.49991855
-        functionName: CatJumpUp_2
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.6515526
-        functionName: CatJumpUp_3
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.79250354
-        functionName: CatJumpUp_4
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.9246594
-        functionName: CatJumpUp_5
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.25737265
-        functionName: PlayRandomCatAudio
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: e0e55111c6e952f48bc54c21105f9faf, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
+      events: []
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

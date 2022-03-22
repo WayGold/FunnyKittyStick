@@ -8,6 +8,11 @@ TagManager:
   - closet
   - desk
   - chair
+  - bear
+  - Cat
+  - ground
+  - CatUI
+  - FishUI
   layers:
   - Default
   - TransparentFX

@@ -11,6 +11,8 @@ public class StickTrackerWiimote : MonoBehaviour
     [SerializeField]
     private GameObject stickObject;
 
+    private float resetOffsetHeartbeatTimeInSeconds = 0.2f;
+
     // Start is called before the first frame update
     IEnumerator Start()
     {
@@ -42,6 +44,8 @@ public class StickTrackerWiimote : MonoBehaviour
 
         //stickObject.transform.rotation = Quaternion.FromToRotation(stickObject.transform.rotation.eulerAngles, Vector3.up) * stickObject.transform.rotation;
         //stickObject.transform.rotation = Quaternion.FromToRotation(stickObject.transform.forward, Vector3.forward) * stickObject.transform.rotation;
+
+        StartCoroutine(ResetOffsetHeartbeat());
     }
 
     private Vector3 GetAccelVector()
@@ -82,8 +86,17 @@ public class StickTrackerWiimote : MonoBehaviour
                                                 wiimote.MotionPlus.RollSpeed) / 95f; // Divide by 95Hz (average updates per second from wiimote)
                 this.wmpOffset += offset;
 
-                this.stickObject.transform.Rotate(offset, Space.Self);
+                this.stickObject.transform.Rotate(this.wmpOffset, Space.Self);
             }
         } while (ret > 0);
+    }
+
+    private IEnumerator ResetOffsetHeartbeat()
+    {
+        while (true)
+        {
+            this.wmpOffset = Vector3.zero;
+            yield return null;
+        }
     }
 }

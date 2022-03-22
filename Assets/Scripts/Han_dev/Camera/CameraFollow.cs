@@ -32,8 +32,8 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
-        cat = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
-        stick = GameObject.FindGameObjectWithTag("Stick").GetComponent<Transform>();
+        //cat = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
+        //stick = GameObject.FindGameObjectWithTag("Stick").GetComponent<Transform>();
         target= (cat.position + stick.position) / 2;
         startPosition = transform.position;
         offset = transform.position - target;

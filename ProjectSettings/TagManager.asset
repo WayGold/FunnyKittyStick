@@ -13,6 +13,7 @@ TagManager:
   - ground
   - CatUI
   - FishUI
+  - Stick
   layers:
   - Default
   - TransparentFX

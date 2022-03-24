@@ -159,9 +159,18 @@ public class agent : MonoBehaviour
         else if(other.tag=="desk")
         {
             shouldJump = true;
-            jumpStartPoint = jumpStartPoints[2];
-            jumpAnimationIndex = 2;
-            jumpTarget = jumpTargets[1];
+            if(other.gameObject.name=="DeskJumpDetectionArea1")
+            {
+                jumpStartPoint = jumpStartPoints[2];
+                jumpAnimationIndex = 2;
+                jumpTarget = jumpTargets[1];
+            }
+            else if(other.gameObject.name=="DeskJumpDetectionArea2")
+            {
+                jumpStartPoint = jumpStartPoints[6];
+
+                jumpTarget = jumpTargets[4];
+            }
         }
         else if(other.tag=="bed")
         {

@@ -30,6 +30,7 @@ public class IKFoot : MonoBehaviour
     private TwoBoneIKConstraint[] allIKConstraints;
 
     private bool[] allGroundHits;
+    private float[] allCurves;
 
     private LayerMask walkableLayer;
 
@@ -100,8 +101,15 @@ public class IKFoot : MonoBehaviour
 
     private void RotateFeet()
     {
+        allCurves[0] = GetComponent<Animator>().GetFloat("FL");
+        allCurves[1] = GetComponent<Animator>().GetFloat("FR");
+        allCurves[2] = GetComponent<Animator>().GetFloat("BL");
+        allCurves[3] = GetComponent<Animator>().GetFloat("BR");
+        
         for (int i = 0; i < 4; ++i)
         {
+            allIKConstraints[i].weight = allCurves[i];
+            
             CheckGround(out Vector3 hitPoint, out allGroundHits[i], out Vector3 hitNormal, out hitLayer, out _,
                 allTransforms[i], walkableLayer, _maxHitDistance, _addedHeight);
             allHitNormals[i] = hitNormal;
@@ -138,9 +146,10 @@ public class IKFoot : MonoBehaviour
         walkableLayer = LayerMask.NameToLayer("Walkable");
 
         allHitNormals = new Vector3[4];
+        allCurves = new float[4];
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         RotateFeet();
     }

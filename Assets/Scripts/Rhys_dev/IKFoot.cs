@@ -108,7 +108,7 @@ public class IKFoot : MonoBehaviour
         
         for (int i = 0; i < 4; ++i)
         {
-            allIKConstraints[i].weight = allCurves[i];
+            //allIKConstraints[i].weight = allCurves[i];
             
             CheckGround(out Vector3 hitPoint, out allGroundHits[i], out Vector3 hitNormal, out hitLayer, out _,
                 allTransforms[i], walkableLayer, _maxHitDistance, _addedHeight);

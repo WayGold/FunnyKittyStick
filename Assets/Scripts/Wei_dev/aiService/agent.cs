@@ -12,17 +12,21 @@ public class agent : MonoBehaviour
 {
     [SerializeField] public List<Rigidbody> jumpStartPoints;
     [SerializeField] public List<GameObject> jumpTargets;
-    //[SerializeField] public List<GameObject> allTriggers;
 
     public RuntimeAnimatorController catAnimatior;
     public RuntimeAnimatorController jumpAnimator;
 
+    public Rigidbody stickFish;
+
     private Rigidbody jumpStartPoint;
     private GameObject jumpTarget;
+    private float startPointExtent;
+    private float TargetPointExtent;
     private int jumpAnimationIndex=0;
 
     public Rigidbody agentRB;
     public Rigidbody targetRB;
+    public Rigidbody robotRB;
     public Rigidbody agentCoordAux;
     public Rigidbody auxRB;
 
@@ -49,10 +53,11 @@ public class agent : MonoBehaviour
     public Vector3 targetAcceleration;
 
     private Animator _animator;
-    private bool isSit = false;
-    public bool toSeek = false;
-    public bool shouldJump = false;
+    [SerializeField] private bool isSit = false;
+    [SerializeField] private bool toSeek = false;
+    [SerializeField] private bool shouldJump = false;
     private bool lockY = true;
+    [SerializeField] private bool sitRobot = false;
 
     private GameObject throwToTarget = null;
 
@@ -85,18 +90,19 @@ public class agent : MonoBehaviour
         //Debug.Log("Acceleration - " + targetAcceleration);
 
         // Animation Listeners
-        //JumpUpListener();
-        AttackListener();
-        FastTargetListener();
+        if(!sitRobot)
+        {
+            JumpUpListener();
+            AttackListener();
+            FastTargetListener();
+        }
         //ChargeJumpListener();
-
 
         // Disable movement while sitting animation is in progress
         NoSeekWhileSit();
 
         // Check for throwing to preset jumpTo locations
         JumpListener();
-        //JumpArrivalUpdate();
 
         // SEEK COMMAND VERIFIED
         if (toSeek)
@@ -114,8 +120,12 @@ public class agent : MonoBehaviour
 
                 currentMovement.linearAccel.y = 0;
             }
-            else
+            else if(sitRobot)
             {
+                //change head track to robot
+            }
+            else
+                {
                 DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
                 currentMovement = dynamicArrive.getSteering();
 
@@ -135,66 +145,148 @@ public class agent : MonoBehaviour
         UpdateRigidBody(currentMovement);
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        ////If collide with robot, sit on it
+        //if (collision.gameObject.tag == "robot")
+        //{
+        //    if (isSit == false)
+        //    {
+        //        print("hit robot!");
+        //        toSeek = false;
+        //        isSit = true;
+
+        //        _animator.SetTrigger("Sit");
+        //        agentRB.transform.SetParent(robotRB.transform.parent);
+        //        agentRB.transform.localPosition = Vector3.zero;
+        //        SetSpineAnimationAmount(0);
+        //    }
+        //}
+    }
+
+    public void RobotBreak()
+    {
+        sitRobot = false;
+        isSit = false;
+        toSeek = true;
+        _animator.SetTrigger("Stand");
+        targetRB = stickFish;
+        //gameObject.GetComponent<HeadTrackingDebug>().TrackTarget();
+    }
+
     #region JUMP THROW WITH COLLISON TRIGGER AREAS
     bool couldDetect = true;
     private void OnTriggerStay(Collider other)
     {
         if (!couldDetect) return;
         if (shouldJump) return;
-        if(other.tag=="chair")
+        switch (other.tag)
         {
-            shouldJump = true;
-            if (other.gameObject.name == "ChairJumpDetectionArea1")
-            {
-                jumpStartPoint = jumpStartPoints[0];
-                jumpAnimationIndex = 0;
-            }
-            else if(other.gameObject.name== "ChairJumpDetectionArea2")
-            {
-                jumpStartPoint = jumpStartPoints[1];
-                jumpAnimationIndex = 1;
-            }
-            jumpTarget = jumpTargets[0];
-        }
-        else if(other.tag=="desk")
-        {
-            shouldJump = true;
-            jumpStartPoint = jumpStartPoints[2];
-            jumpAnimationIndex = 2;
-            jumpTarget = jumpTargets[1];
-        }
-        else if(other.tag=="bed")
-        {
-            shouldJump = true;
-            if(other.gameObject.name== "BedJumpDetectionArea1")
-            {
-                jumpStartPoint = jumpStartPoints[3];
-                jumpAnimationIndex = 3;
-            }
-            else if (other.gameObject.name == "BedJumpDetectionArea2")
-            {
-                jumpStartPoint = jumpStartPoints[4];
-                jumpAnimationIndex = 4;
-            }
-            jumpTarget = jumpTargets[2];
-        }
-        else if(other.tag=="closet")
-        {
-            shouldJump = true;
-            jumpStartPoint = jumpStartPoints[5];
-            jumpAnimationIndex = 5;
-            jumpTarget = jumpTargets[3];
+            case "chair":
+                {
+                    shouldJump = true;
+                    if (other.gameObject.name == "ChairJumpDetectionArea1")
+                    {
+                        jumpStartPoint = jumpStartPoints[0];
+                        jumpAnimationIndex = 0;
+                    }
+                    else if (other.gameObject.name == "ChairJumpDetectionArea2")
+                    {
+                        jumpStartPoint = jumpStartPoints[1];
+                        jumpAnimationIndex = 1;
+                    }
+                    jumpTarget = jumpTargets[0];
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
+                }
+            case "desk":
+                {
+                    shouldJump = true;
+                    if (other.gameObject.name == "DeskJumpDetectionArea1")
+                    {
+                        jumpStartPoint = jumpStartPoints[2];
+                        jumpAnimationIndex = 2;
+                        jumpTarget = jumpTargets[1];
+                    }
+                    else if (other.gameObject.name == "DeskJumpDetectionArea2")
+                    {
+                        jumpStartPoint = jumpStartPoints[6];
+
+                        jumpTarget = jumpTargets[4];
+                    }
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
+                }
+            case "bed":
+                {
+                    shouldJump = true;
+                    if (other.gameObject.name == "BedJumpDetectionArea1")
+                    {
+                        jumpStartPoint = jumpStartPoints[3];
+                        jumpAnimationIndex = 3;
+                    }
+                    else if (other.gameObject.name == "BedJumpDetectionArea2")
+                    {
+                        jumpStartPoint = jumpStartPoints[4];
+                        jumpAnimationIndex = 4;
+                    }
+                    jumpTarget = jumpTargets[2];
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
+                }
+            case "closet":
+                {
+                    shouldJump = true;
+                    jumpStartPoint = jumpStartPoints[5];
+                    jumpAnimationIndex = 5;
+                    jumpTarget = jumpTargets[3];
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
+                }
+            case "robot":
+                {
+                    if (isSit == true) return;
+                    shouldJump = true;
+                    
+                    jumpStartPoint = jumpStartPoints[6];
+                    jumpAnimationIndex = 6;
+                    jumpTarget = jumpTargets[4];
+                    startPointExtent = 0.5f;
+                    TargetPointExtent = 8f;
+                    break;
+                }
         }
     }
+    public void RobotJumpOver()
+    {
+        _animator.runtimeAnimatorController = catAnimatior;
+        gameObject.transform.position = jumpTarget.transform.position;
 
+        sitRobot = true;
+        shouldJump = false;
+        couldDetect = true;
+        toSeek = false;
+        isSit = true;
+
+        _animator.SetTrigger("Sit");
+        _animator.Play("Cat|Sit_to");
+        agentRB.transform.SetParent(robotRB.transform.parent);
+        agentRB.transform.localPosition = Vector3.zero;
+        SetSpineAnimationAmount(0);
+    }
     void JumpListener()
     {
         if (shouldJump)
         {
-            //print("æ‡¿Î£∫"+Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position));
-            if (Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position) < 3f)
+            print("Distance(targetRB.transform.position, jumpTarget.transform.position):" + Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position));
+            print("Distance(agentRB.transform.position, jumpStartPoint.transform.position):" + Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position));
+            if (Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position) < TargetPointExtent)
             {
-                if (Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position) < 1f)
+                if (Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position) < startPointExtent)
                 {
                     agentRB.transform.LookAt(targetRB.transform.position);
                     _animator.runtimeAnimatorController = jumpAnimator;
@@ -241,6 +333,7 @@ public class agent : MonoBehaviour
     {
         JumpArrivalUpdate();
     }
+
     #endregion
     #endregion
 
@@ -300,17 +393,19 @@ public class agent : MonoBehaviour
 
     void NoRotationWhileFalling(DynamicSteeringOutput currentMovement)
     {
-        if (Mathf.Abs(agentRB.velocity.y) > 0.2)
+        if (Mathf.Abs(agentRB.velocity.y) > 1f)
         {
             SetSpineAnimationAmount(0);
             agentRB.freezeRotation = true;
             currentMovement.linearAccel = new Vector3(0, 0, 0);
             currentMovement.rotAccel = 0;
+            _animator.SetBool("IsFalling", true);
         }
         else
         {
             SetSpineAnimationAmount(100);
             agentRB.freezeRotation = false;
+            _animator.SetBool("IsFalling", false);
         }
     }
     void JumpUpListener()
@@ -321,10 +416,8 @@ public class agent : MonoBehaviour
         {
             if (timeElapsedSinceLastJump >= jumpTimeThreshold)
             {
-                // TempGameManager.Instance.OnCatJumpUp();
-                //_animator.SetTrigger("JumpUp");
-
-                // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
+                print("targetRB.velocity.y:" + targetRB.velocity.y);
+                agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
             }
         }
@@ -358,7 +451,6 @@ public class agent : MonoBehaviour
             if (isSit)
             {
                 isSit = false;
-                // TempGameManager.Instance.OnCatStand();
                 _animator.SetTrigger("Stand");
             }
             if(!toSeek)
@@ -372,7 +464,6 @@ public class agent : MonoBehaviour
             if (!isSit)
             {
                 Debug.Log("Not Sitted!");
-                // TempGameManager.Instance.OnCatSit();
                 _animator.SetTrigger("Sit");
                 isSit = true;
                 toSeek = false;
@@ -395,13 +486,12 @@ public class agent : MonoBehaviour
                 !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
             {
                 Debug.Log("Jump Forward");
-                // TempGameManager.Instance.OnCatJumpForward();
                 SetSpineAnimationAmount(0);
                 _animator.SetTrigger("JumpForward");
                 Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
-                maxSpeed = 6f;
-                // StartCoroutine(RecoverNormalSpeed());
-                // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
+                maxSpeed = 5f;
+                //StartCoroutine(RecoverNormalSpeed());
+                agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
             }
         }
     }

@@ -113,7 +113,7 @@ public class WiiRemoteMenuUI : MonoBehaviour
             {
                 Debug.Log("A Button Pressed.");
                 // Move to onClick Sprite
-                STATE_IDXS[selected_idx] += 1;
+                //STATE_IDXS[selected_idx] += 1;
                 buttons[selected_idx].onClick.Invoke();
             }
             is_dA_down = false;

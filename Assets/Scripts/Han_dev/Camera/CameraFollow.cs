@@ -7,6 +7,15 @@ public class CameraFollow : MonoBehaviour
 
     // 需要跟随的目标对象
     public Transform target;
+
+    //private Vector3 target;
+
+    //public Transform cat;
+    //public Transform stick;
+
+    //public float minSize=6;
+    //public float coefficient;
+
     public Collider targetEffectiveCollider;
     
 
@@ -28,8 +37,11 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
+        //cat = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
+        //stick = GameObject.FindGameObjectWithTag("Stick").GetComponent<Transform>();
+        //target= (cat.position + stick.position) / 2;
         startPosition = transform.position;
-        offset = transform.position - target.position;
+        offset = transform.position - target.transform.position;
     }
 
     void LateUpdate()
@@ -41,22 +53,24 @@ public class CameraFollow : MonoBehaviour
         //    return;
         //}
 
+       //target = (cat.position + stick.position) / 2;
+
         oldPosition = transform.position;
         if (!freazeX)
         {
-            oldPosition.x = Mathf.SmoothDamp(transform.position.x, target.position.x + offset.x, ref xVelocity, smoothTime);
+            oldPosition.x = Mathf.SmoothDamp(transform.position.x, target.transform.position.x + offset.x, ref xVelocity, smoothTime);
         }
 
         if (!freazeY)
         {
-            oldPosition.y = Mathf.SmoothDamp(transform.position.y, target.position.y + offset.y, ref yVelocity, smoothTime);
+            oldPosition.y = Mathf.SmoothDamp(transform.position.y, target.transform.position.y + offset.y, ref yVelocity, smoothTime);
         }
 
         if (!freazeZ)
         {
-            oldPosition.z = Mathf.SmoothDamp(transform.position.z, target.position.z + offset.z, ref zVelocity, smoothTime);
+            oldPosition.z = Mathf.SmoothDamp(transform.position.z, target.transform.position.z + offset.z, ref zVelocity, smoothTime);
         }
-
+        //Camera.main.orthographicSize = (Vector3.Distance(cat.position , stick.position) / 2 * coefficient > minSize) ? Vector3.Distance(cat.position , stick.position) / 2 * coefficient : minSize;
         transform.position = oldPosition;
     }
 

@@ -13,6 +13,8 @@ TagManager:
   - ground
   - CatUI
   - FishUI
+  - Stick
+  - robot
   layers:
   - Default
   - TransparentFX
@@ -20,7 +22,7 @@ TagManager:
   - stick
   - Water
   - UI
-  - 
+  - Walkable
   - 
   - 
   - 

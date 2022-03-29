@@ -10,11 +10,23 @@ using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
 {
-    [SerializeField] public List<JumpToData> JumpToList;
-    [SerializeField] public List<GameObject> allTriggers;
+    [SerializeField] public List<Rigidbody> jumpStartPoints;
+    [SerializeField] public List<GameObject> jumpTargets;
+
+    public RuntimeAnimatorController catAnimatior;
+    public RuntimeAnimatorController jumpAnimator;
+
+    public Rigidbody stickFish;
+
+    private Rigidbody jumpStartPoint;
+    private GameObject jumpTarget;
+    private float startPointExtent;
+    private float TargetPointExtent;
+    private int jumpAnimationIndex=0;
 
     public Rigidbody agentRB;
     public Rigidbody targetRB;
+    public Rigidbody robotRB;
     public Rigidbody agentCoordAux;
     public Rigidbody auxRB;
 
@@ -41,10 +53,11 @@ public class agent : MonoBehaviour
     public Vector3 targetAcceleration;
 
     private Animator _animator;
-    private bool isSit = false;
-    private bool toSeek = false;
-    private bool isThrowing = false;
+    [SerializeField] private bool isSit = false;
+    [SerializeField] private bool toSeek = false;
+    [SerializeField] private bool shouldJump = false;
     private bool lockY = true;
+    [SerializeField] private bool sitRobot = false;
 
     private GameObject throwToTarget = null;
 
@@ -69,10 +82,6 @@ public class agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //KinematicSteeringOutput currentMovement;
-        //currentMovement.linearVelocity = new Vector3(0, 0, 0);
-        //currentMovement.rotVelocity = 0;
-
         DynamicSteeringOutput currentMovement;
         currentMovement.linearAccel = new Vector3(0, 0, 0);
         currentMovement.rotAccel = 0;
@@ -81,184 +90,251 @@ public class agent : MonoBehaviour
         //Debug.Log("Acceleration - " + targetAcceleration);
 
         // Animation Listeners
-        //JumpUpListener();
-        AttackListener();
-        FastTargetListener();
+        if(!sitRobot)
+        {
+            JumpUpListener();
+            AttackListener();
+            FastTargetListener();
+        }
         //ChargeJumpListener();
-
-        // Check for throwing to preset jumpTo locations
-        //ThrowListener();
-        ThrowArrivalUpdate();
 
         // Disable movement while sitting animation is in progress
         NoSeekWhileSit();
 
+        // Check for throwing to preset jumpTo locations
+        JumpListener();
+
         // SEEK COMMAND VERIFIED
         if (toSeek)
         {
-            //currentMovement = kinematicSeek(agentRB, targetRB, maxSpeed);
-            DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
-            currentMovement = dynamicArrive.getSteering();
+            if (shouldJump)
+            {
+                DynamicArrive dynamicArrive = new DynamicArrive(agentRB, jumpStartPoint, maxAcceleration, maxSpeed, targetRadius, slowRadius);
+                currentMovement = dynamicArrive.getSteering();
 
-            targetRadius = 0.05f;
-            slowRadius = 0.15f;
+                targetRadius = 0.05f;
+                slowRadius = 0.15f;
 
-            //DynamicFace dynamicFace = new DynamicFace(agentRB, targetRB, auxRB, maxAngularAcceleration, maxRotation, targetRadius, slowRadius);
-            //currentMovement.rotAccel = dynamicFace.getSteering().rotAccel;
+                DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, jumpStartPoint, maxAngularAcceleration, maxRotation, 0.05f, 0.15f);
+                currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
 
-            DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, auxRB, maxAngularAcceleration, maxRotation, 0.05f, 0.15f);
-            currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
+                currentMovement.linearAccel.y = 0;
+            }
+            else if(sitRobot)
+            {
+                //change head track to robot
+            }
+            else
+                {
+                DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
+                currentMovement = dynamicArrive.getSteering();
 
-            currentMovement.linearAccel.y = 0;
+                targetRadius = 0.05f;
+                slowRadius = 0.15f;
+
+                DynamicLWYAG dynamicLWYAG = new DynamicLWYAG(agentRB, auxRB, maxAngularAcceleration, maxRotation, 0.05f, 0.15f);
+                currentMovement.rotAccel = dynamicLWYAG.getSteering().rotAccel;
+
+                currentMovement.linearAccel.y = 0;
+            }
         }
 
         // No Rotation While Falling
         NoRotationWhileFalling(currentMovement);
 
-        if (!isThrowing) UpdateRigidBody(currentMovement);
+        UpdateRigidBody(currentMovement);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        ////If collide with robot, sit on it
+        //if (collision.gameObject.tag == "robot")
+        //{
+        //    if (isSit == false)
+        //    {
+        //        print("hit robot!");
+        //        toSeek = false;
+        //        isSit = true;
+
+        //        _animator.SetTrigger("Sit");
+        //        agentRB.transform.SetParent(robotRB.transform.parent);
+        //        agentRB.transform.localPosition = Vector3.zero;
+        //        SetSpineAnimationAmount(0);
+        //    }
+        //}
+    }
+
+    public void RobotBreak()
+    {
+        sitRobot = false;
+        isSit = false;
+        toSeek = true;
+        _animator.SetTrigger("Stand");
+        targetRB = stickFish;
+        //gameObject.GetComponent<HeadTrackingDebug>().TrackTarget();
     }
 
     #region JUMP THROW WITH COLLISON TRIGGER AREAS
+    bool couldDetect = true;
     private void OnTriggerStay(Collider other)
     {
-        if (!isThrowing)
+        if (!couldDetect) return;
+        if (shouldJump) return;
+        switch (other.tag)
         {
-            foreach (var triggerBox in allTriggers)
-            {
-                if (triggerBox.GetComponent<Collider>() == other)
+            case "chair":
                 {
-                    //0:bed 1:chair 2:closet 3:desk 4:bear
-                    switch (other.tag)
+                    shouldJump = true;
+                    if (other.gameObject.name == "ChairJumpDetectionArea1")
                     {
-                        case "bed":
-                            Debug.Log("In Bed Trigger Box!");
-                            // Check for our fish position against jumpTo target,
-                            // within a range and higher than the jumpTo target
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[0].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[0].JumpPointObj.transform.position.z)) <= JumpToList[0].DetectRange &&
-                                                targetRB.position.y > JumpToList[0].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Bed!");
-                                StartCoroutine(WaitToTrow(JumpToList[0].JumpPointObj, JumpToList[0].AddHeight));
-                            }
-                            break;
-                        case "chair":
-                            Debug.Log("In Chair Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[1].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[1].JumpPointObj.transform.position.z)) <= JumpToList[1].DetectRange &&
-                                                targetRB.position.y > JumpToList[1].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Chair!");
-                                StartCoroutine(WaitToTrow(JumpToList[1].JumpPointObj, JumpToList[1].AddHeight));
-                            }
-                            break;
-                        case "desk":
-                            Debug.Log("In Desk Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[3].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[3].JumpPointObj.transform.position.z)) <= JumpToList[3].DetectRange &&
-                                                targetRB.position.y > JumpToList[3].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Desk!");
-                                // Throw to Target
-                                StartCoroutine(WaitToTrow(JumpToList[3].JumpPointObj, JumpToList[3].AddHeight));
-                            }
-                            break;
-                        case "closet":
-                            Debug.Log("In Closet Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[2].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[2].JumpPointObj.transform.position.z)) <= JumpToList[2].DetectRange &&
-                                                targetRB.position.y > JumpToList[2].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Closet!");
-                                // Throw to Target
-                                StartCoroutine(WaitToTrow(JumpToList[2].JumpPointObj, JumpToList[2].AddHeight));
-                            }
-                            break;
-                        case "bear":
-                            Debug.Log("In Bear Trigger Box!");
-                            if (Vector3.Distance(new Vector3(targetRB.position.x, 0, targetRB.position.z),
-                                                new Vector3(JumpToList[4].JumpPointObj.transform.position.x, 0,
-                                                JumpToList[4].JumpPointObj.transform.position.z)) <= JumpToList[4].DetectRange &&
-                                                targetRB.position.y > JumpToList[4].JumpPointObj.transform.position.y)
-                            {
-                                Debug.Log("Throw to Bear!");
-                                // Throw to Target
-                                StartCoroutine(WaitToTrow(JumpToList[4].JumpPointObj, JumpToList[4].AddHeight));
-                            }
-                            break;
+                        jumpStartPoint = jumpStartPoints[0];
+                        jumpAnimationIndex = 0;
                     }
+                    else if (other.gameObject.name == "ChairJumpDetectionArea2")
+                    {
+                        jumpStartPoint = jumpStartPoints[1];
+                        jumpAnimationIndex = 1;
+                    }
+                    jumpTarget = jumpTargets[0];
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
                 }
-            }
+            case "desk":
+                {
+                    shouldJump = true;
+                    if (other.gameObject.name == "DeskJumpDetectionArea1")
+                    {
+                        jumpStartPoint = jumpStartPoints[2];
+                        jumpAnimationIndex = 2;
+                        jumpTarget = jumpTargets[1];
+                    }
+                    else if (other.gameObject.name == "DeskJumpDetectionArea2")
+                    {
+                        jumpStartPoint = jumpStartPoints[6];
+
+                        jumpTarget = jumpTargets[4];
+                    }
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
+                }
+            case "bed":
+                {
+                    shouldJump = true;
+                    if (other.gameObject.name == "BedJumpDetectionArea1")
+                    {
+                        jumpStartPoint = jumpStartPoints[3];
+                        jumpAnimationIndex = 3;
+                    }
+                    else if (other.gameObject.name == "BedJumpDetectionArea2")
+                    {
+                        jumpStartPoint = jumpStartPoints[4];
+                        jumpAnimationIndex = 4;
+                    }
+                    jumpTarget = jumpTargets[2];
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
+                }
+            case "closet":
+                {
+                    shouldJump = true;
+                    jumpStartPoint = jumpStartPoints[5];
+                    jumpAnimationIndex = 5;
+                    jumpTarget = jumpTargets[3];
+                    startPointExtent = 3f;
+                    TargetPointExtent = 1f;
+                    break;
+                }
+            case "robot":
+                {
+                    if (isSit == true) return;
+                    shouldJump = true;
+                    
+                    jumpStartPoint = jumpStartPoints[6];
+                    jumpAnimationIndex = 6;
+                    jumpTarget = jumpTargets[4];
+                    startPointExtent = 0.5f;
+                    TargetPointExtent = 8f;
+                    break;
+                }
         }
     }
-
-    IEnumerator WaitToTrow(GameObject target, float addHeight)
+    public void RobotJumpOver()
     {
+        _animator.runtimeAnimatorController = catAnimatior;
+        gameObject.transform.position = jumpTarget.transform.position;
+
+        sitRobot = true;
+        shouldJump = false;
+        couldDetect = true;
         toSeek = false;
-        _animator.SetTrigger("Stand");
-        agentRB.transform.LookAt(targetRB.transform.position);
+        isSit = true;
 
-        yield return new WaitForSeconds(1.5f);
-        
-        ThrowToTarget(target, addHeight);
+        _animator.SetTrigger("Sit");
+        _animator.Play("Cat|Sit_to");
+        agentRB.transform.SetParent(robotRB.transform.parent);
+        agentRB.transform.localPosition = Vector3.zero;
+        SetSpineAnimationAmount(0);
     }
-    private Vector3 throwVelocity;
-    void ThrowToTarget(GameObject target, float addHeight)
+    void JumpListener()
     {
-        throwVelocity = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject,
-                            target.transform.position, addHeight);
-
-        isThrowing = true;
-        throwToTarget = target;
-        Debug.Log("Throwing with init velocity: " + throwVelocity);
-        _animator.SetTrigger("JumpForward");
-    }
-
-    /// <summary>
-    /// Animation Event in Cat|JumpForward
-    /// </summary>
-    public void CatJumpForwardEvent1()
-    {
-        gameObject.GetComponent<Collider>().enabled = false;
-        agentRB.velocity = throwVelocity;
-    }
-    public void CatJumpForwardEvent2()
-    {
-        gameObject.GetComponent<Collider>().enabled = true;
-    }
-
-    void ThrowArrivalUpdate()
-    {
-        if (isThrowing)
+        if (shouldJump)
         {
-            Debug.Log("Currently Throwing, Check for arrival...");
-            // If the agent arrive at the target
-            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) &&
-                (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
+            print("Distance(targetRB.transform.position, jumpTarget.transform.position):" + Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position));
+            print("Distance(agentRB.transform.position, jumpStartPoint.transform.position):" + Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position));
+            if (Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position) < TargetPointExtent)
             {
-                gameObject.GetComponent<BoxCollider>().enabled = true;
-
-                //agentRB.velocity = Vector3.zero;
-                agentRB.velocity = agentRB.velocity / 2;
-                // Reset isThrowing flag and target aux
-                isThrowing = false;
-                throwToTarget = null;
-                // Enable Seek
-                toSeek = true;
-                Debug.Log("Throw Arrived...");
+                if (Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position) < startPointExtent)
+                {
+                    agentRB.transform.LookAt(targetRB.transform.position);
+                    _animator.runtimeAnimatorController = jumpAnimator;
+                    _animator.SetInteger("JumpIndex", jumpAnimationIndex);
+                    couldDetect = false;
+                }
             }
             else
             {
-                toSeek = false;
-                isThrowing = true;
-                Debug.Log("Hasn't Arrived, Throw in Progress...");
+                shouldJump = false;
             }
         }
     }
+    void JumpArrivalUpdate()
+    {
+        _animator.runtimeAnimatorController = catAnimatior;
+        gameObject.transform.position = jumpTarget.transform.position;
+        shouldJump = false;
+        couldDetect = true;
+    }
+    #region JumpAnimationEvent
+    public void ChairJumpOver_1()
+    {
+        JumpArrivalUpdate();
+    }
+
+    public void ChairJumpOver_2()
+    {
+        JumpArrivalUpdate();
+    }
+    public void DeskJumpOver()
+    {
+        JumpArrivalUpdate();
+    }
+    public void BedJumpOver_1()
+    {
+        JumpArrivalUpdate();
+    }
+    public void BedJumpOver_2()
+    {
+        JumpArrivalUpdate();
+    }
+    public void ClosetJumpOver()
+    {
+        JumpArrivalUpdate();
+    }
+
+    #endregion
     #endregion
 
     void UpdateRigidBody(KinematicSteeringOutput currentMovement)
@@ -317,83 +393,19 @@ public class agent : MonoBehaviour
 
     void NoRotationWhileFalling(DynamicSteeringOutput currentMovement)
     {
-        if (Mathf.Abs(agentRB.velocity.y) > 0.2)
+        if (Mathf.Abs(agentRB.velocity.y) > 1f)
         {
             SetSpineAnimationAmount(0);
             agentRB.freezeRotation = true;
             currentMovement.linearAccel = new Vector3(0, 0, 0);
             currentMovement.rotAccel = 0;
+            _animator.SetBool("IsFalling", true);
         }
         else
         {
             SetSpineAnimationAmount(100);
             agentRB.freezeRotation = false;
-        }
-    }
-
-    #region ANIMATION LISTENERS
-
-    void ThrowListener()
-    {
-        // Already triggerred to jump, Check for Arrival here
-        if (isThrowing)
-        {
-            // If the agent arrive at the target
-            if ((agentRB.position.x >= throwToTarget.transform.position.x - 1f && agentRB.position.x <= throwToTarget.transform.position.x + 1f) &&
-                (agentRB.position.z >= throwToTarget.transform.position.z - 1f && agentRB.position.z <= throwToTarget.transform.position.z + 1f))
-            {
-                gameObject.GetComponent<BoxCollider>().enabled = true;
-                
-                //agentRB.velocity = Vector3.zero;
-                agentRB.velocity = agentRB.velocity / 2;
-                // Reset isThrowing flag and target aux
-                isThrowing = false;
-                throwToTarget = null;
-                // Enable Seek
-                toSeek = true;
-                Debug.Log("Throw Arrived...");
-
-            }
-            else
-            {
-                toSeek = false;
-                isThrowing = true;
-                Debug.Log("Throw in Progress...");
-            }
-        }
-        // Else Check for all target to jump to
-        else
-        {
-            foreach (var jumpTarget in JumpToList)
-            {
-                // If the agent enter a range and there is a meaningful height difference
-                if (Vector3.Distance(new Vector3(jumpTarget.JumpPointObj.transform.position.x, 0, jumpTarget.JumpPointObj.transform.position.z),
-                    new Vector3(agentRB.position.x, 0, agentRB.position.z)) <= jumpTarget.DetectRange &&
-                    Mathf.Abs(jumpTarget.JumpPointObj.transform.position.y - agentRB.position.y) > 3 &&
-                    Vector3.Distance(jumpTarget.JumpPointObj.transform.position, targetRB.transform.position) <= 2)
-                {
-                    Debug.Log("In Range of: " + jumpTarget.JumpPointObj.name);
-                    // And if the agent is at a lower level
-                    if (agentRB.position.y < jumpTarget.JumpPointObj.transform.position.y)
-                    {
-                        Vector3 result = ProjectionThrow.CaculateThrowVelocity(agentRB.gameObject, jumpTarget.JumpPointObj.transform.position, jumpTarget.AddHeight);
-
-                        //float timeToJumpToTarget = 1.0f;
-                        // This was originally used for calc acceleration
-                        //result = result / timeToJumpToTarget;
-
-                        foreach (var collider in gameObject.GetComponents<BoxCollider>())
-                            collider.enabled = false;
-
-                        // Disable Seeking while Throwing, turn on isThrowing flag
-                        toSeek = false;
-                        isThrowing = true;
-                        throwToTarget = jumpTarget.JumpPointObj;
-                        Debug.Log("Throwing with init velocity: " + result);
-                        agentRB.velocity = result;
-                    }
-                }
-            }
+            _animator.SetBool("IsFalling", false);
         }
     }
     void JumpUpListener()
@@ -404,10 +416,8 @@ public class agent : MonoBehaviour
         {
             if (timeElapsedSinceLastJump >= jumpTimeThreshold)
             {
-                // TempGameManager.Instance.OnCatJumpUp();
-                //_animator.SetTrigger("JumpUp");
-
-                // agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
+                print("targetRB.velocity.y:" + targetRB.velocity.y);
+                agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
                 timeElapsedSinceLastJump = 0.0f;
             }
         }
@@ -441,7 +451,6 @@ public class agent : MonoBehaviour
             if (isSit)
             {
                 isSit = false;
-                // TempGameManager.Instance.OnCatStand();
                 _animator.SetTrigger("Stand");
             }
             if(!toSeek)
@@ -455,7 +464,6 @@ public class agent : MonoBehaviour
             if (!isSit)
             {
                 Debug.Log("Not Sitted!");
-                // TempGameManager.Instance.OnCatSit();
                 _animator.SetTrigger("Sit");
                 isSit = true;
                 toSeek = false;
@@ -478,18 +486,15 @@ public class agent : MonoBehaviour
                 !_animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"))
             {
                 Debug.Log("Jump Forward");
-                // TempGameManager.Instance.OnCatJumpForward();
                 SetSpineAnimationAmount(0);
                 _animator.SetTrigger("JumpForward");
                 Debug.Log("After Trigger state set: " + _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Forward"));
-                maxSpeed = 6f;
-                // StartCoroutine(RecoverNormalSpeed());
-                // agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
+                maxSpeed = 5f;
+                //StartCoroutine(RecoverNormalSpeed());
+                agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
             }
         }
     }
-
-    #endregion
 
     public void SetSpineAnimationAmount(float amount)
     {

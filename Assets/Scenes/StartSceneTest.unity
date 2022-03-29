@@ -394,7 +394,6 @@ GameObject:
   - component: {fileID: 648916093}
   - component: {fileID: 648916092}
   - component: {fileID: 648916091}
-  - component: {fileID: 648916090}
   m_Layer: 5
   m_Name: AnimatedDotsImage (1)
   m_TagString: Untagged
@@ -421,25 +420,6 @@ RectTransform:
   m_AnchoredPosition: {x: 4, y: 0}
   m_SizeDelta: {x: 2460, y: 1340}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!95 &648916090
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 648916088}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b88c9377ecf5b7445a23923aa654d7ee, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &648916091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2161,7 +2141,6 @@ GameObject:
   - component: {fileID: 2085188874}
   - component: {fileID: 2085188873}
   - component: {fileID: 2085188872}
-  - component: {fileID: 2085188877}
   m_Layer: 5
   m_Name: AnimatedDotsImage
   m_TagString: Untagged
@@ -2287,22 +2266,3 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!95 &2085188877
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085188870}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b88c9377ecf5b7445a23923aa654d7ee, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0

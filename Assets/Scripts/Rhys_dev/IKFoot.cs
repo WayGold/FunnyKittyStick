@@ -29,10 +29,16 @@ public class IKFoot : MonoBehaviour
 
     private TwoBoneIKConstraint[] allIKConstraints;
 
+    private bool[] allGroundHits;
+    private float[] allCurves;
+
     private LayerMask walkableLayer;
 
     private float _maxHitDistance = 5f;
     private float _addedHeight = 3f;
+    private LayerMask hitLayer;
+    private Vector3[] allHitNormals;
+    private float[] yOffset;
     
     #endregion
 
@@ -95,9 +101,28 @@ public class IKFoot : MonoBehaviour
 
     private void RotateFeet()
     {
+        allCurves[0] = GetComponent<Animator>().GetFloat("FL");
+        allCurves[1] = GetComponent<Animator>().GetFloat("FR");
+        allCurves[2] = GetComponent<Animator>().GetFloat("BL");
+        allCurves[3] = GetComponent<Animator>().GetFloat("BR");
+        
         for (int i = 0; i < 4; ++i)
         {
+            //allIKConstraints[i].weight = allCurves[i];
+            
+            CheckGround(out Vector3 hitPoint, out allGroundHits[i], out Vector3 hitNormal, out hitLayer, out _,
+                allTransforms[i], walkableLayer, _maxHitDistance, _addedHeight);
+            allHitNormals[i] = hitNormal;
 
+            if (allGroundHits[i] == true)
+            {
+                allTargetTransforms[i].position = new Vector3(allTransforms[i].position.x, hitPoint.y + yOffset[i],
+                    allTransforms[i].position.z);
+            }
+            else
+            {
+                allTargetTransforms[i].position = allTransforms[i].position;
+            }
         }
     }
 
@@ -109,6 +134,8 @@ public class IKFoot : MonoBehaviour
     {
         allTransforms = new[] {transformFL, transformFR, transformBL, transformBR};
         allTargetTransforms = new[] {targetTransformFL, targetTransformFR, targetTransformBL, targetTransformBR};
+        allGroundHits = new bool[5];
+        yOffset = new[] {0.18f, 0.18f, 0.06f, 0.06f};
         
         allIKConstraints = new TwoBoneIKConstraint[4];
         allIKConstraints[0] = rigFL.GetComponent<TwoBoneIKConstraint>();
@@ -117,6 +144,9 @@ public class IKFoot : MonoBehaviour
         allIKConstraints[3] = rigBR.GetComponent<TwoBoneIKConstraint>();
         
         walkableLayer = LayerMask.NameToLayer("Walkable");
+
+        allHitNormals = new Vector3[4];
+        allCurves = new float[4];
     }
 
     private void FixedUpdate()

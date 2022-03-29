@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WiimoteApi;
 
 public class MenuControlSystem : MonoBehaviour
 {
     [SerializeField] public string mainGameLevel;
     [SerializeField] public string mainMenuLevel;
 
-    // Start is called before the first frame update
     public void LoadNewGameLevelCallback()
     {
         SceneManager.LoadScene(mainGameLevel);

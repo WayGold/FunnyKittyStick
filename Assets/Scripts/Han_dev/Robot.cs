@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Robot : MonoBehaviour
 {
-    bool isStart = true;
+    bool isStart = false;
     bool isDestory = false;
     bool shouldRotate = false;
     bool canGo = true;
@@ -38,13 +38,12 @@ public class Robot : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag=="Cat")
+        if (collision.gameObject.tag == "Cat")
         {
             if (isDestory == false)
             {
-                
                 StartCoroutine(DestoryRobot(collision.gameObject));
-                isStart = true;
+                
                 isDestory = true;
             }
         }
@@ -58,10 +57,15 @@ public class Robot : MonoBehaviour
     
     IEnumerator DestoryRobot(GameObject cat)
     {
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(3);
+        isStart = true; 
+
+        yield return new WaitForSeconds(20);
+
         cat.transform.parent = null;
-        //cat.GetComponent<Rigidbody>().velocity = new Vector3(0, 50, 0);
         cat.GetComponent<agent>().RobotBreak();
+        cat.GetComponent<Rigidbody>().AddForce(new Vector3(0, 200, 0), ForceMode.Acceleration);
+
         Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
         foreach (var value in transforms)
         {

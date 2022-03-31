@@ -243,7 +243,7 @@ Material:
     - _LightTransmissionThresholdOffset: 0.25
     - _Metallic: 0
     - _Mode: 0
-    - _NormalMapIntensity: 0.2
+    - _NormalMapIntensity: 0.4
     - _OcclusionMapIntensity: 1
     - _OcclusionStrength: 1
     - _OptionsTab: 1

@@ -16,12 +16,13 @@ public class StickTrackerWiimote : MonoBehaviour
     private float resetOffsetHeartbeatTimeInSeconds = 0.2f;
 
     private Vector3 originalStickPosition;
-    private float maxXOffset = 15f;
-    private float maxYOffset = 16f;
+    private float maxXOffset = 30f;
+    private float maxYOffset = 20f;
     private float maxZOffset = 17f;
 
     private float minDotDistance = 0.15f;
     private float maxDotDistance = 0.65f;
+    private float sensitivity = 1f;
 
 
     // Start is called before the first frame update
@@ -76,7 +77,7 @@ public class StickTrackerWiimote : MonoBehaviour
 
             ret = this.wiimote.ReadWiimoteData();
 
-            if (ret > 0 && wiimote.current_ext == ExtensionController.MOTIONPLUS)
+            if (wiimote.current_ext == ExtensionController.MOTIONPLUS && wiimote.Button.b)
             {
                 Vector3 offset = new Vector3(wiimote.MotionPlus.PitchSpeed,
                                                 -wiimote.MotionPlus.YawSpeed,
@@ -85,45 +86,47 @@ public class StickTrackerWiimote : MonoBehaviour
 
                 this.stickObject.transform.Rotate(this.wmpOffset, Space.Self);
             }
-
-            Vector3 offsetVector = Vector3.zero;
-
-
-            //For Tracking X and Y positioning
-            float[] pointer = wiimote.Ir.GetPointingPosition();
-
-            float xOffset = pointer[0] * this.maxXOffset;
-            //offsetVector = new Vector3(offsetVector.x + xOffset, offsetVector.y, offsetVector.z + xOffset);
-
-
-            float yOffset = pointer[1] * this.maxYOffset;
-            //offsetVector = new Vector3(offsetVector.x, offsetVector.y + yOffset, offsetVector.z);
-
-            //For tracking Z positioning
-            Vector2[] sensorDots = new Vector2[2];
-            float[,] irData = wiimote.Ir.GetProbableSensorBarIR();
-            for (int i = 0; i < 2; i++)
+            else
             {
-                float normalizedX = (float)irData[i, 0] / 1023f;
-                float normalizedY = (float)irData[i, 1] / 767f;
+                Vector3 offsetVector = Vector3.zero;
 
-                if (normalizedX != -1 && normalizedY != -1)
+                //For Tracking X and Y positioning
+                float[] pointer = wiimote.Ir.GetPointingPosition();
+
+                float xOffset = pointer[0] * this.sensitivity * this.maxXOffset;
+                offsetVector = new Vector3(offsetVector.x - xOffset, offsetVector.y, offsetVector.z - xOffset);
+
+                Debug.LogError("Offset vector: " + offsetVector);
+
+                float yOffset = pointer[1] * this.sensitivity * this.maxYOffset;
+                offsetVector = new Vector3(offsetVector.x, offsetVector.y - yOffset, offsetVector.z);
+
+                //For tracking Z positioning
+                Vector2[] sensorDots = new Vector2[2];
+                float[,] irData = wiimote.Ir.GetProbableSensorBarIR();
+                for (int i = 0; i < 2; i++)
                 {
-                    sensorDots[i] = new Vector2(normalizedX, normalizedY);
+                    float normalizedX = (float)irData[i, 0] / 1023f;
+                    float normalizedY = (float)irData[i, 1] / 767f;
+
+                    if (normalizedX != -1 && normalizedY != -1)
+                    {
+                        sensorDots[i] = new Vector2(normalizedX, normalizedY);
+                    }
                 }
-            }
 
-            float dotDistance = Vector2.Distance(sensorDots[0], sensorDots[1]);
-            float zOffset = 0.0f;
+                float dotDistance = Vector2.Distance(sensorDots[0], sensorDots[1]);
+                float zOffset = 0.0f;
 
-            if (dotDistance > 0.0f)
-            {
-                zOffset = (dotDistance / this.maxDotDistance) * this.maxZOffset;
+                if (dotDistance > 0.0f)
+                {
+                    zOffset = (dotDistance / this.maxDotDistance) * this.sensitivity * this.maxZOffset;
 
-                offsetVector = new Vector3(offsetVector.x - zOffset, offsetVector.y, offsetVector.z + zOffset);
+                    offsetVector = new Vector3(offsetVector.x - zOffset, offsetVector.y, offsetVector.z + zOffset);
 
-                this.stickHolder.transform.position = this.originalStickPosition + offsetVector;
-            }
+                    this.stickHolder.transform.position = this.originalStickPosition + offsetVector;
+                }
+            }      
         } while (ret > 0);
     }
 

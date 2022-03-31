@@ -25,7 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlbedoMap:
-        m_Texture: {fileID: 2800000, guid: 117d54f5b16e5c44c805cdb52e4b9f1c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6ccc31462065cb84ab7bd98e3156d270, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -101,7 +101,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 117d54f5b16e5c44c805cdb52e4b9f1c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6ccc31462065cb84ab7bd98e3156d270, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -198,7 +198,7 @@ Material:
     - _GlossyReflections: 1
     - _GoochRampIntensity: 0.5
     - _HatchingMapScale: 1
-    - _Initialized: 0
+    - _Initialized: 1
     - _InputTab: 1
     - _Iridescence: 0
     - _IridescenceSize: 1
@@ -215,7 +215,7 @@ Material:
     - _LightTransmissionThresholdOffset: 0.25
     - _Metallic: 0
     - _Mode: 0
-    - _NormalMapIntensity: 1
+    - _NormalMapIntensity: 0.15
     - _OcclusionMapIntensity: 1
     - _OcclusionStrength: 1
     - _OptionsTab: 1
@@ -264,7 +264,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     m_Colors:
-    - _AlbedoColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+    - _AlbedoColor: {r: 0.6132076, g: 0.56913966, b: 0.50618553, a: 1}
     - _Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     - _DetailColor: {r: 1, g: 1, b: 1, a: 1}
     - _DissolveBorderColor: {r: 1, g: 1, b: 1, a: 1}

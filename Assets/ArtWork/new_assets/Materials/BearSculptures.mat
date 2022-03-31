@@ -213,7 +213,7 @@ Material:
     - _HatchingMapScale: 1
     - _IndexOfRefraction: 0
     - _Initialized: 1
-    - _InputTab: 0
+    - _InputTab: 1
     - _Iridescence: 0
     - _IridescenceSize: 1
     - _IridescenceSmoothness: 0.5

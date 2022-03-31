@@ -23,4 +23,12 @@ public class Fish : MonoBehaviour
         rigibody.AddForce(0, force*-1, 0);
         Debug.Log("PullFish");
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag=="Cat")
+        {
+            print("Hit Cat!");
+            //Put code Here:
+        }
+    }
 }

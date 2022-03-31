@@ -9,13 +9,26 @@ public class StickTrackerWiimote : MonoBehaviour
     public Vector3 wmpOffset = Vector3.zero;
 
     [SerializeField]
+    private GameObject stickHolder;
+    [SerializeField]
     private GameObject stickObject;
 
     private float resetOffsetHeartbeatTimeInSeconds = 0.2f;
 
+    private Vector3 originalStickPosition;
+    private float maxXOffset = 15f;
+    private float maxYOffset = 16f;
+    private float maxZOffset = 17f;
+
+    private float minDotDistance = 0.15f;
+    private float maxDotDistance = 0.65f;
+
+
     // Start is called before the first frame update
     IEnumerator Start()
     {
+        this.originalStickPosition = stickHolder.transform.position;
+
         while (WiimoteManager.HasWiimote() == false)
         {
             yield return null;
@@ -24,7 +37,7 @@ public class StickTrackerWiimote : MonoBehaviour
         this.wiimote = WiimoteManager.Wiimotes[0];
 
         //Set up gyroscope
-        wiimote.SendDataReportMode(InputDataType.REPORT_EXT21);
+        wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_IR10_EXT9);
 
         this.wiimote.RequestIdentifyWiiMotionPlus();
         wiimote.ReadWiimoteData();
@@ -46,22 +59,6 @@ public class StickTrackerWiimote : MonoBehaviour
         //stickObject.transform.rotation = Quaternion.FromToRotation(stickObject.transform.forward, Vector3.forward) * stickObject.transform.rotation;
 
         StartCoroutine(ResetOffsetHeartbeat());
-    }
-
-    private Vector3 GetAccelVector()
-    {
-        float accel_x;
-        float accel_y;
-        float accel_z;
-
-        float[] accel = this.wiimote.Accel.GetCalibratedAccelData();
-        accel_x = accel[0];
-        accel_y = -accel[2];
-        accel_z = -accel[1];
-
-        //Debug.LogError("X: " + accel_x + " Y: " + accel_y + " Z: " + accel_z);
-
-        return new Vector3(accel_x, accel_y, accel_z).normalized;
     }
 
     // Update is called once per frame
@@ -87,6 +84,45 @@ public class StickTrackerWiimote : MonoBehaviour
                 this.wmpOffset += offset;
 
                 this.stickObject.transform.Rotate(this.wmpOffset, Space.Self);
+            }
+
+            Vector3 offsetVector = Vector3.zero;
+
+
+            //For Tracking X and Y positioning
+            float[] pointer = wiimote.Ir.GetPointingPosition();
+
+            float xOffset = pointer[0] * this.maxXOffset;
+            //offsetVector = new Vector3(offsetVector.x + xOffset, offsetVector.y, offsetVector.z + xOffset);
+
+
+            float yOffset = pointer[1] * this.maxYOffset;
+            //offsetVector = new Vector3(offsetVector.x, offsetVector.y + yOffset, offsetVector.z);
+
+            //For tracking Z positioning
+            Vector2[] sensorDots = new Vector2[2];
+            float[,] irData = wiimote.Ir.GetProbableSensorBarIR();
+            for (int i = 0; i < 2; i++)
+            {
+                float normalizedX = (float)irData[i, 0] / 1023f;
+                float normalizedY = (float)irData[i, 1] / 767f;
+
+                if (normalizedX != -1 && normalizedY != -1)
+                {
+                    sensorDots[i] = new Vector2(normalizedX, normalizedY);
+                }
+            }
+
+            float dotDistance = Vector2.Distance(sensorDots[0], sensorDots[1]);
+            float zOffset = 0.0f;
+
+            if (dotDistance > 0.0f)
+            {
+                zOffset = (dotDistance / this.maxDotDistance) * this.maxZOffset;
+
+                offsetVector = new Vector3(offsetVector.x - zOffset, offsetVector.y, offsetVector.z + zOffset);
+
+                this.stickHolder.transform.position = this.originalStickPosition + offsetVector;
             }
         } while (ret > 0);
     }

@@ -4,7 +4,17 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Plane
+  - bed
+  - closet
+  - desk
+  - chair
+  - bear
+  - Cat
+  - ground
+  - CatUI
+  - FishUI
+  - Stick
+  - robot
   layers:
   - Default
   - TransparentFX
@@ -12,7 +22,7 @@ TagManager:
   - stick
   - Water
   - UI
-  - 
+  - Walkable
   - 
   - 
   - 

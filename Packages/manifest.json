@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.animation.rigging": "1.0.3",
     "com.unity.cinemachine": "2.6.11",
     "com.unity.collab-proxy": "1.15.7",
@@ -8,6 +9,7 @@
     "com.unity.ide.vscode": "1.2.4",
     "com.unity.mathematics": "1.2.5",
     "com.unity.postprocessing": "3.2.0",
+    "com.unity.probuilder": "4.5.2",
     "com.unity.test-framework": "1.1.29",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.4.8",

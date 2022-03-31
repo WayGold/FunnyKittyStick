@@ -15,10 +15,15 @@ public class HeadTrackingDebug : MonoBehaviour
 
     private void Awake()
     {
+        TrackTarget();
+    }
+
+    public void TrackTarget()
+    {
         GameObject gameObject = joyCon ? sphere : cube;
 
         GetComponent<agent>().targetRB = gameObject.GetComponent<Rigidbody>();
-        
+
         WeightedTransform weightedTransform = new WeightedTransform();
         weightedTransform.transform = gameObject.transform;
         weightedTransform.weight = 1;

@@ -43,12 +43,6 @@ public class TempGameManager : MonoBehaviour
 
 
     // Start is called before the first frame update
-
-
-
-
-
-
     [Header("Audio")]
     private AudioSource BGMAudioSource;
     public AudioSource CatAudioSource;
@@ -86,13 +80,10 @@ public class TempGameManager : MonoBehaviour
         var catAudioClips = globalAudioData.AudioClip;
         CatAudioSource.clip = catAudioClips[index];
         CatAudioSource.Play();
-        
     }
 
     public void PlayRandomCatAudio()
     {
-
-
         if (CatAudioSource.isPlaying) return;
 
         var catAudioClips = globalAudioData.AudioClip;

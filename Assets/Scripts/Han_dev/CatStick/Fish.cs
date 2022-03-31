@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Fish : MonoBehaviour
 {
+    public MagnetController magnetController;
+
     Rigidbody rigibody;
     public float force;
     void Start()
@@ -25,11 +27,27 @@ public class Fish : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag=="cat")
+        if(other.tag=="Cat")
         {
             print("hit the cat!");
-            //put code here, Sage
+            magnetController.TurnOn();
 
         }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Cat")
+        {
+            print("hit the cat!");
+            Invoke("TurnOffMagnet", .5f);
+            
+
+        }
+    }
+
+    public void TurnOffMagnet()
+    {
+        magnetController.TurnOff();
     }
 }

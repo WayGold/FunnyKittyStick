@@ -14,6 +14,7 @@ TagManager:
   - CatUI
   - FishUI
   - Stick
+  - catstick
   layers:
   - Default
   - TransparentFX

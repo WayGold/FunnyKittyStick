@@ -144,7 +144,7 @@ public class agent : MonoBehaviour
         }
 
         // No Rotation While Falling
-        NoRotationWhileFalling(currentMovement);
+        //NoRotationWhileFalling(currentMovement);
 
         UpdateRigidBody(currentMovement);
     }

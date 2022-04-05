@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class Fish : MonoBehaviour
 {
-    public MagnetController magnetController;
+    private MagnetController magnetController;
 
     Rigidbody rigibody;
     public float force;
     void Start()
     {
         rigibody = gameObject.GetComponent<Rigidbody>();
+        if(GameObject.Find("ArduinoController"))
+        {
+            magnetController = GameObject.Find("ArduinoController").GetComponent<MagnetController>();
+        }
     }
     private void Update()
     {
@@ -25,24 +29,22 @@ public class Fish : MonoBehaviour
         rigibody.AddForce(0, force*-1, 0);
         Debug.Log("PullFish");
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag=="Cat")
+        if(other.tag=="Cat" && magnetController!=null)
         {
             print("hit the cat!");
             magnetController.TurnOn();
-
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Cat")
+        if (other.tag == "Cat" && magnetController != null)
         {
             print("hit the cat!");
             Invoke("TurnOffMagnet", .5f);
-            
-
         }
     }
 

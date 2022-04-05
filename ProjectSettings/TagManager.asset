@@ -15,6 +15,9 @@ TagManager:
   - FishUI
   - Stick
   - robot
+  - Target
+  - bedbotton
+  - laptop
   layers:
   - Default
   - TransparentFX

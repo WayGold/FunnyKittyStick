@@ -83,7 +83,7 @@ public class CatAnimationController : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
         }
         else
         {

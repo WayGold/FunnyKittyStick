@@ -64,7 +64,7 @@ public class Robot : MonoBehaviour
 
         cat.transform.parent = null;
         cat.GetComponent<agent>().RobotBreak();
-        cat.GetComponent<Rigidbody>().AddForce(new Vector3(0, 200, 0), ForceMode.Acceleration);
+        //cat.GetComponent<Rigidbody>().AddForce(new Vector3(0, 200, 0), ForceMode.Acceleration);
 
         Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
         foreach (var value in transforms)

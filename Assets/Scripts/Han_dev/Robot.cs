@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class Robot : MonoBehaviour
 {
-    bool isStart = false;
-    bool isDestory = false;
-    bool shouldRotate = false;
-    bool canGo = true;
+    public bool isStart = false;
+    public bool isDestory = false;
+    public bool shouldRotate = false;
 
-    float timer = 0;
-    float rotateDegree = 1;
+    public float timer = 0;
+    public float rotateDegree = 1;
 
-    void Update()
+    public void Update()
     {
         if(isStart)
         {
@@ -22,8 +21,7 @@ public class Robot : MonoBehaviour
             }
             else
             {
-                if (canGo)
-                    transform.Translate(Vector3.forward * Time.deltaTime * 3);
+                transform.Translate(Vector3.forward * Time.deltaTime * 3);
             }
 
             timer += Time.deltaTime;
@@ -31,7 +29,6 @@ public class Robot : MonoBehaviour
             {
                 rotateDegree = Random.Range(-0.5f, 0.5f);
                 shouldRotate = !shouldRotate;
-                if (shouldRotate) canGo = true;
                 timer = 0;
             }
         }
@@ -42,8 +39,7 @@ public class Robot : MonoBehaviour
         {
             if (isDestory == false)
             {
-                StartCoroutine(DestoryRobot(collision.gameObject));
-                
+                //StartCoroutine(StartRobot(collision.gameObject));
                 isDestory = true;
             }
         }
@@ -51,8 +47,12 @@ public class Robot : MonoBehaviour
         {
             print("hit barrier");
             shouldRotate = true;
-            canGo = false;
         }
+    }
+
+    public void StartRobotPower(GameObject cat)
+    {
+        StartCoroutine(DestoryRobot(cat));
     }
     
     IEnumerator DestoryRobot(GameObject cat)

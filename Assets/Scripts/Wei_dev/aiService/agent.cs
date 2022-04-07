@@ -287,7 +287,7 @@ public class agent : MonoBehaviour
                 if (Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position) < startPointExtent)
                 {
                     agentRB.GetComponent<FSpineAnimator>().enabled = false;
-                    agentRB.transform.LookAt(new Vector3( targetRB.transform.position.x,0, targetRB.transform.position.z));
+                    agentRB.transform.LookAt(new Vector3( targetRB.transform.position.x,agentRB.transform.position.y, targetRB.transform.position.z));
                     _animator.runtimeAnimatorController = jumpAnimator;
                     _animator.SetInteger("JumpIndex", jumpAnimationIndex);
                     couldDetect = false;
@@ -364,8 +364,10 @@ public class agent : MonoBehaviour
         agentRB.transform.SetParent(robotRB.transform.parent);
         agentRB.transform.localPosition = Vector3.zero;
 
+        robotRB.GetComponentInParent<Robot>().StartRobotPower(agentRB.gameObject);
+
         agentRB.GetComponent<FSpineAnimator>().enabled = false;
-        agentRB.GetComponent<HeadTrackingDebug>().target = GameObject.Find("robotRB");
+        agentRB.GetComponent<HeadTrackingDebug>().target = robotRB.gameObject;
         agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
     }
 
@@ -375,11 +377,10 @@ public class agent : MonoBehaviour
         isSit = false;
         toSeek = true;
         canMove = true;
-        _animator.SetTrigger("Stand");
+        _animator.SetTrigger("isShocked");
 
         targetRB = stickFish;
-        agentRB.GetComponent<FSpineAnimator>().enabled = false;
-        targetRB = stickFish;
+        agentRB.GetComponent<FSpineAnimator>().enabled = true;
         agentRB.GetComponent<HeadTrackingDebug>().target = stickFish.gameObject;
         agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
     }
@@ -449,7 +450,7 @@ public class agent : MonoBehaviour
 
     void NoRotationWhileFalling(DynamicSteeringOutput currentMovement)
     {
-        if (agentRB.velocity.y < -2f)
+        if (Mathf.Abs( agentRB.velocity.y) > 2f)
         {
             SetSpineAnimationAmount(0);
             agentRB.freezeRotation = true;

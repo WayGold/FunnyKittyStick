@@ -204,6 +204,9 @@ ModelImporter:
   - first:
       74: 7229555477840517134
     second: Cat|Walk_Right
+  - first:
+      74: -1469076690436046320
+    second: Cat|123
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -1810,7 +1813,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -2089,7 +2092,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Cat|Walk_Forward
+      name: Cat|123
       takeName: Cat|Walk_Forward
       internalID: 0
       firstFrame: 0

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 using MovementOutputs;
 using static AIService.KinematicSeek;
 using AIService;
@@ -81,6 +81,7 @@ public class agent : MonoBehaviour
 
         if(_animator.runtimeAnimatorController != catAnimatior)
             _animator.runtimeAnimatorController = catAnimatior;
+
     }
 
     // Update is called once per frame
@@ -149,17 +150,6 @@ public class agent : MonoBehaviour
         UpdateRigidBody(currentMovement);
     }
 
-    public void RobotBreak()
-    {
-        sitRobot = false;
-        isSit = false;
-        toSeek = true;
-        canMove = true;
-        _animator.SetTrigger("Stand");
-        targetRB = stickFish;
-        //gameObject.GetComponent<HeadTrackingDebug>().TrackTarget();
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "bedbotton")//bed botton, cat will got shocked
@@ -176,16 +166,25 @@ public class agent : MonoBehaviour
             gameObject.transform.LookAt(other.transform);
             _animator.SetTrigger("Sit");
             Invoke("LaptopStand", 10);
+            agentRB.GetComponent<HeadTrackingDebug>().target = GameObject.Find("laptopscreen");
+            agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
+            other.gameObject.GetComponentInChildren<RawImage>().enabled = true;
         }
     }
-
     void LaptopStand()
     {
-        GameObject.Destroy(GameObject.Find("LaptopDetectionArea"));
-        canMove = true;
-        toSeek = true;
-        isSit = false;
-        _animator.SetTrigger("Stand");
+        GameObject LaptopDetectionArea = GameObject.Find("LaptopDetectionArea");
+        if(LaptopDetectionArea!=null)
+        {
+            targetRB = stickFish;
+            agentRB.GetComponent<HeadTrackingDebug>().target = stickFish.gameObject;
+            agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
+            GameObject.Destroy(GameObject.Find("LaptopDetectionArea"));
+            canMove = true;
+            toSeek = true;
+            isSit = false;
+            _animator.SetTrigger("Stand");
+        }
     }
 
     #region JUMP THROW WITH COLLISON TRIGGER AREAS
@@ -210,8 +209,8 @@ public class agent : MonoBehaviour
                         jumpAnimationIndex = 1;
                     }
                     jumpTarget = jumpTargets[0];
-                    startPointExtent = 3f;
-                    TargetPointExtent = 1f;
+                    startPointExtent = 1f;
+                    TargetPointExtent = 5f;
                     break;
                 }
             case "desk":
@@ -229,7 +228,7 @@ public class agent : MonoBehaviour
                         jumpAnimationIndex =7;
                         jumpTarget = jumpTargets[5];
                     }
-                    startPointExtent = 3f;
+                    startPointExtent = 1f;
                     TargetPointExtent = 5f;
                     break;
                 }
@@ -247,8 +246,8 @@ public class agent : MonoBehaviour
                         jumpAnimationIndex = 4;
                     }
                     jumpTarget = jumpTargets[2];
-                    startPointExtent = 3f;
-                    TargetPointExtent = 1f;
+                    startPointExtent = 1f;
+                    TargetPointExtent = 5f;
                     break;
                 }
             case "closet":
@@ -257,8 +256,8 @@ public class agent : MonoBehaviour
                     jumpStartPoint = jumpStartPoints[5];
                     jumpAnimationIndex = 5;
                     jumpTarget = jumpTargets[3];
-                    startPointExtent = 3f;
-                    TargetPointExtent = 1f;
+                    startPointExtent = 1f;
+                    TargetPointExtent = 5f;
                     break;
                 }
             case "robot":
@@ -270,7 +269,7 @@ public class agent : MonoBehaviour
                     jumpAnimationIndex = 6;
                     jumpTarget = jumpTargets[4];
                     startPointExtent = 0.5f;
-                    TargetPointExtent = 8f;
+                    TargetPointExtent = 3f;
                     break;
                 }
         }
@@ -280,13 +279,15 @@ public class agent : MonoBehaviour
     {
         if (shouldJump)
         {
-            print("Distance(targetRB.transform.position, jumpTarget.transform.position):" + Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position));
-            print("Distance(agentRB.transform.position, jumpStartPoint.transform.position):" + Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position));
-            if (Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position) < TargetPointExtent)
+            //print("Distance(targetRB.transform.position, jumpTarget.transform.position):" + Vector3.Distance(targetRB.transform.position, jumpTarget.transform.position));
+            //print("Distance(agentRB.transform.position, jumpStartPoint.transform.position):" + Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position));
+            if (Mathf.Abs(targetRB.transform.position.x-jumpTarget.transform.position.x) < TargetPointExtent &&
+                Mathf.Abs(targetRB.transform.position.z - jumpTarget.transform.position.z) < TargetPointExtent)
             {
                 if (Vector3.Distance(agentRB.transform.position, jumpStartPoint.transform.position) < startPointExtent)
                 {
-                    agentRB.transform.LookAt(targetRB.transform.position);
+                    agentRB.GetComponent<FSpineAnimator>().enabled = false;
+                    agentRB.transform.LookAt(new Vector3( targetRB.transform.position.x,agentRB.transform.position.y, targetRB.transform.position.z));
                     _animator.runtimeAnimatorController = jumpAnimator;
                     _animator.SetInteger("JumpIndex", jumpAnimationIndex);
                     couldDetect = false;
@@ -302,6 +303,7 @@ public class agent : MonoBehaviour
     {
         _animator.runtimeAnimatorController = catAnimatior;
         gameObject.transform.position = jumpTarget.transform.position;
+        agentRB.GetComponent<FSpineAnimator>().enabled = true;
         shouldJump = false;
         couldDetect = true;
     }
@@ -361,7 +363,26 @@ public class agent : MonoBehaviour
         _animator.Play("Cat|Sit_to");
         agentRB.transform.SetParent(robotRB.transform.parent);
         agentRB.transform.localPosition = Vector3.zero;
-        SetSpineAnimationAmount(0);
+
+        robotRB.GetComponentInParent<Robot>().StartRobotPower(agentRB.gameObject);
+
+        agentRB.GetComponent<FSpineAnimator>().enabled = false;
+        agentRB.GetComponent<HeadTrackingDebug>().target = robotRB.gameObject;
+        agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
+    }
+
+    public void RobotBreak()
+    {
+        sitRobot = false;
+        isSit = false;
+        toSeek = true;
+        canMove = true;
+        _animator.SetTrigger("isShocked");
+
+        targetRB = stickFish;
+        agentRB.GetComponent<FSpineAnimator>().enabled = true;
+        agentRB.GetComponent<HeadTrackingDebug>().target = stickFish.gameObject;
+        agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
     }
 
     public void BedBottonOver()
@@ -429,7 +450,7 @@ public class agent : MonoBehaviour
 
     void NoRotationWhileFalling(DynamicSteeringOutput currentMovement)
     {
-        if (Mathf.Abs(agentRB.velocity.y) > 1f)
+        if (Mathf.Abs( agentRB.velocity.y) > 2f)
         {
             SetSpineAnimationAmount(0);
             agentRB.freezeRotation = true;

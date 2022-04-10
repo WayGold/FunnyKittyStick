@@ -527,7 +527,6 @@ public class agent : MonoBehaviour
         agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
     }
 
-
     #region TEMP EVENTS
 
     ///// <summary>

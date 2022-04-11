@@ -23,6 +23,7 @@ public class HUDManager : MonoBehaviour
     {
         collectibles = GameObject.FindObjectsOfType<Collectible>().ToList();
         HeartSlider = GetComponentInChildren<Slider>();
+        HeartSlider.value = 0;
         GrowthNum = 1f/collectibles.Count;
         growth = false;
         target_value = 0;

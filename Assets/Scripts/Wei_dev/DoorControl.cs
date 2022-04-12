@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DoorControl : MonoBehaviour
 {
-    public Animator doorAnimator;
+    public GameObject door;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,12 +17,12 @@ public class DoorControl : MonoBehaviour
         
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
         //If collide with cat, open door
-        if (collision.gameObject.tag == "cat")
+        if (other.gameObject.tag == "Cat")
         {
-            doorAnimator.SetTrigger("Open");
+            door.GetComponent<Animator>().SetTrigger("Open");
         }
     }
 }

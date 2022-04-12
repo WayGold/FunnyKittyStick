@@ -20,15 +20,30 @@ public class StickTrackerWiimote : MonoBehaviour
     private float maxYOffset = 20f;
     private float maxZOffset = 17f;
 
+    //private float maxXOffset = 1f;
+    //private float maxYOffset = 1f;
+    //private float maxZOffset = 1f;
+
     private float minDotDistance = 0.15f;
     private float maxDotDistance = 0.65f;
-    private float sensitivity = 1f;
+    private float sensitivity = 1.0f;
 
 
     // Start is called before the first frame update
     IEnumerator Start()
     {
         this.originalStickPosition = stickHolder.transform.position;
+
+        WiimoteManager.FindWiimotes();
+
+        while (WiimoteManager.HasWiimote() == false)
+        {
+            yield return null;
+        }
+
+        WiimoteManager.Cleanup(WiimoteManager.Wiimotes[0]);
+
+        WiimoteManager.FindWiimotes();
 
         while (WiimoteManager.HasWiimote() == false)
         {
@@ -42,6 +57,7 @@ public class StickTrackerWiimote : MonoBehaviour
 
         this.wiimote.RequestIdentifyWiiMotionPlus();
         wiimote.ReadWiimoteData();
+        
         while (this.wiimote.wmp_attached == false)
         {
             Debug.LogError("Initializing WMP...");
@@ -49,6 +65,8 @@ public class StickTrackerWiimote : MonoBehaviour
             this.wiimote.RequestIdentifyWiiMotionPlus();
             wiimote.ReadWiimoteData();
         }
+        
+
         this.wiimote.ActivateWiiMotionPlus();
         yield return new WaitForSeconds(2.0f);
         MotionPlusData wmpData = this.wiimote.MotionPlus;
@@ -77,6 +95,12 @@ public class StickTrackerWiimote : MonoBehaviour
 
             ret = this.wiimote.ReadWiimoteData();
 
+            /*if (wiimote.Button.a)
+            {
+                WiimoteManager.Cleanup(wiimote);
+            }*/
+            
+
             if (wiimote.current_ext == ExtensionController.MOTIONPLUS && wiimote.Button.b)
             {
                 Vector3 offset = new Vector3(wiimote.MotionPlus.PitchSpeed,
@@ -95,8 +119,6 @@ public class StickTrackerWiimote : MonoBehaviour
 
                 float xOffset = pointer[0] * this.sensitivity * this.maxXOffset;
                 offsetVector = new Vector3(offsetVector.x - xOffset, offsetVector.y, offsetVector.z - xOffset);
-
-                Debug.LogError("Offset vector: " + offsetVector);
 
                 float yOffset = pointer[1] * this.sensitivity * this.maxYOffset;
                 offsetVector = new Vector3(offsetVector.x, offsetVector.y - yOffset, offsetVector.z);
@@ -125,6 +147,9 @@ public class StickTrackerWiimote : MonoBehaviour
                     offsetVector = new Vector3(offsetVector.x - zOffset, offsetVector.y, offsetVector.z + zOffset);
 
                     this.stickHolder.transform.position = this.originalStickPosition + offsetVector;
+
+                    //this.stickHolder.transform.position = Vector3.Lerp(this.stickHolder.transform.position,
+                       // this.stickHolder.transform.position + offsetVector, this.sensitivity);
                 }
             }      
         } while (ret > 0);

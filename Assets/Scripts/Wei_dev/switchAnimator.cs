@@ -18,14 +18,13 @@ public class switchAnimator : MonoBehaviour
 
     public void _switchToMainAnimator()
     {
-        Transform catTrans = GetComponent<Transform>();
-
         // Set Original Animation Controller Once Jumping is Finished
         Animator _animator = GetComponent<Animator>();
         _animator.runtimeAnimatorController = Resources.Load("Animator/Animator_Cat") as RuntimeAnimatorController;
 
         // Set Trans Back
-        this.transform.position = catTrans.position;
+        if(this.name == "Cat.L.012")
+            this.transform.position = new Vector3(-5.4f, 0f, -9.7f);
 
         // Start Agent
         GetComponent<agent>().enabled = true;

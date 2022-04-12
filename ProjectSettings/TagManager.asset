@@ -15,7 +15,13 @@ TagManager:
   - FishUI
   - Stick
   - robot
+<<<<<<< HEAD
   - door
+=======
+  - Target
+  - bedbotton
+  - laptop
+>>>>>>> main
   layers:
   - Default
   - TransparentFX

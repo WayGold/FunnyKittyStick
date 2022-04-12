@@ -204,6 +204,9 @@ ModelImporter:
   - first:
       74: 7229555477840517134
     second: Cat|Walk_Right
+  - first:
+      74: -1469076690436046320
+    second: Cat|Walk_Forward
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -1810,7 +1813,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0

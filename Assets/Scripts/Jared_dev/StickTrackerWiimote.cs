@@ -95,12 +95,6 @@ public class StickTrackerWiimote : MonoBehaviour
 
             ret = this.wiimote.ReadWiimoteData();
 
-            /*if (wiimote.Button.a)
-            {
-                WiimoteManager.Cleanup(wiimote);
-            }*/
-            
-
             if (wiimote.current_ext == ExtensionController.MOTIONPLUS && wiimote.Button.b)
             {
                 Vector3 offset = new Vector3(wiimote.MotionPlus.PitchSpeed,
@@ -153,6 +147,11 @@ public class StickTrackerWiimote : MonoBehaviour
                 }
             }      
         } while (ret > 0);
+    }
+
+    private void SetXYPosition()
+    { 
+    
     }
 
     private IEnumerator ResetOffsetHeartbeat()

@@ -93,6 +93,7 @@ public class agent : MonoBehaviour
     {
         if(grabFish)
         {
+            agentRB.transform.eulerAngles = new Vector3(0, 120, 0);
             agentRB.transform.position = stickFish.transform.position +  grabOffset;
             return;
         }
@@ -194,14 +195,15 @@ public class agent : MonoBehaviour
         stickFish.GetComponent<CapsuleCollider>().enabled = false;
         yield return new WaitForSeconds(3);
 
-        canMove = true;
-        toSeek = true;
         agentRB.useGravity = true;
-        agentRB.GetComponent<BoxCollider>().enabled = true;
         _animator.SetBool("grabFish", false);
         grabFish = false;
+        agentRB.GetComponent<BoxCollider>().enabled = true;
         yield return new WaitForSeconds(3);
+        canMove = true;
+        toSeek = true;
         stickFish.GetComponent<CapsuleCollider>().enabled = true;
+
     }
     void LaptopStand()
     {

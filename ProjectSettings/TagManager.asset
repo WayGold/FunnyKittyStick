@@ -15,6 +15,7 @@ TagManager:
   - FishUI
   - Stick
   - robot
+  - door
   layers:
   - Default
   - TransparentFX

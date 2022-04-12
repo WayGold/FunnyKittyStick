@@ -28,6 +28,7 @@ public class StickTrackerWiimote : MonoBehaviour
     private float maxDotDistance = 0.65f;
     private float sensitivity = 1.0f;
 
+    public float rayDistance = 10f;
 
     // Start is called before the first frame update
     IEnumerator Start()
@@ -83,6 +84,8 @@ public class StickTrackerWiimote : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        this.CenterToCamera();
+        
         int ret;
         do
         {
@@ -151,7 +154,14 @@ public class StickTrackerWiimote : MonoBehaviour
 
     private void SetXYPosition()
     { 
-    
+        
+    }
+
+    private void CenterToCamera()
+    {
+        Ray cameraRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
+
+        this.stickHolder.transform.position = cameraRay.GetPoint(this.rayDistance);
     }
 
     private IEnumerator ResetOffsetHeartbeat()

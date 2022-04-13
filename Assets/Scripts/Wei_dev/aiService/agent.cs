@@ -93,7 +93,7 @@ public class agent : MonoBehaviour
     {
         if(grabFish)
         {
-            agentRB.transform.eulerAngles = new Vector3(0, 120, 0);
+            agentRB.transform.eulerAngles = new Vector3(0, 95, 0);
             agentRB.transform.position = stickFish.transform.position +  grabOffset;
             return;
         }
@@ -156,6 +156,20 @@ public class agent : MonoBehaviour
 
         UpdateRigidBody(currentMovement);
     }
+    void JumpGrabListener()
+    {
+        if ((agentRB.position.y < targetRB.position.y) &&
+            Vector3.Distance(new Vector3(agentRB.position.x, 0, agentRB.position.z),
+                             new Vector3(targetRB.position.x, 0, targetRB.position.z)) < 2f)
+        {
+            timeElapsedSinceLastJump += Time.deltaTime;
+            if (timeElapsedSinceLastJump >= jumpTimeThreshold)
+            {
+                _animator.SetTrigger("JumpUp");
+                timeElapsedSinceLastJump = 0.0f;
+            }
+        }
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "bedbotton")//bed botton, cat will got shocked
@@ -178,7 +192,8 @@ public class agent : MonoBehaviour
         }
         if(other.tag=="stickfish")
         {
-            if(!grabFish)
+            
+            if (!grabFish && _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Up"))
             {
                 canMove = false;
                 toSeek = false;
@@ -186,6 +201,7 @@ public class agent : MonoBehaviour
                 agentRB.GetComponent<BoxCollider>().enabled = false;
                 grabFish = true;
                 _animator.SetBool("grabFish", true);
+                stickFish.GetComponent<Rigidbody>().mass = 50;
                 StartCoroutine(ReleaseGrabFish());
              }
         }
@@ -193,17 +209,20 @@ public class agent : MonoBehaviour
     IEnumerator ReleaseGrabFish()
     {
         stickFish.GetComponent<CapsuleCollider>().enabled = false;
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(10);
 
         agentRB.useGravity = true;
         _animator.SetBool("grabFish", false);
         grabFish = false;
         agentRB.GetComponent<BoxCollider>().enabled = true;
+
+        stickFish.GetComponent<Rigidbody>().mass = 1;
+
         yield return new WaitForSeconds(3);
         canMove = true;
         toSeek = true;
         stickFish.GetComponent<CapsuleCollider>().enabled = true;
-
+        
     }
     void LaptopStand()
     {
@@ -502,20 +521,7 @@ public class agent : MonoBehaviour
             _animator.SetBool("IsFalling", false);
         }
     }
-    void JumpGrabListener()
-    {
-        if ((agentRB.position.y < targetRB.position.y) &&
-            Vector3.Distance(new Vector3(agentRB.position.x, 0, agentRB.position.z),
-                             new Vector3(targetRB.position.x, 0, targetRB.position.z)) < 2f)
-        {
-            timeElapsedSinceLastJump += Time.deltaTime;
-            if (timeElapsedSinceLastJump >= jumpTimeThreshold)
-            {
-                _animator.SetTrigger("JumpUp");
-                timeElapsedSinceLastJump = 0.0f;
-            }
-        }
-    }
+
     public void CatJumpUp()
     {
         agentRB.velocity = new Vector3(0, 1, 0) * Mathf.Sqrt((float)(2 * 9.81 * Mathf.Abs(targetRB.position.y - agentRB.position.y)));

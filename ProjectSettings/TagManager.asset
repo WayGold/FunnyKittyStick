@@ -18,6 +18,7 @@ TagManager:
   - Target
   - bedbotton
   - laptop
+  - stickfish
   layers:
   - Default
   - TransparentFX

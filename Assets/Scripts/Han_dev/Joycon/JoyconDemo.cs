@@ -50,13 +50,11 @@ namespace JoyConLibrary
 				// GetButtonDown checks if a button has been pressed (not held)
 				if (j.GetButton(Joycon.Button.SHOULDER_2))
 				{
-					Debug.Log("Shoulder button 2 held");
 					// GetStick returns a 2-element vector with x/y joystick components
 					transform.Translate(Vector3.down * Time.deltaTime * movingSpeed, Space.World);
 				}
 				if (j.GetButton(Joycon.Button.SHOULDER_1))
 				{
-					Debug.Log("Shoulder button 1 held");
 					transform.Translate(Vector3.up * Time.deltaTime * movingSpeed, Space.World);
 				}
 

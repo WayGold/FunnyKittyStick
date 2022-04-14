@@ -21,13 +21,14 @@ public class StickTrackerWiimote : MonoBehaviour
     private float yBounds = 6f;
     private float maxYOffset = 20f;
     private float maxZOffset = 17f;
+    private float shakeBuffer = 0.001f;
 
     //private float maxXOffset = 1f;
     //private float maxYOffset = 1f;
     //private float maxZOffset = 1f;
 
     private float minDotDistance = 0.15f;
-    private float maxDotDistance = 0.65f;
+    private float maxDotDistance = 0.45f;
     private float sensitivity = 0.5f;
 
     private float dotDistance = 0.0f;
@@ -59,8 +60,6 @@ public class StickTrackerWiimote : MonoBehaviour
 
         this.wiimote = WiimoteManager.Wiimotes[0];
 
-        yield return new WaitForSeconds(2.0f);
-
         //Set up gyroscope
         this.wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_ACCEL_EXT16);
 
@@ -78,7 +77,7 @@ public class StickTrackerWiimote : MonoBehaviour
         
 
         this.wiimote.ActivateWiiMotionPlus();
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(1.0f);
         MotionPlusData wmpData = this.wiimote.MotionPlus;
         wmpData.SetZeroValues();
 
@@ -99,7 +98,6 @@ public class StickTrackerWiimote : MonoBehaviour
     {
         if (!WiimoteManager.HasWiimote() || this.wiimote.wmp_attached == false)
         {
-            Debug.Log("AAAHHHHH");
             return;
         }
         
@@ -135,20 +133,6 @@ public class StickTrackerWiimote : MonoBehaviour
                     this.wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_ACCEL_IR12);
                     this.wiimote.SetupIRCamera(IRDataType.BASIC);
                 }
-                
-                //this.wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_ACCEL_IR12);
-                //For Tracking X and Y positioning
-                /*float[] pointer = wiimote.Ir.GetPointingPosition();
-
-                float xOffset = pointer[0] * this.sensitivity * this.maxXOffset;
-                offsetVector = new Vector3(offsetVector.x - xOffset, offsetVector.y, offsetVector.z - xOffset);
-
-                float yOffset = pointer[1] * this.sensitivity * this.maxYOffset;
-                offsetVector = new Vector3(offsetVector.x, offsetVector.y - yOffset, offsetVector.z);
-                */
-
-                //For tracking Z positioning
-
             }      
         } while (ret > 0);
     }
@@ -175,6 +159,10 @@ public class StickTrackerWiimote : MonoBehaviour
         float xPointer = (sanitizedValue * 2) - 1.0f;
 
         float xOffset = xPointer * this.xBounds;
+        if (Mathf.Abs(xOffset - this.offsetVector.x) < this.shakeBuffer)
+        {
+            xOffset = this.offsetVector.x;
+        }
 
         //Y Position
         sanitizedValue = pointer[1];
@@ -190,6 +178,10 @@ public class StickTrackerWiimote : MonoBehaviour
         float yPointer = (sanitizedValue * 2) - 1.0f;
 
         float yOffset = yPointer * this.yBounds;
+        if (Mathf.Abs(yOffset - this.offsetVector.y) < this.shakeBuffer)
+        {
+            yOffset = this.offsetVector.y;
+        }
 
         //Z Position
         Vector2[] sensorDots = new Vector2[2];
@@ -211,6 +203,10 @@ public class StickTrackerWiimote : MonoBehaviour
         if (this.dotDistance > 0.0f)
         {
             zOffset = (((this.dotDistance / this.maxDotDistance) * 2) - 1) * this.maxZOffset;
+            if (Mathf.Abs(zOffset - this.offsetVector.z) < this.shakeBuffer)
+            {
+                zOffset = this.offsetVector.z;
+            }
 
             //offsetVector = new Vector3(offsetVector.x - zOffset, offsetVector.y, offsetVector.z + zOffset);
         }

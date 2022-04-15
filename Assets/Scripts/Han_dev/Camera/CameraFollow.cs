@@ -40,6 +40,7 @@ public class CameraFollow : MonoBehaviour
         //cat = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
         //stick = GameObject.FindGameObjectWithTag("Stick").GetComponent<Transform>();
         //target= (cat.position + stick.position) / 2;
+        target = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
         startPosition = transform.position;
         offset = transform.position - target.transform.position;
     }

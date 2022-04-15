@@ -6,11 +6,13 @@ using UnityEngine.Audio;
 public class AudioItem : MonoBehaviour
 {
 
-    public enum AudioItemType { NORMAL, AMBIENT}
+    public enum AudioItemType { NORMAL, RANDOM, AMBIENT}
 
     [Header("Audio Attributes")]
-    public AudioSource _as;
-    public AudioClip _clip;
+    public List<AudioSource> asGroup;
+    public int asIndex;
+    public int asCount;
+    public AudioClip[] clipGroup;
     public AudioItemType _type;
     public float ambientTime = 2f;
 
@@ -18,30 +20,54 @@ public class AudioItem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Add AudioSource If Not, Otherwise Get It
-        if (!TryGetComponent<AudioSource>(out _as))
+        // Create AudioSource of asCount number
+        for(int i = 0; i < asCount; ++i)
         {
-            _as = gameObject.AddComponent<AudioSource>();
+            CreateNewAudioSource();
         }
+    }
 
-        
 
+    void CreateNewAudioSource()
+    {
+        // Create A New AS
+        var _as = gameObject.AddComponent<AudioSource>();
+
+        // Assign AS Attributes
         switch (_type)
         {
+
             // One Shot Audio
             case AudioItemType.NORMAL:
-                _as.clip = _clip;
+                _as.clip = clipGroup[0];
                 _as.playOnAwake = false; // Not Necessary
                 break;
 
+
+            // Random Audio
+            case AudioItemType.RANDOM:
+                var index = (int)Random.Range(0, clipGroup.Length - 1);
+                var randomClip = clipGroup[index];
+                _as.clip = randomClip;
+                _as.playOnAwake = false; // Not Necessary
+                break;
+        
+
             // Continues Seamless Audio
             case AudioItemType.AMBIENT:
-                _as.clip = _clip;
+                _as.clip = clipGroup[0];
                 _as.volume = 0;
                 _as.loop = true;
                 _as.Play();
                 break;
+
+            
         }
+
+
+        // Add to list to track
+        asGroup.Add(_as);
+
 
     }
 
@@ -51,26 +77,40 @@ public class AudioItem : MonoBehaviour
 
     public void Play()
     {
+
+
+        // Check if current Index is available
+        if (asGroup[asIndex].isPlaying)
+        {
+            // update index
+            asIndex = (asIndex + 1) % asGroup.Count;
+        }
+
+
         switch (_type)
         {
-            // One Shot Audio
-            case AudioItemType.NORMAL:
-                _as.Play();
-                break;
+           
 
             // Continues Seamless Audio
             case AudioItemType.AMBIENT:
                 StartCoroutine(PlayAmbient(ambientTime));
                 break;
+
+
+            // Otherwise, just normal play it
+            default:
+                asGroup[asIndex].Play();
+                break;
         }
     }
+
 
     
     private IEnumerator PlayAmbient(float time)
     {
-        FadeInAudioSource(_as, 0.3f);
+        FadeInAudioSource(asGroup[asIndex], 0.3f);
         yield return new WaitForSeconds(time);
-        FadeOutAudioSource(_as, 1f);
+        FadeOutAudioSource(asGroup[asIndex], 1f);
     }
 
 

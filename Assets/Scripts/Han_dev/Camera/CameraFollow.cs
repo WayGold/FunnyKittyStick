@@ -47,6 +47,8 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
+        //target = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
+        //offset = transform.position - target.transform.position;
 
         //// If outside the effective collider, don't follow the target
         //if (!targetEffectiveCollider.bounds.Contains(target.position))
@@ -54,7 +56,7 @@ public class CameraFollow : MonoBehaviour
         //    return;
         //}
 
-       //target = (cat.position + stick.position) / 2;
+        //target = (cat.position + stick.position) / 2;
 
         oldPosition = transform.position;
         if (!freazeX)

@@ -10,18 +10,8 @@ public class EnableSelectedCat : MonoBehaviour
 
     private bool first_entrance;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        first_entrance = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!first_entrance)
-            return;
-
         switch (CatSelection.CAT_SELECTED)
         {
             case 0:
@@ -36,7 +26,17 @@ public class EnableSelectedCat : MonoBehaviour
             default:
                 break;
         }
+    }
 
-        first_entrance = false;
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
     }
 }

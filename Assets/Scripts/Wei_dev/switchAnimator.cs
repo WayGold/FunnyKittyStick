@@ -23,6 +23,7 @@ public class switchAnimator : MonoBehaviour
 
         // Set Original Animation Controller Once Jumping is Finished
         Animator _animator = GetComponent<Animator>();
+        _animator.applyRootMotion = false;
         _animator.runtimeAnimatorController = Resources.Load("Animator/Animator_Cat") as RuntimeAnimatorController;
 
         // Set Trans Back

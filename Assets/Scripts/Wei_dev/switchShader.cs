@@ -5,14 +5,23 @@ using UnityEngine;
 public class switchShader : MonoBehaviour
 {
     [SerializeField] public Material Toon_Cat;
+    [SerializeField] public Animator jumpAnimator;
+    [SerializeField] public Animator fadeController;
     [SerializeField] public GameObject fish;
-    [SerializeField] private float elapsedTime = 0;
+    [SerializeField] public Dictionary<string, int> cat_map = new Dictionary<string, int> 
+    { { "Cat.L.012", 0 }, { "Cat.L.012 (1)", 1 }, { "Cat.L.012 (2)", 2 } };
 
+    [SerializeField] private float elapsedTime = 0;
+    [SerializeField] private float outElapsedTime = 0;
+
+    private bool isOutBox;
     private Material original_mat;
+    
 
     // Start is called before the first frame update
     void Start()
     {
+        isOutBox = false;
         original_mat = GetComponent<SkinnedMeshRenderer>().materials[0];
     }
 
@@ -20,33 +29,49 @@ public class switchShader : MonoBehaviour
     void Update()
     {
         SkinnedMeshRenderer meshRenderer = GetComponent<SkinnedMeshRenderer>();
-        
-        if (isInRadius(transform.position, fish.transform.position, 5))
-        { 
-            if (elapsedTime == 0)
+
+        if (isOutBox)
+        {
+            outElapsedTime += Time.deltaTime;
+            if(outElapsedTime >= 5.0)
             {
-                elapsedTime += Time.deltaTime;
-                original_mat = meshRenderer.material;
-                meshRenderer.material = Toon_Cat;
+                fadeController.SetTrigger("FadeOut");
+                CatSelection.CAT_SELECTED = cat_map[transform.parent.name];
+            }
+
+        }
+
+        if (!isOutBox)
+        {
+            if (isInRadius(transform.position, fish.transform.position, 5))
+            {
+                if (elapsedTime == 0)
+                {
+                    elapsedTime += Time.deltaTime;
+                    original_mat = meshRenderer.material;
+                    meshRenderer.material = Toon_Cat;
+                }
+                else
+                {
+                    elapsedTime += Time.deltaTime;
+                    meshRenderer.material.SetFloat("_OutlineSize", elapsedTime * 2);
+                }
+
+                // Hover for 4 seconds
+                if (elapsedTime >= 4.0)
+                {
+                    // Jump Out Of The Box, Enable Jump Out Animator
+                    jumpAnimator.applyRootMotion = false;
+                    transform.parent.GetComponent<Animator>().SetTrigger("Jump");
+                    isOutBox = true;
+                    meshRenderer.material = original_mat;
+                }
             }
             else
             {
-                elapsedTime += Time.deltaTime;
-                meshRenderer.material.SetFloat("_OutlineSize", elapsedTime * 2);
-            }
-
-            // Hover for 2 seconds
-            if(elapsedTime >= 4.0)
-            {
-                // Jump Out Of The Box, Enable Jump Out Animator
-                transform.parent.GetComponent<Animator>().enabled = true;
                 meshRenderer.material = original_mat;
+                elapsedTime = 0;
             }
-        }
-        else
-        {
-            meshRenderer.material = original_mat;
-            elapsedTime = 0;
         }
     }
 

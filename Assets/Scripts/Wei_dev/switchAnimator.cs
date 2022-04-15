@@ -20,6 +20,7 @@ public class switchAnimator : MonoBehaviour
     {
         Transform catTrans = GetComponent<Transform>();
         Vector3 currPos = catTrans.position;
+        GetComponent<BoxCollider>().enabled = true;
 
         // Set Original Animation Controller Once Jumping is Finished
         Animator _animator = GetComponent<Animator>();

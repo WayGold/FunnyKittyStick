@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEditor;
+using System.Reflection;
+
+
+
 
 public class AudioItem : MonoBehaviour
 {
@@ -10,21 +15,53 @@ public class AudioItem : MonoBehaviour
 
     [Header("Audio Attributes")]
     public List<AudioSource> asGroup;
+    public AudioSource asReference;
+
     public int asIndex;
     public int asCount;
     public AudioClip[] clipGroup;
     public AudioItemType _type;
     public float ambientTime = 2f;
 
+    [Header("Debug")]
+    [InspectorButton("Play")]
+    public bool PlayAudio;
+
 
     // Start is called before the first frame update
     void Start()
     {
+
+        TryGetComponent<AudioSource>(out asReference);
+
         // Create AudioSource of asCount number
         for(int i = 0; i < asCount; ++i)
         {
             CreateNewAudioSource();
         }
+
+        
+        
+    }
+
+
+    void CopyAudioSourceValue(AudioSource as_from, AudioSource as_to)
+    {
+        // Manually Copy every field
+        as_to.outputAudioMixerGroup = as_from.outputAudioMixerGroup;
+        as_to.mute = as_from.mute;
+        as_to.bypassEffects = as_from.bypassEffects;
+        as_to.bypassListenerEffects = as_from.bypassListenerEffects;
+        as_to.bypassReverbZones = as_from.bypassReverbZones;
+        as_to.playOnAwake = as_from.playOnAwake;
+        as_to.loop = as_from.loop;
+        as_to.priority = as_from.priority;
+        as_to.volume = as_from.volume;
+        as_to.pitch = as_from.pitch;
+        as_to.panStereo = as_from.panStereo;
+        as_to.spatialBlend = as_from.spatialBlend;
+        as_to.reverbZoneMix = as_from.reverbZoneMix;
+
     }
 
 
@@ -32,6 +69,9 @@ public class AudioItem : MonoBehaviour
     {
         // Create A New AS
         var _as = gameObject.AddComponent<AudioSource>();
+
+        // Copy initial audioSource setting if any
+        if (asReference != null) CopyAudioSourceValue(asReference, _as);
 
         // Assign AS Attributes
         switch (_type)
@@ -46,9 +86,7 @@ public class AudioItem : MonoBehaviour
 
             // Random Audio
             case AudioItemType.RANDOM:
-                var index = (int)Random.Range(0, clipGroup.Length - 1);
-                var randomClip = clipGroup[index];
-                _as.clip = randomClip;
+                _as.clip = GetRandomAudioClip();
                 _as.playOnAwake = false; // Not Necessary
                 break;
         
@@ -67,6 +105,7 @@ public class AudioItem : MonoBehaviour
 
         // Add to list to track
         asGroup.Add(_as);
+
 
 
     }
@@ -96,6 +135,22 @@ public class AudioItem : MonoBehaviour
                 StartCoroutine(PlayAmbient(ambientTime));
                 break;
 
+            // Random
+            case AudioItemType.RANDOM:
+
+                var currentClip = asGroup[asIndex].clip;
+                var randomClip = GetRandomAudioClip();
+
+                // Try to get a different audioClip than last time
+                while(currentClip == randomClip)
+                {
+                    randomClip = GetRandomAudioClip();
+                }
+                asGroup[asIndex].clip = randomClip;
+                
+
+                asGroup[asIndex].Play();
+                break;
 
             // Otherwise, just normal play it
             default:
@@ -105,6 +160,16 @@ public class AudioItem : MonoBehaviour
     }
 
 
+
+
+
+
+    private AudioClip GetRandomAudioClip()
+    {
+        var index = (int)Random.Range(0, clipGroup.Length - 1);
+        var randomClip = clipGroup[index];
+        return randomClip;
+    }
     
     private IEnumerator PlayAmbient(float time)
     {
@@ -179,8 +244,6 @@ public class AudioItem : MonoBehaviour
     {
         audioMixer.SetFloat(exposedParam, value);
     }
-
-
 
 
 }

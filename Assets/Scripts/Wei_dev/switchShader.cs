@@ -54,7 +54,7 @@ public class switchShader : MonoBehaviour
                 else
                 {
                     elapsedTime += Time.deltaTime;
-                    meshRenderer.material.SetFloat("_OutlineSize", elapsedTime * 2);
+                    meshRenderer.material.SetFloat("_OutlineSize", elapsedTime * 3);
                 }
 
                 // Hover for 4 seconds
@@ -62,6 +62,7 @@ public class switchShader : MonoBehaviour
                 {
                     // Jump Out Of The Box, Enable Jump Out Animator
                     jumpAnimator.applyRootMotion = false;
+                    //transform.parent.GetComponent<BoxCollider>().enabled = true;
                     transform.parent.GetComponent<Animator>().SetTrigger("Jump");
                     isOutBox = true;
                     meshRenderer.material = original_mat;

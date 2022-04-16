@@ -33,4 +33,9 @@ public class switchAnimator : MonoBehaviour
         // Start Agent
         GetComponent<agent>().enabled = true;
     }
+
+    public void _enableCollider()
+    {
+        GetComponent<BoxCollider>().enabled = true;
+    }
 }

@@ -85400,6 +85400,13 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
+  - time: 0.46666667
+    functionName: PlayCatEmoji
+    data: Highlight
+    objectReferenceParameter: {fileID: 11500000, guid: 5d14fabd7d5d7f3468bf288a729033e8, type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 2.1
     functionName: ChairJumpOver_2
     data: 

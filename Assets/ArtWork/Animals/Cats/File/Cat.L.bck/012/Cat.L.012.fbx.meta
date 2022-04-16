@@ -934,6 +934,13 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.3148936
+        functionName: PlayCatEmoji
+        data: Trying
+        objectReferenceParameter: {fileID: 11500000, guid: 5d14fabd7d5d7f3468bf288a729033e8, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

@@ -1,8 +1,14 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Resources/Animator/Animator_Cat.controller.meta
+guid: dbe09f72fbe358447be063a7adc29376
+NativeFormatImporter:
+=======
 guid: 87f5f37d541e5c44695b0224ba535170
 folderAsset: yes
 DefaultImporter:
+>>>>>>> main:Assets/ArtWork/Teddybear.meta
   externalObjects: {}
+  mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -23,4 +23,9 @@ public class MenuControlSystem : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void LoadIntro1()
+    {
+        SceneManager.LoadScene("Intro1");
+    }
 }

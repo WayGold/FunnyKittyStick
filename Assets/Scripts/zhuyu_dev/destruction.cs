@@ -15,6 +15,9 @@ public class destruction : MonoBehaviour
             {
                 value.gameObject.AddComponent<Rigidbody>();
             }
+
+            var audioItem = GetComponent<AudioItem>();
+            audioItem.Play();
         }
     }
 }

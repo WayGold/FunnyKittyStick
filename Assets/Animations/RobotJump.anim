@@ -85393,6 +85393,13 @@ AnimationClip:
   m_HasGenericRootTransform: 1
   m_HasMotionFloatCurves: 0
   m_Events:
+  - time: 0.43333334
+    functionName: Play
+    data: 
+    objectReferenceParameter: {fileID: 11500000, guid: c30420da7250cb94da0c850de3d8a078, type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 2.1
     functionName: RobotJumpOver
     data: 

@@ -928,9 +928,9 @@ ModelImporter:
       curves: []
       events:
       - time: 0.3148936
-        functionName: CatJumpUp
+        functionName: Play
         data: 
-        objectReferenceParameter: {instanceID: 0}
+        objectReferenceParameter: {fileID: 11500000, guid: c30420da7250cb94da0c850de3d8a078, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0

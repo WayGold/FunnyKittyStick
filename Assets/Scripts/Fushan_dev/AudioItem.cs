@@ -18,10 +18,12 @@ public class AudioItem : MonoBehaviour
     public AudioSource asReference;
 
     public int asIndex;
-    public int asCount;
+    public int asCount = 1;
     public AudioClip[] clipGroup;
     public AudioItemType _type;
-    public float ambientTime = 2f;
+    public float ambientFadeInTime;
+    public float ambientHoldTime;
+    public float ambientFadeOutTime;
 
     [Header("Debug")]
     [InspectorButton("Play")]
@@ -111,6 +113,12 @@ public class AudioItem : MonoBehaviour
     }
 
 
+    public AudioSource GetCurrentAudioSource()
+    {
+        return asGroup[asIndex];
+    }
+
+
     // Make Audio Obvious
 
 
@@ -119,7 +127,7 @@ public class AudioItem : MonoBehaviour
 
 
         // Check if current Index is available
-        if (asGroup[asIndex].isPlaying)
+        if (GetCurrentAudioSource().isPlaying)
         {
             // update index
             asIndex = (asIndex + 1) % asGroup.Count;
@@ -132,13 +140,13 @@ public class AudioItem : MonoBehaviour
 
             // Continues Seamless Audio
             case AudioItemType.AMBIENT:
-                StartCoroutine(PlayAmbient(ambientTime));
+                StartCoroutine(PlayAmbient());
                 break;
 
             // Random
             case AudioItemType.RANDOM:
 
-                var currentClip = asGroup[asIndex].clip;
+                var currentClip = GetCurrentAudioSource().clip;
                 var randomClip = GetRandomAudioClip();
 
                 // Try to get a different audioClip than last time
@@ -146,15 +154,15 @@ public class AudioItem : MonoBehaviour
                 {
                     randomClip = GetRandomAudioClip();
                 }
-                asGroup[asIndex].clip = randomClip;
-                
+                GetCurrentAudioSource().clip = randomClip;
 
-                asGroup[asIndex].Play();
+
+                GetCurrentAudioSource().Play();
                 break;
 
             // Otherwise, just normal play it
             default:
-                asGroup[asIndex].Play();
+                GetCurrentAudioSource().Play();
                 break;
         }
     }
@@ -166,16 +174,16 @@ public class AudioItem : MonoBehaviour
 
     private AudioClip GetRandomAudioClip()
     {
-        var index = (int)Random.Range(0, clipGroup.Length - 1);
+        var index = (int)Random.Range(0, clipGroup.Length);
         var randomClip = clipGroup[index];
         return randomClip;
     }
     
-    private IEnumerator PlayAmbient(float time)
+    private IEnumerator PlayAmbient()
     {
-        FadeInAudioSource(asGroup[asIndex], 0.3f);
-        yield return new WaitForSeconds(time);
-        FadeOutAudioSource(asGroup[asIndex], 1f);
+        StartCoroutine(FadeInAudioSource(GetCurrentAudioSource(), ambientFadeInTime));
+        yield return new WaitForSeconds(ambientHoldTime);
+        StartCoroutine(FadeOutAudioSource(GetCurrentAudioSource(), ambientFadeOutTime));
     }
 
 

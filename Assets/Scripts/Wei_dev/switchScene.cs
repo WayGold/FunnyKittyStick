@@ -19,6 +19,6 @@ public class switchScene : MonoBehaviour
 
     public void _switchToMainGame()
     {
-        SceneManager.LoadScene("mainGame");
+        SceneManager.LoadScene("Intro2");
     }
 }

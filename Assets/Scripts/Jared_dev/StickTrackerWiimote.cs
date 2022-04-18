@@ -18,17 +18,22 @@ public class StickTrackerWiimote : MonoBehaviour
     private Vector3 originalStickPosition;
     private Vector3 offsetVector = Vector3.zero;
     private float xBounds = 8f;
-    private float yBounds = 6f;
+    private float yBounds = 7f;
+
+    private Vector3 rotationEulers = Vector3.zero;
+    private float maxXRotation = 20f;
+    private float maxYRotation = 20f;
+
     private float maxYOffset = 20f;
-    private float maxZOffset = 17f;
-    private float shakeBuffer = 0.001f;
+    private float maxZOffset = 12f;
+    private float shakeBuffer = 0.2f;
 
     //private float maxXOffset = 1f;
     //private float maxYOffset = 1f;
     //private float maxZOffset = 1f;
 
     private float minDotDistance = 0.15f;
-    private float maxDotDistance = 0.45f;
+    private float maxDotDistance = 0.25f;
     private float sensitivity = 0.5f;
 
     private float dotDistance = 0.0f;
@@ -164,6 +169,8 @@ public class StickTrackerWiimote : MonoBehaviour
             xOffset = this.offsetVector.x;
         }
 
+        float xRotation = xPointer * this.maxXRotation;
+        
         //Y Position
         sanitizedValue = pointer[1];
         if (sanitizedValue > 1.0f)
@@ -182,6 +189,8 @@ public class StickTrackerWiimote : MonoBehaviour
         {
             yOffset = this.offsetVector.y;
         }
+
+        float yRotation = yPointer * this.maxYRotation;
 
         //Z Position
         Vector2[] sensorDots = new Vector2[2];
@@ -215,6 +224,7 @@ public class StickTrackerWiimote : MonoBehaviour
         if ((pointer[0] > 0.0f && pointer[0] < 1.0f) && (pointer[1] > 0.0f && pointer[1] < 1.0f))
         {
             this.offsetVector = new Vector3(xOffset - zOffset, yOffset, xOffset + zOffset);
+            this.rotationEulers = new Vector3(yRotation, xRotation, 0.0f);
         }
     }
 
@@ -248,7 +258,8 @@ public class StickTrackerWiimote : MonoBehaviour
             }
 
             this.stickHolder.transform.position += this.offsetVector;
-
+            //this.stickObject.transform.SetPositionAndRotation(this.stickHolder.transform.position, Quaternion.Euler(this.rotationEulers));
+            //Debug.LogError("Rotation Eulers: " + this.rotationEulers);
             yield return null;
         }
     }

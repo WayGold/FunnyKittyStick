@@ -109,7 +109,7 @@ public class agent : MonoBehaviour
         if(canMove)
         {
             JumpGrabListener();
-            //AttackListener();
+            AttackListener();
             FastTargetListener();
         }
         //ChargeJumpListener();
@@ -158,7 +158,7 @@ public class agent : MonoBehaviour
     }
     void JumpGrabListener()
     {
-        if ((agentRB.position.y < targetRB.position.y) &&
+        if ((agentRB.position.y < targetRB.position.y) &&(targetRB.position.y-agentRB.position.y>5)&&
             Vector3.Distance(new Vector3(agentRB.position.x, 0, agentRB.position.z),
                              new Vector3(targetRB.position.x, 0, targetRB.position.z)) < 2f)
         {

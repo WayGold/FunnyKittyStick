@@ -68,4 +68,9 @@ public class UIManager : MonoBehaviour
         // PlayCatAudio(1);
         PlayUIAnimation(catUIAnimator, "Trying", 1.5f);
     }
+
+    public void CatLike()
+    {
+        PlayUIAnimation(catUIAnimator, "Like", 1.5f);
+    }
 }

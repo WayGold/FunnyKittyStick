@@ -10,6 +10,8 @@ using FIMSpace.FSpine;
 
 public class agent : MonoBehaviour
 {
+    public Vector3 grabOffset;
+
     [SerializeField] public List<Rigidbody> jumpStartPoints;
     [SerializeField] public List<GameObject> jumpTargets;
 
@@ -40,7 +42,7 @@ public class agent : MonoBehaviour
     public float jumpUpAtAcceleration;
 
     public float attackTimeThreshold = 4f;
-    public float jumpTimeThreshold = 5f;
+    public float jumpTimeThreshold = 1f;
     public float velocityMultiplier = 1f;
 
     public float maxAngularAcceleration;
@@ -56,9 +58,11 @@ public class agent : MonoBehaviour
     [SerializeField] private bool isSit = false;
     [SerializeField] private bool toSeek = false;
     [SerializeField] private bool shouldJump = false;
+    [SerializeField] private bool canMove = true;
     private bool lockY = true;
     [SerializeField] private bool sitRobot = false;
-    [SerializeField] private bool canMove = true;
+    [SerializeField] private bool grabFish = false;
+
 
     private GameObject throwToTarget = null;
 
@@ -79,7 +83,7 @@ public class agent : MonoBehaviour
 
         _spineAnimator = GetComponent<FSpineAnimator>();
 
-        if(_animator.runtimeAnimatorController != catAnimatior)
+        if (_animator.runtimeAnimatorController != catAnimatior)
             _animator.runtimeAnimatorController = catAnimatior;
 
     }
@@ -87,6 +91,13 @@ public class agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(grabFish)
+        {
+            agentRB.transform.eulerAngles = new Vector3(0, 95, 0);
+            agentRB.transform.position = stickFish.transform.position +  grabOffset;
+            return;
+        }
+
         DynamicSteeringOutput currentMovement;
         currentMovement.linearAccel = new Vector3(0, 0, 0);
         currentMovement.rotAccel = 0;
@@ -97,8 +108,8 @@ public class agent : MonoBehaviour
         // Animation Listeners
         if(canMove)
         {
-            JumpUpListener();
-            AttackListener();
+            JumpGrabListener();
+            //AttackListener();
             FastTargetListener();
         }
         //ChargeJumpListener();
@@ -125,10 +136,6 @@ public class agent : MonoBehaviour
 
                 currentMovement.linearAccel.y = 0;
             }
-            else if(sitRobot)
-            {
-                //change head track to robot
-            }
             else
                 {
                 DynamicArrive dynamicArrive = new DynamicArrive(agentRB, targetRB, maxAcceleration, maxSpeed, targetRadius, slowRadius);
@@ -149,7 +156,20 @@ public class agent : MonoBehaviour
 
         UpdateRigidBody(currentMovement);
     }
-
+    void JumpGrabListener()
+    {
+        if ((agentRB.position.y < targetRB.position.y) &&
+            Vector3.Distance(new Vector3(agentRB.position.x, 0, agentRB.position.z),
+                             new Vector3(targetRB.position.x, 0, targetRB.position.z)) < 2f)
+        {
+            timeElapsedSinceLastJump += Time.deltaTime;
+            if (timeElapsedSinceLastJump >= jumpTimeThreshold)
+            {
+                _animator.SetTrigger("JumpUp");
+                timeElapsedSinceLastJump = 0.0f;
+            }
+        }
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "bedbotton")//bed botton, cat will got shocked
@@ -170,6 +190,39 @@ public class agent : MonoBehaviour
             agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
             other.gameObject.GetComponentInChildren<RawImage>().enabled = true;
         }
+        if(other.tag=="stickfish")
+        {
+            
+            if (!grabFish && _animator.GetCurrentAnimatorStateInfo(0).IsName("Cat|Jump_Up"))
+            {
+                canMove = false;
+                toSeek = false;
+                agentRB.useGravity = false;
+                agentRB.GetComponent<BoxCollider>().enabled = false;
+                grabFish = true;
+                _animator.SetBool("grabFish", true);
+                stickFish.GetComponent<Rigidbody>().mass = 50;
+                StartCoroutine(ReleaseGrabFish());
+             }
+        }
+    }
+    IEnumerator ReleaseGrabFish()
+    {
+        stickFish.GetComponent<CapsuleCollider>().enabled = false;
+        yield return new WaitForSeconds(10);
+
+        agentRB.useGravity = true;
+        _animator.SetBool("grabFish", false);
+        grabFish = false;
+        agentRB.GetComponent<BoxCollider>().enabled = true;
+
+        stickFish.GetComponent<Rigidbody>().mass = 1;
+
+        yield return new WaitForSeconds(3);
+        canMove = true;
+        toSeek = true;
+        stickFish.GetComponent<CapsuleCollider>().enabled = true;
+        
     }
     void LaptopStand()
     {
@@ -414,7 +467,7 @@ public class agent : MonoBehaviour
     void UpdateRigidBody(DynamicSteeringOutput i_steering)
     {
         // Update position and orientation
-        agentRB.position += agentRB.velocity * Time.deltaTime;
+        agentRB.position += new Vector3( agentRB.velocity.x,0,agentRB.velocity.z)* Time.deltaTime;
         agentRB.rotation = Quaternion.Euler(new Vector3(0, agentRB.rotation.eulerAngles.y + (agentRB.angularVelocity.y * Time.deltaTime) * Mathf.Rad2Deg, 0));
 
         // Update velocity and rotation.
@@ -424,12 +477,15 @@ public class agent : MonoBehaviour
 
         lastVelocity = agentRB.velocity;
 
+        float verticalVelocity = agentRB.velocity.y;
         // Check for speeding and clip.
-        if (Vector3.Magnitude(agentRB.velocity) > maxSpeed)
+        Vector3 newVelocity = new Vector3(agentRB.velocity.x, 0, agentRB.velocity.z);
+        if (Vector3.Magnitude(newVelocity) > maxSpeed)
         {
-            agentRB.velocity = Vector3.Normalize(agentRB.velocity);
-            agentRB.velocity *= maxSpeed;
+            newVelocity = Vector3.Normalize(newVelocity);
+            newVelocity *= maxSpeed;
         }
+        agentRB.velocity = new Vector3(newVelocity.x, verticalVelocity, newVelocity.z);
 
         // Check for rot speeding and clip.
         if (agentRB.angularVelocity.y > maxRotation)
@@ -465,19 +521,10 @@ public class agent : MonoBehaviour
             _animator.SetBool("IsFalling", false);
         }
     }
-    void JumpUpListener()
-    {
-        timeElapsedSinceLastJump += Time.deltaTime;
 
-        if (targetRB.velocity.y >= jumpUpAtAcceleration)
-        {
-            if (timeElapsedSinceLastJump >= jumpTimeThreshold)
-            {
-                print("targetRB.velocity.y:" + targetRB.velocity.y);
-                agentRB.AddForce(transform.up * jumpUpForce, ForceMode.Impulse);
-                timeElapsedSinceLastJump = 0.0f;
-            }
-        }
+    public void CatJumpUp()
+    {
+        agentRB.velocity = new Vector3(0, 1, 0) * Mathf.Sqrt((float)(2 * 9.81 * Mathf.Abs(targetRB.position.y - agentRB.position.y)));
     }
 
     void AttackListener()
@@ -493,7 +540,6 @@ public class agent : MonoBehaviour
             if (timeElapsedSinceLastAttack >= attackTimeThreshold)
             {
                 timeElapsedSinceLastAttack = 0.0f;
-                // TempGameManager.Instance.OnCatAttack();
                 _animator.SetTrigger("Attack");
             }
         }
@@ -583,7 +629,6 @@ public class agent : MonoBehaviour
     {
         agentRB.AddForce(transform.up * 6f, ForceMode.Impulse);
     }
-
 
     #region TEMP EVENTS
 

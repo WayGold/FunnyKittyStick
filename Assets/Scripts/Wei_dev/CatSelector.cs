@@ -5,7 +5,11 @@ using UnityEngine;
 public class CatSelector : MonoBehaviour
 {
     [SerializeField] List<GameObject> cats;
+    [SerializeField] GameObject jumpTarget;
     [SerializeField] GameObject fish;
+
+    private bool selected = false;
+    private GameObject selectedCat;
 
     // Start is called before the first frame update
     void Start()
@@ -16,11 +20,19 @@ public class CatSelector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (selected)
+            return;
+
         foreach(GameObject cat in cats)
         {
             if(isInRadius(cat.transform.position, fish.transform.position, 3))
             {
-                cat.GetComponent<agent>().enabled = true;
+                selected = true;
+                selectedCat = cat;
+
+                // Jump Out Of The Box, Enable Jump Out Animator
+                cat.GetComponent<Animator>().enabled = true;
+
                 break;
             }
         }

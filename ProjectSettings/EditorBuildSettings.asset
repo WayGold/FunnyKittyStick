@@ -12,9 +12,15 @@ EditorBuildSettings:
     path: Assets/Scenes/StartSceneTest.unity
     guid: f47d1f7068fc81544b5ea53114ac2e3e
   - enabled: 1
+    path: Assets/Scenes/Intro1.unity
+    guid: 73eb25e87b6bbe442839f84eb0ace9b0
+  - enabled: 1
+    path: Assets/Scenes/CatSelection 1.unity
+    guid: cd9497b7c986ec748b8b3969ef94358f
+  - enabled: 1
+    path: Assets/Scenes/Intro2.unity
+    guid: 4da2ad82d3dd5c844a6f6c9f266b57b3
+  - enabled: 1
     path: Assets/Scenes/mainGame.unity
     guid: 2e9cbbab49f376748beab05fd0962595
-  - enabled: 1
-    path: Assets/Scenes/wei_test.unity
-    guid: 04d9c83f1f3a1a540b73f1327e7bccac
   m_configObjects: {}

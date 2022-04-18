@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/ArduinoConnection/KittyStick_Receiver/KittyStick_Receiver.ino.meta
+guid: a6da84ae40347bf45bce39a44b346794
+=======
 guid: 43d457923b5e12c4591d3bcdea2d0ee7
+>>>>>>> main:Assets/FImpossible Creations/Plugins - Animating/Spine Animator/Packages - Demo Scenes - Assembly Definitions/Fimpossible Assembly Definitions.unitypackage.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

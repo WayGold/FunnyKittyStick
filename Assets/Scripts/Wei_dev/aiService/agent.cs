@@ -197,11 +197,11 @@ public class agent : MonoBehaviour
             {
                 canMove = false;
                 toSeek = false;
-                agentRB.useGravity = false;
+
                 agentRB.GetComponent<BoxCollider>().enabled = false;
                 grabFish = true;
                 _animator.SetBool("grabFish", true);
-                stickFish.GetComponent<Rigidbody>().mass = 50;
+                stickFish.GetComponent<Rigidbody>().mass = 10;
                 StartCoroutine(ReleaseGrabFish());
              }
         }
@@ -211,7 +211,7 @@ public class agent : MonoBehaviour
         stickFish.GetComponent<CapsuleCollider>().enabled = false;
         yield return new WaitForSeconds(10);
 
-        agentRB.useGravity = true;
+        agentRB.velocity = Vector3.zero;
         _animator.SetBool("grabFish", false);
         grabFish = false;
         agentRB.GetComponent<BoxCollider>().enabled = true;
@@ -444,6 +444,12 @@ public class agent : MonoBehaviour
         canMove = true;
         Destroy(GameObject.Find("BedBottonDetectionArea"));
     }
+
+
+    public void CatJumpUp()
+    {
+        agentRB.velocity = new Vector3(0, 1, 0) * Mathf.Sqrt((float)(2 * 9.81 * Mathf.Abs(targetRB.position.y - agentRB.position.y)));
+    }
     #endregion
     #endregion
 
@@ -522,10 +528,7 @@ public class agent : MonoBehaviour
         }
     }
 
-    public void CatJumpUp()
-    {
-        agentRB.velocity = new Vector3(0, 1, 0) * Mathf.Sqrt((float)(2 * 9.81 * Mathf.Abs(targetRB.position.y - agentRB.position.y)));
-    }
+
 
     void AttackListener()
     {

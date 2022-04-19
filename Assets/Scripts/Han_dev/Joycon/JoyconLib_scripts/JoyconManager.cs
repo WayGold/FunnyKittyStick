@@ -54,18 +54,18 @@ namespace JoyConLibrary
 			{
 				enumerate = (hid_device_info)Marshal.PtrToStructure(ptr, typeof(hid_device_info));
 
-				Debug.Log(enumerate.product_id);
+				//Debug.Log(enumerate.product_id);
 				if (enumerate.product_id == product_l || enumerate.product_id == product_r)
 				{
 					if (enumerate.product_id == product_l)
 					{
 						isLeft = true;
-						Debug.Log("Left Joy-Con connected.");
+						//Debug.Log("Left Joy-Con connected.");
 					}
 					else if (enumerate.product_id == product_r)
 					{
 						isLeft = false;
-						Debug.Log("Right Joy-Con connected.");
+						//Debug.Log("Right Joy-Con connected.");
 					}
 					else
 					{
@@ -85,7 +85,7 @@ namespace JoyConLibrary
 		{
 			for (int i = 0; i < j.Count; ++i)
 			{
-				Debug.Log(i);
+				//Debug.Log(i);
 				Joycon jc = j[i];
 				byte LEDs = 0x0;
 				LEDs |= (byte)(0x1 << i);

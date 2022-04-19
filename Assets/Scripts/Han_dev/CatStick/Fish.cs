@@ -18,7 +18,7 @@ public class Fish : MonoBehaviour
     }
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             PullFish();
         }
@@ -44,12 +44,23 @@ public class Fish : MonoBehaviour
         if (other.tag == "Cat" && magnetController != null)
         {
             print("hit the cat!");
-            Invoke("TurnOffMagnet", .5f);
+
+        }
+    }
+
+    public void TurnOnMagnet()
+    {
+        if(magnetController != null)
+        {
+            magnetController.TurnOn();
         }
     }
 
     public void TurnOffMagnet()
     {
-        magnetController.TurnOff();
+        if (magnetController != null)
+        {
+            magnetController.TurnOff();
+        }
     }
 }

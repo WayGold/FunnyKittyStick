@@ -17,7 +17,7 @@ public class Fish : MonoBehaviour
         }
     }
     private void Update()
-    {
+    {        
         if(Input.GetKeyDown(KeyCode.F))
         {
             PullFish();

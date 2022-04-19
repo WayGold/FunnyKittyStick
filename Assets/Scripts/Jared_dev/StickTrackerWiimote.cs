@@ -17,6 +17,8 @@ public class StickTrackerWiimote : MonoBehaviour
 
     private Vector3 originalStickPosition;
     private Vector3 offsetVector = Vector3.zero;
+    private Vector3 prevOffsetVector = Vector3.zero;
+    private Vector2 prevPointerValues = Vector2.zero;
     private float xBounds = 8f;
     private float yBounds = 7f;
 
@@ -27,6 +29,7 @@ public class StickTrackerWiimote : MonoBehaviour
     private float maxYOffset = 20f;
     private float maxZOffset = 12f;
     private float shakeBuffer = 0.2f;
+    private float shakeOffset = 0.5f;
 
     //private float maxXOffset = 1f;
     //private float maxYOffset = 1f;
@@ -43,6 +46,12 @@ public class StickTrackerWiimote : MonoBehaviour
     private bool gyroMode = false;
 
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        Application.targetFrameRate = 60;
+    }
+
     IEnumerator Start()
     {
         this.originalStickPosition = stickHolder.transform.position;
@@ -85,14 +94,14 @@ public class StickTrackerWiimote : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         MotionPlusData wmpData = this.wiimote.MotionPlus;
         wmpData.SetZeroValues();
-
+        
         stickObject.transform.SetPositionAndRotation(this.stickObject.transform.position, Quaternion.Euler(new Vector3(0f, -45f, 0f)));
 
         //stickObject.transform.rotation = Quaternion.FromToRotation(stickObject.transform.rotation.eulerAngles, Vector3.up) * stickObject.transform.rotation;
         //stickObject.transform.rotation = Quaternion.FromToRotation(stickObject.transform.forward, Vector3.forward) * stickObject.transform.rotation;
 
         this.wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_ACCEL_IR12);
-        this.wiimote.SetupIRCamera(IRDataType.BASIC);
+        this.wiimote.SetupIRCamera(IRDataType.EXTENDED);
 
         StartCoroutine(ResetOffsetHeartbeat());
         StartCoroutine(TrackStick());
@@ -136,7 +145,7 @@ public class StickTrackerWiimote : MonoBehaviour
                 {
                     this.gyroMode = false;
                     this.wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_ACCEL_IR12);
-                    this.wiimote.SetupIRCamera(IRDataType.BASIC);
+                    this.wiimote.SetupIRCamera(IRDataType.EXTENDED);
                 }
             }      
         } while (ret > 0);
@@ -144,6 +153,8 @@ public class StickTrackerWiimote : MonoBehaviour
 
     private void SetXYZPosition()
     {
+        this.prevOffsetVector = this.offsetVector;
+        
         float[] pointer = this.wiimote.Ir.GetPointingPosition();
 
         //Debug.LogError("IR Pointing Position: " + pointer[0]);
@@ -211,7 +222,7 @@ public class StickTrackerWiimote : MonoBehaviour
 
         if (this.dotDistance > 0.0f)
         {
-            zOffset = (((this.dotDistance / this.maxDotDistance) * 2) - 1) * this.maxZOffset;
+            zOffset = ((((this.dotDistance / this.maxDotDistance) * 2) - 1) * 2) * this.maxZOffset;
             if (Mathf.Abs(zOffset - this.offsetVector.z) < this.shakeBuffer)
             {
                 zOffset = this.offsetVector.z;
@@ -220,12 +231,13 @@ public class StickTrackerWiimote : MonoBehaviour
             //offsetVector = new Vector3(offsetVector.x - zOffset, offsetVector.y, offsetVector.z + zOffset);
         }
 
-
         if ((pointer[0] > 0.0f && pointer[0] < 1.0f) && (pointer[1] > 0.0f && pointer[1] < 1.0f))
         {
             this.offsetVector = new Vector3(xOffset - zOffset, yOffset, xOffset + zOffset);
             this.rotationEulers = new Vector3(yRotation, xRotation, 0.0f);
         }
+
+        this.prevPointerValues = new Vector2(pointer[0], pointer[1]);
     }
 
     private void CenterToCamera()
@@ -257,7 +269,18 @@ public class StickTrackerWiimote : MonoBehaviour
                 this.SetXYZPosition();             
             }
 
-            this.stickHolder.transform.position += this.offsetVector;
+            Debug.LogError("MagDiff: " + (this.offsetVector - this.prevOffsetVector).magnitude);
+
+            if (Mathf.Abs(this.offsetVector.x - this.prevOffsetVector.x) > this.shakeOffset && 
+                Mathf.Abs(this.offsetVector.y - this.prevOffsetVector.y) > this.shakeOffset &&
+                Mathf.Abs(this.offsetVector.z - this.prevOffsetVector.z) > this.shakeOffset)
+            {
+                this.stickHolder.transform.position += this.offsetVector;
+            }
+            else
+            {
+                this.stickHolder.transform.position += Vector3.Lerp(this.prevOffsetVector, this.offsetVector, 0.1f);
+            }
             //this.stickObject.transform.SetPositionAndRotation(this.stickHolder.transform.position, Quaternion.Euler(this.rotationEulers));
             //Debug.LogError("Rotation Eulers: " + this.rotationEulers);
             yield return null;

@@ -434,7 +434,7 @@ public class agent : MonoBehaviour
         agentRB.transform.SetParent(robotRB.transform.parent);
         agentRB.transform.localPosition = Vector3.zero;
 
-        agentRB.transform.eulerAngles = new Vector3(agentRB.rotation.eulerAngles.x, targetRB.rotation.y+90, agentRB.rotation.eulerAngles.z);
+        agentRB.transform.eulerAngles = new Vector3(agentRB.rotation.eulerAngles.x, targetRB.rotation.y+180, agentRB.rotation.eulerAngles.z);
 
         robotRB.GetComponentInParent<Robot>().StartRobotPower(agentRB.gameObject);
 

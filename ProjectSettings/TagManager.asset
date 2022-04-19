@@ -3,12 +3,24 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - bed
+  - laptop
+  - robot
+  - bedbotton
+  - ground
+  - chair
+  - Cat
+  - desk
+  - closet
+  - Stick
+  - stickfish
+  - CatUI
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Cat
   - Water
   - UI
   - 

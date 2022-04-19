@@ -18,7 +18,13 @@ public class animatortrigger2 : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag=="Cat")
+        if (other.tag == "Cat")
+        {
             animator.SetTrigger("MoveTrain");
+            var audioItem = GetComponent<AudioItem>();
+            audioItem.Play();
+        }
+            
+
     }
 }

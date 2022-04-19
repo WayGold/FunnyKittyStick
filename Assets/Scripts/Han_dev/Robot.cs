@@ -53,6 +53,8 @@ public class Robot : MonoBehaviour
     public void StartRobotPower(GameObject cat)
     {
         StartCoroutine(DestoryRobot(cat));
+        var audioItem = GetComponent<AudioItem>();
+        audioItem.Play();
     }
     
     IEnumerator DestoryRobot(GameObject cat)
@@ -72,6 +74,10 @@ public class Robot : MonoBehaviour
             value.gameObject.AddComponent<Rigidbody>();
         }
         isStart = false;
+
+        var audioItem = GetComponent<AudioItem>();
+        AudioItem.FadeOutAudioSource(audioItem.GetCurrentAudioSource(), 0.3f);
+
 
         gameObject.GetComponent<SphereCollider>().enabled = false;
         gameObject.GetComponent<BoxCollider>().enabled = false;

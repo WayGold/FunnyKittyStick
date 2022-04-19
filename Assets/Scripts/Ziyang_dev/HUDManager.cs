@@ -13,14 +13,16 @@ public class HUDManager : MonoBehaviour
 
     Slider HeartSlider;
 
-    float GrowthNum;
+    public float GrowthNum;
 
-    bool growth;
-    bool isCompelete;
+    public bool growth;
+    public bool isCompelete;
 
-    float target_value;
+    public float target_value;
 
     public Image FadeOutImage;
+
+    public int interableCount;
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +30,7 @@ public class HUDManager : MonoBehaviour
         collectibles = GameObject.FindObjectsOfType<Collectible>().ToList();
         HeartSlider = GetComponentInChildren<Slider>();
         HeartSlider.value = 0;
-        GrowthNum = 1f/collectibles.Count;
+        GrowthNum = 1f/(collectibles.Count + interableCount);
         growth = false;
         isCompelete = false;
         target_value = 0;
@@ -62,7 +64,6 @@ public class HUDManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (growth)
@@ -71,10 +72,14 @@ public class HUDManager : MonoBehaviour
             if(HeartSlider.value >= target_value)
             {
                 growth = false;
-                if (HeartSlider.value >= GrowthNum * collectibles.Count)
+                if (HeartSlider.value >= GrowthNum * (collectibles.Count + interableCount))
                 {
                     CompleteLevel();
                 }
+            }
+            if (HeartSlider.value >= 1)
+            {
+                CompleteLevel();
             }
         }
     }

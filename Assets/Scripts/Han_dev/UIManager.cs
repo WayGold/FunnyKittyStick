@@ -9,18 +9,34 @@ public class UIManager : MonoBehaviour
     public Animator fishUIAnimator;
     public RectTransform catUITransform;
 
+    public Animator cat_gray;
+    public Animator cat_white;
+    public Animator cat_short;
     private void Start()
     {
-        //InitializeAnimator();
+        InitializeAnimator();
     }
     void InitializeAnimator()
     {
         if (!catUIAnimator)
-            catUIAnimator=GameObject.FindGameObjectWithTag("CatUI").GetComponent<Animator>();
+        {
+            switch (CatSelection.CAT_SELECTED)
+            {
+                case 0:
+                    catUIAnimator = cat_gray;
+                    break;
+                case 1:
+                    catUIAnimator = cat_short;
+                    break;
+                case 2:
+                    catUIAnimator = cat_white;
+                    break;
+                default:
+                    break;
+            }
+        }
         if (!fishUIAnimator)
             fishUIAnimator=GameObject.FindGameObjectWithTag("FishUI").GetComponent<Animator>();
-        if(!catUITransform)
-            catUITransform=GameObject.FindGameObjectWithTag("CatUI").GetComponent<RectTransform>();
     }
     void PlayUIAnimation(Animator _animator, string boolName, float duration)
     {
@@ -47,7 +63,7 @@ public class UIManager : MonoBehaviour
     {
         //PlayCatAudio(0);
         // PlaySFXJump();
-        PlayUIAnimation(fishUIAnimator, "Highlight", 2f);
+        PlayUIAnimation(fishUIAnimator, "Highlight", 0.5f);
     }
 
     public void OnCatSit()
@@ -71,6 +87,6 @@ public class UIManager : MonoBehaviour
 
     public void CatLike()
     {
-        PlayUIAnimation(catUIAnimator, "Like", 1.5f);
+        PlayUIAnimation(catUIAnimator, "Like", 2f);
     }
 }

@@ -170,6 +170,7 @@ public class agent : MonoBehaviour
             }
         }
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "bedbotton")//bed botton, cat will got shocked
@@ -189,6 +190,8 @@ public class agent : MonoBehaviour
             agentRB.GetComponent<HeadTrackingDebug>().target = GameObject.Find("laptopscreen");
             agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
             other.gameObject.GetComponentInChildren<RawImage>().enabled = true;
+
+            GameObject.FindObjectOfType<HUDManager>().ColletItem();
         }
         if(other.tag=="stickfish")
         {
@@ -203,12 +206,20 @@ public class agent : MonoBehaviour
                 _animator.SetBool("grabFish", true);
                 stickFish.GetComponent<Rigidbody>().mass = 10;
                 StartCoroutine(ReleaseGrabFish());
-             }
+
+                //Turn On Magnet
+                stickFish.GetComponent<Fish>().TurnOnMagnet();
+            }
         }
     }
+    int GrabNum = 0;
     IEnumerator ReleaseGrabFish()
     {
         stickFish.GetComponent<CapsuleCollider>().enabled = false;
+
+        //TurnOn Magnet
+        stickFish.GetComponent<Fish>().TurnOffMagnet();
+
         yield return new WaitForSeconds(10);
 
         agentRB.velocity = Vector3.zero;
@@ -222,7 +233,13 @@ public class agent : MonoBehaviour
         canMove = true;
         toSeek = true;
         stickFish.GetComponent<CapsuleCollider>().enabled = true;
-        
+
+        if (GrabNum == 0)
+        {
+            GameObject.FindObjectOfType<HUDManager>().ColletItem();
+            GrabNum++;
+        }
+
     }
     void LaptopStand()
     {
@@ -417,21 +434,30 @@ public class agent : MonoBehaviour
         agentRB.transform.SetParent(robotRB.transform.parent);
         agentRB.transform.localPosition = Vector3.zero;
 
+        agentRB.transform.eulerAngles = new Vector3(agentRB.rotation.eulerAngles.x, targetRB.rotation.y+90, agentRB.rotation.eulerAngles.z);
+
         robotRB.GetComponentInParent<Robot>().StartRobotPower(agentRB.gameObject);
 
         agentRB.GetComponent<FSpineAnimator>().enabled = false;
         agentRB.GetComponent<HeadTrackingDebug>().target = robotRB.gameObject;
         agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
+
+        GameObject.FindObjectOfType<HUDManager>().ColletItem();
     }
 
     public void RobotBreak()
     {
+        _animator.SetTrigger("isShocked");
+
+        StartCoroutine(RobotBreak2());
+    }
+    IEnumerator RobotBreak2()
+    {
+        yield return new WaitForSeconds(4);
         sitRobot = false;
         isSit = false;
         toSeek = true;
         canMove = true;
-        _animator.SetTrigger("isShocked");
-
         targetRB = stickFish;
         agentRB.GetComponent<FSpineAnimator>().enabled = true;
         agentRB.GetComponent<HeadTrackingDebug>().target = stickFish.gameObject;
@@ -512,18 +538,25 @@ public class agent : MonoBehaviour
 
     void NoRotationWhileFalling(DynamicSteeringOutput currentMovement)
     {
-        if (Mathf.Abs( agentRB.velocity.y) > 2f)
+        if(Mathf.Abs(agentRB.velocity.y) > 1f)
         {
             SetSpineAnimationAmount(0);
             agentRB.freezeRotation = true;
             currentMovement.linearAccel = new Vector3(0, 0, 0);
             currentMovement.rotAccel = 0;
-            _animator.SetBool("IsFalling", true);
         }
         else
         {
             SetSpineAnimationAmount(100);
             agentRB.freezeRotation = false;
+        }
+
+        if (Mathf.Abs( agentRB.velocity.y) > 3f)
+        {
+            _animator.SetBool("IsFalling", true);
+        }
+        else
+        {
             _animator.SetBool("IsFalling", false);
         }
     }
@@ -548,6 +581,7 @@ public class agent : MonoBehaviour
         }
     }
 
+    int SitNum = 0;
     void FastTargetListener()
     {
         /* NOT FAST TARGET */
@@ -569,7 +603,11 @@ public class agent : MonoBehaviour
             // Sit down - only headtrack + orientation
             if (!isSit)
             {
-                Debug.Log("Not Sitted!");
+                if(SitNum==0)
+                {
+                    GameObject.FindObjectOfType<HUDManager>().ColletItem();
+                    SitNum++;
+                }
                 _animator.SetTrigger("Sit");
                 isSit = true;
                 toSeek = false;

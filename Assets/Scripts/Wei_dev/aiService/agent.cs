@@ -177,7 +177,15 @@ public class agent : MonoBehaviour
         {
             canMove = false;
             toSeek = false;
-            _animator.SetTrigger("isShocked");
+
+            agentRB.transform.LookAt(GameObject.Find("mouse").transform);
+            if(GameObject.Find("mouse"))
+            {
+                agentRB.GetComponent<HeadTrackingDebug>().target = GameObject.Find("mouse");
+                agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
+                _animator.SetTrigger("isShocked");
+                StartCoroutine(ActiveMouse());
+            }
         }
         if(other.tag=="laptop")
         {
@@ -211,6 +219,19 @@ public class agent : MonoBehaviour
                 stickFish.GetComponent<Fish>().TurnOnMagnet();
             }
         }
+    }
+    IEnumerator ActiveMouse()
+    {
+        if (GameObject.Find("BedBottonDetectionArea")) Destroy(GameObject.Find("BedBottonDetectionArea"));
+        if (!GameObject.Find("mouse")) yield return null;
+        yield return new WaitForSeconds(3);
+        GameObject.Find("mouse").GetComponent<Animator>().enabled = true;
+        yield return new WaitForSeconds(3);
+        agentRB.GetComponent<HeadTrackingDebug>().target = stickFish.gameObject;
+        agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
+        targetRB = stickFish;
+        Destroy(GameObject.Find("mouse"));
+
     }
     int GrabNum = 0;
     IEnumerator ReleaseGrabFish()
@@ -468,7 +489,6 @@ public class agent : MonoBehaviour
     {
         toSeek = true;
         canMove = true;
-        Destroy(GameObject.Find("BedBottonDetectionArea"));
     }
 
 

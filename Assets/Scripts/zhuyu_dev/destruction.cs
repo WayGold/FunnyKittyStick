@@ -9,11 +9,20 @@ public class destruction : MonoBehaviour
     {
         if (other.gameObject.tag == "ground")
         {
-            Destroy(gameObject.GetComponent<Rigidbody>());
-            Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
-            foreach (var value in transforms)
+            if(gameObject.GetComponent<Rigidbody>())
             {
-                value.gameObject.AddComponent<Rigidbody>();
+                Destroy(gameObject.GetComponent<Rigidbody>());
+                Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
+                foreach (var value in transforms)
+                {
+                    value.gameObject.AddComponent<Rigidbody>();
+                }
+
+                if(gameObject.GetComponent<AudioItem>())
+                {
+                    var audioItem = GetComponent<AudioItem>();
+                    audioItem.Play();
+                }
             }
         }
     }

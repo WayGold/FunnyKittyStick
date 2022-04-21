@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using WiimoteApi;
 
 public class StickTrackerWiimote : MonoBehaviour
@@ -42,6 +43,7 @@ public class StickTrackerWiimote : MonoBehaviour
     private float dotDistance = 0.0f;
 
     public float rayDistance = 70f;
+    public float rayDistanceSelection = 15f;
 
     private bool gyroMode = false;
 
@@ -249,7 +251,14 @@ public class StickTrackerWiimote : MonoBehaviour
     {
         Ray cameraRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
 
-        this.stickHolder.transform.position = cameraRay.GetPoint(this.rayDistance);
+        if (SceneManager.GetActiveScene().name == "mainGame")
+        {
+            this.stickHolder.transform.position = cameraRay.GetPoint(this.rayDistance);
+        }
+        else
+        {
+            this.stickHolder.transform.position = cameraRay.GetPoint(this.rayDistanceSelection);
+        }
     }
 
     private IEnumerator ResetOffsetHeartbeat()
@@ -266,8 +275,9 @@ public class StickTrackerWiimote : MonoBehaviour
         while (!WiimoteManager.HasWiimote()) { yield return null; }       
 
         while (true)
-        {
+        {            
             this.CenterToCamera();
+            
 
             this.stickHolder.transform.position += this.prevOffsetVector;
 

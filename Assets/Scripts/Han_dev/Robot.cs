@@ -24,7 +24,7 @@ public class Robot : MonoBehaviour
         {
             if (shouldRotate)
             {
-                transform.Rotate(new Vector3(0, rotateDegree, 0));
+                transform.Rotate(new Vector3(0, rotateDegree, 0) * Time.deltaTime);
             }
             else
             {
@@ -34,7 +34,7 @@ public class Robot : MonoBehaviour
             timer += Time.deltaTime;
             if (timer > 3)
             {
-                rotateDegree =-0.2F;
+                rotateDegree =-20;
                 shouldRotate = !shouldRotate;
                 timer = 0;
             }

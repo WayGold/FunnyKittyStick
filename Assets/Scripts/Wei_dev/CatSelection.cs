@@ -4,6 +4,6 @@ using UnityEngine;
 
 public class CatSelection : MonoBehaviour
 {
-    [SerializeField] public static int CAT_SELECTED = 1;
+    [SerializeField] public static int CAT_SELECTED = 0;
 
 }

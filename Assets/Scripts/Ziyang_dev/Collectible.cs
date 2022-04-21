@@ -9,6 +9,10 @@ public class Collectible : MonoBehaviour
         if(other.tag == "Cat")
         {
             Destroy(gameObject);
+            if(gameObject.name=="Cape")
+            {
+                other.GetComponentInChildren<Cloth>().gameObject.GetComponent<SkinnedMeshRenderer>().enabled = true;
+            }
             GameObject.FindObjectOfType<HUDManager>().ColletItem();
         }
     }

@@ -5,28 +5,25 @@ TagManager:
   serializedVersion: 2
   tags:
   - bed
-  - closet
-  - desk
-  - chair
-  - bear
-  - Cat
-  - ground
-  - CatUI
-  - FishUI
-  - Stick
-  - robot
-  - Target
-  - bedbotton
   - laptop
+  - robot
+  - bedbotton
+  - ground
+  - chair
+  - Cat
+  - desk
+  - closet
+  - Stick
   - stickfish
+  - CatUI
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - stick
+  - Cat
   - Water
   - UI
-  - Walkable
+  - 
   - 
   - 
   - 

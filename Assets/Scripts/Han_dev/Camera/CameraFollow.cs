@@ -40,12 +40,15 @@ public class CameraFollow : MonoBehaviour
         //cat = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
         //stick = GameObject.FindGameObjectWithTag("Stick").GetComponent<Transform>();
         //target= (cat.position + stick.position) / 2;
+        target = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
         startPosition = transform.position;
         offset = transform.position - target.transform.position;
     }
 
     void LateUpdate()
     {
+        //target = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
+        //offset = transform.position - target.transform.position;
 
         //// If outside the effective collider, don't follow the target
         //if (!targetEffectiveCollider.bounds.Contains(target.position))
@@ -53,7 +56,7 @@ public class CameraFollow : MonoBehaviour
         //    return;
         //}
 
-       //target = (cat.position + stick.position) / 2;
+        //target = (cat.position + stick.position) / 2;
 
         oldPosition = transform.position;
         if (!freazeX)

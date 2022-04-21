@@ -11,26 +11,38 @@ public class Robot : MonoBehaviour
     public float timer = 0;
     public float rotateDegree = 1;
 
+    bool setCatPos = false;
+    Vector3 catOffset;
+    GameObject Cat;
+    private void Start()
+    {
+        catOffset = new Vector3(0, 0.2f, 0);
+    }
     public void Update()
     {
         if(isStart)
         {
             if (shouldRotate)
             {
-                transform.Rotate(new Vector3(0, rotateDegree, 0));
+                transform.Rotate(new Vector3(0, rotateDegree, 0) * Time.deltaTime);
             }
             else
             {
-                transform.Translate(Vector3.forward * Time.deltaTime * 3);
+                transform.Translate(Vector3.forward * Time.deltaTime * 5);
             }
 
             timer += Time.deltaTime;
             if (timer > 3)
             {
-                rotateDegree = Random.Range(-0.5f, 0.5f);
+                rotateDegree =-20;
                 shouldRotate = !shouldRotate;
                 timer = 0;
             }
+        }
+
+        if(setCatPos)
+        {
+            Cat.transform.position = gameObject.transform.position + catOffset;
         }
     }
     private void OnCollisionEnter(Collision collision)
@@ -43,35 +55,49 @@ public class Robot : MonoBehaviour
                 isDestory = true;
             }
         }
-        else if(collision.gameObject.tag!="ground")
-        {
-            print("hit barrier");
-            shouldRotate = true;
-        }
+        //else if(collision.gameObject.tag!="ground")
+        //{
+        //    print("hit barrier");
+        //    shouldRotate = true;
+        //}
     }
 
     public void StartRobotPower(GameObject cat)
     {
         StartCoroutine(DestoryRobot(cat));
+        var audioItem = GetComponent<AudioItem>();
+        audioItem.Play();
+
+        Cat = cat;
+        //catOffset = cat.transform.position- gameObject.transform.position;
     }
     
     IEnumerator DestoryRobot(GameObject cat)
     {
+        setCatPos = true;
         yield return new WaitForSeconds(3);
-        isStart = true; 
+        isStart = true;
 
-        yield return new WaitForSeconds(20);
+        yield return new WaitForSeconds(7);
+        setCatPos = false;
+
+        yield return new WaitForSeconds(2);
+
+        isStart = false;
 
         cat.transform.parent = null;
         cat.GetComponent<agent>().RobotBreak();
-        //cat.GetComponent<Rigidbody>().AddForce(new Vector3(0, 200, 0), ForceMode.Acceleration);
 
         Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
         foreach (var value in transforms)
         {
             value.gameObject.AddComponent<Rigidbody>();
         }
-        isStart = false;
+
+
+        var audioItem = GetComponent<AudioItem>();
+        AudioItem.FadeOutAudioSource(audioItem.GetCurrentAudioSource(), 0.3f);
+
 
         gameObject.GetComponent<SphereCollider>().enabled = false;
         gameObject.GetComponent<BoxCollider>().enabled = false;

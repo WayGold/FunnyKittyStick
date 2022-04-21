@@ -41,8 +41,6 @@ public class AudioItem : MonoBehaviour
         {
             CreateNewAudioSource();
         }
-
-        
         
     }
 

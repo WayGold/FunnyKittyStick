@@ -29,7 +29,7 @@ public class StickTrackerWiimote : MonoBehaviour
     private float maxYOffset = 20f;
     private float maxZOffset = 12f;
     private float shakeBuffer = 0.2f;
-    private float shakeOffset = 0.5f;
+    private float shakeOffset = 0.3f;
 
     //private float maxXOffset = 1f;
     //private float maxYOffset = 1f;
@@ -268,8 +268,6 @@ public class StickTrackerWiimote : MonoBehaviour
             {
                 this.SetXYZPosition();             
             }
-
-            Debug.LogError("MagDiff: " + (this.offsetVector - this.prevOffsetVector).magnitude);
 
             if (Mathf.Abs(this.offsetVector.x - this.prevOffsetVector.x) > this.shakeOffset && 
                 Mathf.Abs(this.offsetVector.y - this.prevOffsetVector.y) > this.shakeOffset &&

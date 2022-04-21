@@ -11,7 +11,6 @@ public class HeadTrackingDebug : MonoBehaviour
     [SerializeField] private MultiAimConstraint aim;
     [SerializeField] private RigBuilder rigBuilder;
     [SerializeField] public GameObject target;
-    [SerializeField] private GameObject cube;
 
     private void Awake()
     {
@@ -20,7 +19,7 @@ public class HeadTrackingDebug : MonoBehaviour
 
     public void TrackTarget()
     {
-        GameObject gameObject = joyCon ? target : cube;
+        GameObject gameObject = target;
 
         GetComponent<agent>().targetRB = gameObject.GetComponent<Rigidbody>();
 

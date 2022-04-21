@@ -8,7 +8,11 @@
 RF24 radio(7, 8);
 
 byte addresses[][6] = {"1Node","2Node"};
+
 int magnet = 2;
+int LEDRed = 4;
+int LEDGreen = 3;
+
 int response;
 
 // -----------------------------------------------------------------------------
@@ -20,6 +24,12 @@ void setup() {
 
   pinMode(magnet, OUTPUT);
   digitalWrite(magnet, LOW); 
+  
+  pinMode(LEDRed, OUTPUT);
+  digitalWrite(LEDRed, LOW); 
+
+  pinMode(LEDGreen, OUTPUT);
+  digitalWrite(LEDGreen, HIGH); 
 
   // Initiate the radio object
   radio.begin();
@@ -60,11 +70,13 @@ void loop() {
 
     if (data == 1) {
       digitalWrite(magnet, HIGH);
+      digitalWrite(LEDRed, HIGH);
       response = 1;
     }
 
     if (data == 0) {
       digitalWrite(magnet, LOW);
+      digitalWrite(LEDRed, LOW);
       response = 0;
     }
 

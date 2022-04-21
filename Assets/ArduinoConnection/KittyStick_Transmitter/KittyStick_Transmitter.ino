@@ -63,7 +63,7 @@ void loop() {
             // Now listen for a response
             radio.startListening();
   
-            // 200 milliseconds is enough
+            // 200 milliseconds
             unsigned long started_waiting_at_On = millis();
 
             // Loop here until we get indication that some data is ready for us to read (or we time out)
@@ -104,7 +104,7 @@ void loop() {
             // Now listen for a response
             radio.startListening();
   
-            // 200 milliseconds is enough
+            // 200 milliseconds
             unsigned long started_waiting_at_Off = millis();
 
             // Loop here until we get indication that some data is ready for us to read (or we time out)

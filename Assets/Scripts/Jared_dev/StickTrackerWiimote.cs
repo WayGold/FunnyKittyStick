@@ -58,6 +58,18 @@ public class StickTrackerWiimote : MonoBehaviour
     {
         this.originalStickPosition = stickHolder.transform.position;
 
+        yield return new WaitForSeconds(2.0f);
+
+        StartCoroutine(this.SetupWiimote());
+
+        stickObject.transform.SetPositionAndRotation(this.stickObject.transform.position, Quaternion.Euler(new Vector3(0f, -45f, 0f)));
+
+        StartCoroutine(ResetOffsetHeartbeat());
+        StartCoroutine(TrackStick());
+    }
+
+    private IEnumerator SetupWiimote()
+    {
         WiimoteManager.FindWiimotes();
 
         while (WiimoteManager.HasWiimote() == false)
@@ -90,23 +102,15 @@ public class StickTrackerWiimote : MonoBehaviour
             this.wiimote.RequestIdentifyWiiMotionPlus();
             wiimote.ReadWiimoteData();
         }
-        
+
 
         this.wiimote.ActivateWiiMotionPlus();
         yield return new WaitForSeconds(1.0f);
         MotionPlusData wmpData = this.wiimote.MotionPlus;
         wmpData.SetZeroValues();
-        
-        stickObject.transform.SetPositionAndRotation(this.stickObject.transform.position, Quaternion.Euler(new Vector3(0f, -45f, 0f)));
-
-        //stickObject.transform.rotation = Quaternion.FromToRotation(stickObject.transform.rotation.eulerAngles, Vector3.up) * stickObject.transform.rotation;
-        //stickObject.transform.rotation = Quaternion.FromToRotation(stickObject.transform.forward, Vector3.forward) * stickObject.transform.rotation;
 
         this.wiimote.SendDataReportMode(InputDataType.REPORT_BUTTONS_ACCEL_IR12);
         this.wiimote.SetupIRCamera(IRDataType.EXTENDED);
-
-        StartCoroutine(ResetOffsetHeartbeat());
-        StartCoroutine(TrackStick());
     }
 
     // Update is called once per frame

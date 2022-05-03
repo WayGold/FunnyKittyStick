@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/jared_test2.unity
     guid: dd39ecc35dd620b40b9200dc7a2d5e77
   - enabled: 1
@@ -20,9 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Intro2.unity
     guid: 4da2ad82d3dd5c844a6f6c9f266b57b3
-  - enabled: 1
-    path: Assets/Scenes/mainGame.unity
-    guid: 2e9cbbab49f376748beab05fd0962595
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/End.unity
     guid: 29e30989449c9604d870380dea565dc8

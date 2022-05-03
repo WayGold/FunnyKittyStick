@@ -16,6 +16,7 @@ TagManager:
   - Stick
   - stickfish
   - CatUI
+  - Record
   layers:
   - Default
   - TransparentFX

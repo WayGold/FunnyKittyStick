@@ -16,6 +16,9 @@ TagManager:
   - Stick
   - stickfish
   - CatUI
+  - door
+  - catstick
+  - MousePosDetector
   layers:
   - Default
   - TransparentFX
@@ -23,7 +26,7 @@ TagManager:
   - Cat
   - Water
   - UI
-  - 
+  - MouseDetector
   - 
   - 
   - 

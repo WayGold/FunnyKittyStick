@@ -8,14 +8,6 @@ public class CameraFollow : MonoBehaviour
     // 需要跟随的目标对象
     public Transform target;
 
-    //private Vector3 target;
-
-    //public Transform cat;
-    //public Transform stick;
-
-    //public float minSize=6;
-    //public float coefficient;
-
     public Collider targetEffectiveCollider;
     
 
@@ -45,19 +37,9 @@ public class CameraFollow : MonoBehaviour
         offset = transform.position - target.transform.position;
     }
 
+    
     void LateUpdate()
     {
-        //target = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
-        //offset = transform.position - target.transform.position;
-
-        //// If outside the effective collider, don't follow the target
-        //if (!targetEffectiveCollider.bounds.Contains(target.position))
-        //{
-        //    return;
-        //}
-
-        //target = (cat.position + stick.position) / 2;
-
         oldPosition = transform.position;
         if (!freazeX)
         {
@@ -73,7 +55,6 @@ public class CameraFollow : MonoBehaviour
         {
             oldPosition.z = Mathf.SmoothDamp(transform.position.z, target.transform.position.z + offset.z, ref zVelocity, smoothTime);
         }
-        //Camera.main.orthographicSize = (Vector3.Distance(cat.position , stick.position) / 2 * coefficient > minSize) ? Vector3.Distance(cat.position , stick.position) / 2 * coefficient : minSize;
         transform.position = oldPosition;
     }
 

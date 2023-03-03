@@ -30,7 +30,7 @@ public class StickTrackerWiimote : MonoBehaviour
     private float maxYOffset = 20f;
     private float maxZOffset = 12f;
     private float shakeBuffer = 0.1f;
-    private float shakeOffset = 0.5f;
+    private float shakeOffset = 0.05f;
 
     //private float maxXOffset = 1f;
     //private float maxYOffset = 1f;
@@ -49,11 +49,21 @@ public class StickTrackerWiimote : MonoBehaviour
 
     // Start is called before the first frame update
 
-    private float moveSpeed = 1f;
+
+    [Header("Stick Movement De-noise")]
+    
+    [SerializeField] private float targetCounter;
+    [SerializeField] private float targetCounterUpperBound = 2f;
+
+    [SerializeField] private float moveSpeed = 5f;
+    private Vector3 targetPosition;
+    private Vector3 lastFramePosition;
+
 
     private void Awake()
     {
         Application.targetFrameRate = 60;
+        targetCounter = targetCounterUpperBound + 1; // Initialization
     }
 
     IEnumerator Start()
@@ -157,10 +167,12 @@ public class StickTrackerWiimote : MonoBehaviour
 
     private void SetXYZPosition()
     {
-        if ((this.offsetVector - this.prevOffsetVector).magnitude > this.shakeOffset)
-        {
-            this.prevOffsetVector = this.offsetVector;
-        }
+        //if ((this.offsetVector - this.prevOffsetVector).magnitude > this.shakeOffset)
+        //{
+        //    this.prevOffsetVector = this.offsetVector;
+        //}
+        
+
 
         float[] pointer = this.wiimote.Ir.GetPointingPosition();
 
@@ -272,38 +284,75 @@ public class StickTrackerWiimote : MonoBehaviour
 
     private IEnumerator TrackStick()
     {
+
+        
         while (!WiimoteManager.HasWiimote()) { yield return null; }       
 
         while (true)
-        {            
-            this.CenterToCamera();
+        {
             
 
-            this.stickHolder.transform.position += this.prevOffsetVector;
+
+            targetCounter += 1;
+
+            
+           
+            // load last time position
+
+            if(targetCounter > targetCounterUpperBound)
+            {
+                targetCounter = 0;
+
+                var tempPosition = this.stickHolder.transform.position;
+
+                this.CenterToCamera();
+                targetPosition = this.stickHolder.transform.position + this.offsetVector;
+                this.stickHolder.transform.position = tempPosition;
+
+                Debug.Log(string.Format("Target Position: {0}  - Offset {1}", targetPosition, offsetVector));
+            }
+
+            // Lerp in every frame
+
+            var positionBeforeLerp = this.stickHolder.transform.position;
+            
+
+            this.stickHolder.transform.position = Vector3.Lerp(
+                this.stickHolder.transform.position,
+                targetPosition,
+                moveSpeed * Time.deltaTime);
+
+            var positionAfterLerp = this.stickHolder.transform.position;
+
+            lastFramePosition = positionAfterLerp;
+            prevOffsetVector = positionAfterLerp - positionBeforeLerp;
+            
 
             if (wiimote.Button.b == false)
             {
                 this.SetXYZPosition();             
             }
-            
-            Vector3 targetPosition = this.stickHolder.transform.position + this.offsetVector;
 
-            if ((this.offsetVector - this.prevOffsetVector).magnitude <= this.shakeOffset)
-            {
-                this.offsetVector = this.prevOffsetVector;
-            }
+
             
-            if ((this.stickHolder.transform.position - targetPosition).magnitude > 0.01f)
-            {
-                this.stickHolder.transform.position =
-                    Vector3.Lerp(this.stickHolder.transform.position,
-                    targetPosition,
-                    this.moveSpeed * Time.deltaTime);
-            }
-            else
-            {
-                this.stickHolder.transform.position = targetPosition;
-            }
+            //Vector3 targetPosition = this.stickHolder.transform.position + this.offsetVector;
+
+            //if ((this.offsetVector - this.prevOffsetVector).magnitude <= this.shakeOffset)
+            //{
+            //    this.offsetVector = this.prevOffsetVector;
+            //}
+            
+            //if ((this.stickHolder.transform.position - targetPosition).magnitude > 0.01f)
+            //{
+            //    this.stickHolder.transform.position =
+            //        Vector3.Lerp(this.stickHolder.transform.position,
+            //        targetPosition,
+            //        this.moveSpeed * Time.deltaTime);
+            //}
+            //else
+            //{
+            //    this.stickHolder.transform.position = targetPosition;
+            //}
     
             //this.stickObject.transform.SetPositionAndRotation(this.stickHolder.transform.position, Quaternion.Euler(this.rotationEulers));
             //Debug.LogError("Rotation Eulers: " + this.rotationEulers);

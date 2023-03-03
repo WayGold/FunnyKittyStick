@@ -290,13 +290,9 @@ public class StickTrackerWiimote : MonoBehaviour
 
         while (true)
         {
-            
-
 
             targetCounter += 1;
 
-            
-           
             // load last time position
 
             if(targetCounter > targetCounterUpperBound)
@@ -309,24 +305,15 @@ public class StickTrackerWiimote : MonoBehaviour
                 targetPosition = this.stickHolder.transform.position + this.offsetVector;
                 this.stickHolder.transform.position = tempPosition;
 
-                Debug.Log(string.Format("Target Position: {0}  - Offset {1}", targetPosition, offsetVector));
+                // Debug.Log(string.Format("Target Position: {0}  - Offset {1}", targetPosition, offsetVector));
             }
 
             // Lerp in every frame
-
-            var positionBeforeLerp = this.stickHolder.transform.position;
-            
 
             this.stickHolder.transform.position = Vector3.Lerp(
                 this.stickHolder.transform.position,
                 targetPosition,
                 moveSpeed * Time.deltaTime);
-
-            var positionAfterLerp = this.stickHolder.transform.position;
-
-            lastFramePosition = positionAfterLerp;
-            prevOffsetVector = positionAfterLerp - positionBeforeLerp;
-            
 
             if (wiimote.Button.b == false)
             {
@@ -334,7 +321,6 @@ public class StickTrackerWiimote : MonoBehaviour
             }
 
 
-            
             //Vector3 targetPosition = this.stickHolder.transform.position + this.offsetVector;
 
             //if ((this.offsetVector - this.prevOffsetVector).magnitude <= this.shakeOffset)

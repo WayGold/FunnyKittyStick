@@ -212,7 +212,7 @@ public class agent : MonoBehaviour
                 agentRB.GetComponent<BoxCollider>().enabled = false;
                 grabFish = true;
                 _animator.SetBool("grabFish", true);
-                stickFish.GetComponent<Rigidbody>().mass = 10;
+                stickFish.GetComponent<Rigidbody>().mass = 50;
                 StartCoroutine(ReleaseGrabFish());
 
                 //Turn On Magnet
@@ -241,7 +241,7 @@ public class agent : MonoBehaviour
         //TurnOn Magnet
         stickFish.GetComponent<Fish>().TurnOffMagnet();
 
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(5);
 
         agentRB.velocity = Vector3.zero;
         _animator.SetBool("grabFish", false);

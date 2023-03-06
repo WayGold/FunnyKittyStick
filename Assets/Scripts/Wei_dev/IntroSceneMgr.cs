@@ -17,6 +17,14 @@ public class IntroSceneMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyUp(KeyCode.Space))
+        {
+            _switchToSelection();
+        }
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            _switchToMainGame();
+        }
         videoPlayer.loopPointReached += EndReached;
     }
 

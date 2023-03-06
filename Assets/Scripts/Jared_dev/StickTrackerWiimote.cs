@@ -51,6 +51,8 @@ public class StickTrackerWiimote : MonoBehaviour
 
     private float moveSpeed = 1f;
 
+    public MouseDebug mouseDebug;
+
     private void Awake()
     {
         Application.targetFrameRate = 60;
@@ -114,6 +116,9 @@ public class StickTrackerWiimote : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (mouseDebug.allowMouseDebug)
+            return;
+
         if (!WiimoteManager.HasWiimote() || this.wiimote.wmp_attached == false)
         {
             return;

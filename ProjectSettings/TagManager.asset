@@ -19,6 +19,7 @@ TagManager:
   - door
   - catstick
   - MousePosDetector
+  - FishUI
   layers:
   - Default
   - TransparentFX
@@ -27,7 +28,7 @@ TagManager:
   - Water
   - UI
   - MouseDetector
-  - 
+  - Wall
   - 
   - 
   - 

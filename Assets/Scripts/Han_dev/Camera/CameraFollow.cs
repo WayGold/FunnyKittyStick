@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
+    public GameObject LeftUp;
+    public GameObject LeftDown;
+    public GameObject RightUp;
+    public GameObject RightDown;
+
+    float borderMinX;
+    float borderMaxX;
+    float borderMinZ;
+    float borderMaxZ;
 
     // 需要跟随的目标对象
     public Transform target;
 
     public Collider targetEffectiveCollider;
-    
 
     // 需要锁定的坐标（可以实时生效）
     public bool freazeX, freazeY, freazeZ;
@@ -29,12 +37,14 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
-        //cat = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
-        //stick = GameObject.FindGameObjectWithTag("Stick").GetComponent<Transform>();
-        //target= (cat.position + stick.position) / 2;
         target = GameObject.FindGameObjectWithTag("Cat").GetComponent<Transform>();
         startPosition = transform.position;
         offset = transform.position - target.transform.position;
+
+        borderMaxX = Mathf.Max(LeftUp.transform.position.x, RightDown.transform.position.x);
+        borderMinX=Mathf.Min(LeftUp.transform.position.x, RightDown.transform.position.x);
+        borderMaxZ = Mathf.Max(RightUp.transform.position.z, LeftDown.transform.position.z);
+        borderMinZ=Mathf.Min(RightUp.transform.position.z, LeftDown.transform.position.z);
     }
 
     
@@ -55,6 +65,8 @@ public class CameraFollow : MonoBehaviour
         {
             oldPosition.z = Mathf.SmoothDamp(transform.position.z, target.transform.position.z + offset.z, ref zVelocity, smoothTime);
         }
+        oldPosition.x = Mathf.Clamp(oldPosition.x, borderMinX + offset.x, borderMaxX + offset.x);
+        oldPosition.z = Mathf.Clamp(oldPosition.z, borderMinZ + offset.z, borderMaxZ + offset.z);
         transform.position = oldPosition;
     }
 

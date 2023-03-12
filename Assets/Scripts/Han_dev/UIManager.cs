@@ -36,7 +36,12 @@ public class UIManager : MonoBehaviour
             }
         }
         if (!fishUIAnimator)
-            fishUIAnimator=GameObject.FindGameObjectWithTag("FishUI").GetComponent<Animator>();
+        {
+            if (GameObject.FindGameObjectWithTag("FishUI"))
+            {
+                fishUIAnimator = GameObject.FindGameObjectWithTag("FishUI").GetComponent<Animator>();
+            }
+        }
     }
     void PlayUIAnimation(Animator _animator, string boolName, float duration)
     {

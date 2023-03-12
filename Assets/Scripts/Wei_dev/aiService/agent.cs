@@ -238,10 +238,10 @@ public class agent : MonoBehaviour
     {
         stickFish.GetComponent<CapsuleCollider>().enabled = false;
 
+        yield return new WaitForSeconds(5);
+
         //TurnOn Magnet
         stickFish.GetComponent<Fish>().TurnOffMagnet();
-
-        yield return new WaitForSeconds(5);
 
         agentRB.velocity = Vector3.zero;
         _animator.SetBool("grabFish", false);
@@ -619,24 +619,24 @@ public class agent : MonoBehaviour
         /* FAST TARGET - SIT DOWN UNDER FAR CASE */
         else
         {
-            Debug.Log("Too Fast!");
-            // Sit down - only headtrack + orientation
-            if (!isSit)
-            {
-                if(SitNum==0)
-                {
-                    GameObject.FindObjectOfType<HUDManager>().ColletItem();
-                    SitNum++;
-                }
-                _animator.SetTrigger("Sit");
-                isSit = true;
-                toSeek = false;
-            }
-            else
-            {
-                if(toSeek)
-                    toSeek = false;
-            }
+            //Debug.Log("Too Fast!");
+            //// Sit down - only headtrack + orientation
+            //if (!isSit)
+            //{
+            //    if(SitNum==0)
+            //    {
+            //        GameObject.FindObjectOfType<HUDManager>().ColletItem();
+            //        SitNum++;
+            //    }
+            //    _animator.SetTrigger("Sit");
+            //    isSit = true;
+            //    toSeek = false;
+            //}
+            //else
+            //{
+            //    if(toSeek)
+            //        toSeek = false;
+            //}
         }
     }
 

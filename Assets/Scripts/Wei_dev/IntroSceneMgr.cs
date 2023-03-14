@@ -17,9 +17,13 @@ public class IntroSceneMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            videoPlayer.playbackSpeed = 2.5f;
+        }
         if(Input.GetKeyUp(KeyCode.Space))
         {
-            _switchToSelection();
+            videoPlayer.playbackSpeed = 1.5f;
         }
         if (Input.GetKeyUp(KeyCode.P))
         {

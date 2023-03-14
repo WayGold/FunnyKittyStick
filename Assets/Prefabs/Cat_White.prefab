@@ -617,7 +617,6 @@ GameObject:
   - component: {fileID: 5347871109416823871}
   - component: {fileID: 5347871109416823858}
   - component: {fileID: 5347871109416823869}
-  - component: {fileID: 5347871109416823860}
   - component: {fileID: 5347871109416823870}
   - component: {fileID: 5604505004201744635}
   - component: {fileID: 5604505004201744632}
@@ -1049,31 +1048,6 @@ MonoBehaviour:
   aim: {fileID: 5347871110608757754}
   rigBuilder: {fileID: 5347871109416823871}
   target: {fileID: 0}
-  cube: {fileID: 0}
---- !u!114 &5347871109416823860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5347871109416823865}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ec9156f67d118647b3db50dda0b110e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  transformFL: {fileID: 5347871109786351031}
-  transformFR: {fileID: 5347871110606404102}
-  transformBL: {fileID: 5347871110284380295}
-  transformBR: {fileID: 5347871109920921905}
-  targetTransformFL: {fileID: 5347871109510071264}
-  targetTransformFR: {fileID: 5347871110696895261}
-  targetTransformBL: {fileID: 5347871110894484457}
-  targetTransformBR: {fileID: 5347871110538780348}
-  rigFL: {fileID: 5347871110798050908}
-  rigFR: {fileID: 5347871110763664210}
-  rigBL: {fileID: 5347871109240971228}
-  rigBR: {fileID: 5347871110564545526}
 --- !u!114 &5347871109416823870
 MonoBehaviour:
   m_ObjectHideFlags: 0

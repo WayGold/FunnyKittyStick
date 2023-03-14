@@ -91,6 +91,15 @@ public class agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            stickFish.GetComponent<Fish>().TurnOnMagnet();
+        }
+        if(Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            stickFish.GetComponent<Fish>().TurnOffMagnet();
+        }
+
         if(grabFish)
         {
             agentRB.transform.eulerAngles = new Vector3(0, 95, 0);
@@ -112,7 +121,6 @@ public class agent : MonoBehaviour
             AttackListener();
             FastTargetListener();
         }
-        //ChargeJumpListener();
 
         // Disable movement while sitting animation is in progress
         NoSeekWhileSit();
@@ -153,7 +161,6 @@ public class agent : MonoBehaviour
 
         // No Rotation While Falling
         NoRotationWhileFalling(currentMovement);
-
         UpdateRigidBody(currentMovement);
     }
     void JumpGrabListener()
@@ -231,7 +238,6 @@ public class agent : MonoBehaviour
         agentRB.GetComponent<HeadTrackingDebug>().TrackTarget();
         targetRB = stickFish;
         Destroy(GameObject.Find("mouse"));
-
     }
     int GrabNum = 0;
     IEnumerator ReleaseGrabFish()

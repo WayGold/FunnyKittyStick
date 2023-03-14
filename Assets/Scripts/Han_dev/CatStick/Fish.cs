@@ -30,15 +30,6 @@ public class Fish : MonoBehaviour
         Debug.Log("PullFish");
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.tag=="Cat" && magnetController!=null)
-        {
-            print("hit the cat!");
-            magnetController.TurnOn();
-        }
-    }
-
     private void OnTriggerExit(Collider other)
     {
         if (other.tag == "Cat" && magnetController != null)

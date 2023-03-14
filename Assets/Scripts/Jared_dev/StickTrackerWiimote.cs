@@ -126,7 +126,7 @@ public class StickTrackerWiimote : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (mouseDebug.allowMouseDebug)
             return;

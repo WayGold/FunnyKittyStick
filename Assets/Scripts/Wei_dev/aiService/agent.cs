@@ -72,8 +72,6 @@ public class agent : MonoBehaviour
     private float timeElapsedSinceLastAttack;
     private float timeElapsedSinceLastJump;
 
-    private bool turnOnmagent=false;
-
     [SerializeField] private Vector3 lastVelocity;
 
     // Test Fix Cat Animation
@@ -94,13 +92,13 @@ public class agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKey(KeyCode.LeftShift))
+        if(Input.GetKeyUp(KeyCode.B))
         {
-            turnOnmagent = !turnOnmagent;
-            if(turnOnmagent)
-                stickFish.GetComponent<Fish>().TurnOnMagnet();
-            else
-                stickFish.GetComponent<Fish>().TurnOffMagnet();
+            stickFish.GetComponent<Fish>().TurnOnMagnet();
+        }
+        else if (Input.GetKeyUp(KeyCode.N))
+        {
+            stickFish.GetComponent<Fish>().TurnOffMagnet();
         }
 
         if(grabFish)
@@ -253,7 +251,7 @@ public class agent : MonoBehaviour
 
         yield return new WaitForSeconds(5);
 
-        //TurnOn Magnet
+        //TurnOff Magnet
         stickFish.GetComponent<Fish>().TurnOffMagnet();
 
         agentRB.velocity = Vector3.zero;

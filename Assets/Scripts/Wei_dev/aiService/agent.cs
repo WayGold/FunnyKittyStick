@@ -19,6 +19,7 @@ public class agent : MonoBehaviour
     public RuntimeAnimatorController jumpAnimator;
 
     public Rigidbody stickFish;
+    public GameObject catStick;
 
     [SerializeField] private Rigidbody jumpStartPoint;
     [SerializeField] private GameObject jumpTarget;
@@ -71,6 +72,8 @@ public class agent : MonoBehaviour
     private float timeElapsedSinceLastAttack;
     private float timeElapsedSinceLastJump;
 
+    private bool turnOnmagent=false;
+
     [SerializeField] private Vector3 lastVelocity;
 
     // Test Fix Cat Animation
@@ -91,13 +94,13 @@ public class agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.LeftShift))
+        if(Input.GetKey(KeyCode.LeftShift))
         {
-            stickFish.GetComponent<Fish>().TurnOnMagnet();
-        }
-        if(Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            stickFish.GetComponent<Fish>().TurnOffMagnet();
+            turnOnmagent = !turnOnmagent;
+            if(turnOnmagent)
+                stickFish.GetComponent<Fish>().TurnOnMagnet();
+            else
+                stickFish.GetComponent<Fish>().TurnOffMagnet();
         }
 
         if(grabFish)
@@ -219,11 +222,15 @@ public class agent : MonoBehaviour
                 agentRB.GetComponent<BoxCollider>().enabled = false;
                 grabFish = true;
                 _animator.SetBool("grabFish", true);
+               
                 stickFish.GetComponent<Rigidbody>().mass = 50;
-                StartCoroutine(ReleaseGrabFish());
+
+                catStick.GetComponent<StickTrackerWiimote>().disableInput = true;
+                catStick.GetComponent<MouseDebug>().disableInput = true;
 
                 //Turn On Magnet
                 stickFish.GetComponent<Fish>().TurnOnMagnet();
+                StartCoroutine(ReleaseGrabFish());
             }
         }
     }
@@ -255,6 +262,9 @@ public class agent : MonoBehaviour
         agentRB.GetComponent<BoxCollider>().enabled = true;
 
         stickFish.GetComponent<Rigidbody>().mass = 1;
+
+        catStick.GetComponent<StickTrackerWiimote>().disableInput = false;
+        catStick.GetComponent<MouseDebug>().disableInput = false;
 
         yield return new WaitForSeconds(3);
         canMove = true;

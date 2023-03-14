@@ -7,13 +7,12 @@ public class MouseDebug : MonoBehaviour
     public Transform stick;
     public Transform mouseDetector;
     public bool allowMouseDebug=false;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public bool disableInput = false;
+
     private void FixedUpdate()
     {
+        if (disableInput)
+            return;
         if(allowMouseDebug)
         {
             if (stick)

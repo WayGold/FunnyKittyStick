@@ -6,6 +6,8 @@ using WiimoteApi;
 
 public class StickTrackerWiimote : MonoBehaviour
 {
+    public bool disableInput=false;
+
     private Wiimote wiimote;
     public Vector3 wmpOffset = Vector3.zero;
 
@@ -67,7 +69,7 @@ public class StickTrackerWiimote : MonoBehaviour
         Application.targetFrameRate = 60;
         targetCounter = targetCounterUpperBound + 1; // Initialization
     }
-
+    
     IEnumerator Start()
     {
         this.originalStickPosition = stickHolder.transform.position;
@@ -127,6 +129,9 @@ public class StickTrackerWiimote : MonoBehaviour
     void Update()
     {
         if (mouseDebug.allowMouseDebug)
+            return;
+
+        if (disableInput)
             return;
 
         if (!WiimoteManager.HasWiimote() || this.wiimote.wmp_attached == false)

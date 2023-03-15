@@ -45,7 +45,7 @@ public class StickTrackerWiimote : MonoBehaviour
     private float dotDistance = 0.0f;
 
     public float rayDistance = 70f;
-    public float rayDistanceSelection = 15f;
+    public float rayDistanceSelection = 70f;
 
     private bool gyroMode = false;
 
